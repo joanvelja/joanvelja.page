@@ -6,14 +6,27 @@ import sharp from 'sharp';
 async function convertHeicToJpeg(filePath) {
     const outputPath = filePath.replace(/\.HEIC$/i, '.jpg');
     
-    // Only convert if HEIC file exists and JPG doesn't
-    if (!fs.existsSync(outputPath)) {
-        await sharp(filePath)
-            .jpeg({ quality: 90 })
-            .toFile(outputPath);
+    // Only attempt conversion in development
+    if (process.env.NODE_ENV === 'development') {
+        if (!fs.existsSync(outputPath)) {
+            try {
+                await sharp(filePath)
+                    .jpeg({ quality: 90 })
+                    .toFile(outputPath);
+            } catch (error) {
+                console.warn(`Warning: Could not convert HEIC file: ${filePath}`, error);
+                return null;
+            }
+        }
+        return outputPath;
     }
     
-    return outputPath;
+    // In production, check if a JPG version exists
+    if (fs.existsSync(outputPath)) {
+        return outputPath;
+    }
+    
+    return null;
 }
 
 // Parse title and date from filename
@@ -47,7 +60,7 @@ export async function getPhotos() {
     const photosDir = path.join(process.cwd(), 'public', 'images', 'photos');
     const files = fs.readdirSync(photosDir);
     
-    // Filter for image files including HEIC
+    // Filter for image files
     const imageFiles = files.filter(file => 
         /\.(jpg|jpeg|png|webp|HEIC)$/i.test(file)
     );
@@ -57,37 +70,49 @@ export async function getPhotos() {
         const filePath = path.join(photosDir, file);
         const stats = fs.statSync(filePath);
         
-        // Convert HEIC to JPEG if needed
+        // Handle HEIC files
         let processedPath = filePath;
         if (/\.HEIC$/i.test(file)) {
-            processedPath = await convertHeicToJpeg(filePath);
+            const jpegPath = await convertHeicToJpeg(filePath);
+            if (!jpegPath) {
+                // Skip this photo if we can't process it
+                return null;
+            }
+            processedPath = jpegPath;
         }
         
-        // Get image dimensions
-        const dimensions = await probe(fs.createReadStream(processedPath));
-        
-        // Parse title and date from filename
-        const { title, date } = parsePhotoInfo(file);
+        try {
+            // Get image dimensions
+            const dimensions = await probe(fs.createReadStream(processedPath));
+            
+            // Parse title and date from filename
+            const { title, date } = parsePhotoInfo(file);
 
-        // Use the JPEG path for HEIC images
-        const publicPath = processedPath
-            .replace(process.cwd(), '')
-            .replace('/public', '')
-            .replace(/\\/g, '/'); // Fix Windows paths
+            // Use the JPEG path for HEIC images
+            const publicPath = processedPath
+                .replace(process.cwd(), '')
+                .replace('/public', '')
+                .replace(/\\/g, '/');
 
-        return {
-            src: publicPath,
-            alt: title,
-            title: title,
-            date: date || stats.mtime, // Use parsed date or fallback to file date
-            aspectRatio: `${dimensions.width}/${dimensions.height}`,
-            dimensions: {
-                width: dimensions.width,
-                height: dimensions.height
-            }
-        };
+            return {
+                src: publicPath,
+                alt: title,
+                title: title,
+                date: date || stats.mtime,
+                aspectRatio: `${dimensions.width}/${dimensions.height}`,
+                dimensions: {
+                    width: dimensions.width,
+                    height: dimensions.height
+                }
+            };
+        } catch (error) {
+            console.warn(`Warning: Could not process image: ${file}`, error);
+            return null;
+        }
     }));
 
-    // Sort photos by date, newest first
-    return photos.sort((a, b) => b.date - a.date);
+    // Filter out null entries and sort by date
+    return photos
+        .filter(photo => photo !== null)
+        .sort((a, b) => b.date - a.date);
 } 
