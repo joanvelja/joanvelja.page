@@ -4,7 +4,7 @@ import probe from 'probe-image-size';
 import sharp from 'sharp';
 
 async function convertHeicToJpeg(filePath) {
-    const outputPath = filePath.replace(/\.heic$/i, '.jpg');
+    const outputPath = filePath.replace(/\.HEIC$/i, '.jpg');
     
     // Only convert if HEIC file exists and JPG doesn't
     if (!fs.existsSync(outputPath)) {
@@ -49,7 +49,7 @@ export async function getPhotos() {
     
     // Filter for image files including HEIC
     const imageFiles = files.filter(file => 
-        /\.(jpg|jpeg|png|webp|heic)$/i.test(file)
+        /\.(jpg|jpeg|png|webp|HEIC)$/i.test(file)
     );
 
     // Get image dimensions and create photo objects
@@ -59,7 +59,7 @@ export async function getPhotos() {
         
         // Convert HEIC to JPEG if needed
         let processedPath = filePath;
-        if (/\.heic$/i.test(file)) {
+        if (/\.HEIC$/i.test(file)) {
             processedPath = await convertHeicToJpeg(filePath);
         }
         
