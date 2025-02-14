@@ -20,10 +20,24 @@ export function PhotoGallery({ photos }) {
     // Determine if a photo should span the full width
     const shouldSpanFull = (photo) => {
         const [width, height] = photo.aspectRatio.split('/').map(Number);
-        const ratio = width / height;
-        const t = height;
-        // Span full width if the image is significantly landscape (wider than 16:9)
         return width > height;
+    };
+
+    // Determine if a photo should be centered (vertical photo in a row by itself)
+    const shouldCenter = (photo, index, photos) => {
+        if (shouldSpanFull(photo)) return false;
+        
+        // Get previous and next photos
+        const prevPhoto = photos[index - 1];
+        const nextPhoto = photos[index + 1];
+        
+        // Check if previous photo spans full width
+        const prevSpans = prevPhoto && shouldSpanFull(prevPhoto);
+        // Check if next photo spans full width
+        const nextSpans = nextPhoto && shouldSpanFull(nextPhoto);
+        
+        // Center if it's between two full-width photos or at edges with a full-width neighbor
+        return (prevSpans && (!nextPhoto || nextSpans)) || (!prevPhoto && nextSpans);
     };
 
     useEffect(() => {
@@ -85,6 +99,7 @@ export function PhotoGallery({ photos }) {
                     const [width, height] = photo.aspectRatio.split('/').map(Number);
                     const paddingTop = `${(height / width) * 100}%`;
                     const isFullSpan = shouldSpanFull(photo);
+                    const isCentered = shouldCenter(photo, index, photos);
 
                     return (
                         <motion.div
@@ -93,6 +108,8 @@ export function PhotoGallery({ photos }) {
                             onClick={() => openPhoto(index)}
                             className={`relative cursor-pointer group ${
                                 isFullSpan ? 'col-span-2 md:col-span-3' : ''
+                            } ${
+                                isCentered ? 'md:col-start-2' : ''
                             }`}
                             style={{ paddingTop }}
                             whileHover={{ 
