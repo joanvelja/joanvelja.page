@@ -1,0 +1,497 @@
+---
+title: 'On the importance of interpretable code - Einops'
+description: 'In the journey to interpretability, you must be able to read the building blocks.'
+image: '/images/blog/einops.jpg'
+date: '2024-03-14'
+tags: ['AI', 'Deep Learning', 'Code', 'Einops']
+---
+
+I had never been too fond of the idea of readability in code. I always thought that code should be as concise as possible, and that the more you write, the more you have to maintain. Probably, my view was influenced by the fact that all the code I had written was for personal projects, and I was the only one who had to maintain it. Even more importantly, I had never had the urge to share my code with others, go back to it after a long time, or work in a team.
+
+However, as it turns out, I was wrong.
+
+Since I embarked in this journey towards interpretability, I have come to realize that code should be readable, maintainable and interpretable. In the journey to interpretability, you must be able to read the building blocks. In this article, I will introduce you to `einops` and `einsum`, a Python libraries (or rather, *frameworks*) that allow you to write code in a more readable and interpretable manner.
+
+## Einops
+In the words of [Noam Shazeer](https://time.com/collection/time100-ai/6310599/noam-shazeer/), one of the authors of the [Transformer architecture](https://arxiv.org/abs/1706.03762), *Variable names should be concise and informative. For a tensor, nothing is more informative than how many dimensions it has, and what those dimensions represent*. This is the philosophy behind `einops`, a Python library that allows you to write code in a more readable and interpretable manner. `Einops` stands for Einstein-Inspired notation for operations. This notation is loosely inspired by Einstein summation, but expands/elaborates further on that [@rogozhnikovArogozhnikovEinops2024].
+As a cheeky historical aside, Einstein summation is named after the famed physicist, although he had no part in its development. Einstein had the merit of popularizing the notation, by expressing his theory of General Relativity in it. We owe the development of this notation (among all) to Tullio Levi-Civita and Gregorio Ricci-Curbastro, italian inventors of Tensor Calculus. Famously, when asked what he liked the most about Italy, Einstein quoted *«Spaghetti and Levi-Civita»*.
+
+## Why use einops notation?
+The reason behind this is to convey semantic information, namely being verbose in the expectation of what we believe an operation on a tensor/array should look like.
+```python 
+y = x.view(x.shape[0], -1)
+y = rearrange(x, 'b c h w -> b (c h w)')
+```
+
+While the above two lines are doing the same job in *some* context, the second one provides information about the input and the output. In other words, `einops`focuses on the interface: *what is the input and output*, not *how* the output is computed.
+
+The next operation looks similar:
+
+```python
+y = rearrange(x, 'time c h w -> time (c h w)')
+```
+
+but it gives the reader a hint: this is not an independent batch of images anymore (which was signalled by `b` before), but rather a sequence (video).
+Semantic information makes the code both easier to read and to maintain.
+
+##### `Einops` tutorial
+In `einops` notation we don't write
+
+```python
+y = x.transpose(0, 2, 3, 1)
+```
+
+we write, in a more comprehensible manner, 
+
+```python
+y = rearrange(x, 'b c h w -> b h w c')
+```
+
+`einops` supports widely used tensor packages (such as `numpy`, `pytorch` and many more), and extends them.
+##### Preparation
+
+```python
+import numpy as np
+import einops
+import matplotlib.pyplot as plt
+```
+
+###### Load a batch of images to play with
+```python
+imgs = np.load('/Users/joanvelja/Documents/Obsidian Vault/Mechanistic Interpretability - A primer/resources/test_images.npy',allow_pickle=False) # There are 6 images (batch_size=6) of shape 96x96 with 3 color channels packed in a tensor
+print(imgs.shape)
+```
+
+
+
+```python
+# Display the first image of the batch
+plt.imshow(imgs[0])
+plt.show()
+```
+
+```python
+# Display the second image of the batch
+plt.imshow(imgs[1])
+plt.show()
+```
+
+```python
+# We will use three ops:
+from einops import rearrange, reduce, repeat
+```
+
+```python
+# rearrange, as its name suggests, rearranges elements in a tensor.
+# below, we swap height and width. In other words, transposed first two axes (or dimensions)
+plt.imshow(rearrange(imgs[0], 'h w c -> w h c'))
+plt.show()
+```
+
+##### Composition of axes
+Transposition is very common and useful, but let's move to other capabilities provided by einops:
+
+```python
+# einops allows seamlessly composing batch and height to a new height dimension (vertical arrangement)
+# in our toy example, we can render all images by collapsing the 4d (batched) tensor to a 3d tensor!
+plt.imshow(rearrange(imgs, 'b h w c -> (b h) w c'))
+plt.show()
+```
+
+```python
+# or compose a new dimension of batch and width (horizontal arrangement)
+plt.imshow(rearrange(imgs, 'b h w c ->  h (b w) c'))
+plt.show()
+```
+
+```python
+# resulting dimensions are computed very simply:
+# length of newly composed axis is a product of components
+# (6, 96, 96, 3) -> (96, (6 * 96), 3)
+rearrange(imgs, 'b h w c ->  h (b w) c').shape
+```
+
+```python
+# We can also compose multiple axes.
+# For example, flattening the 4d array into 1d...
+rearrange(imgs, 'b h w c ->  (h b w c)').shape 
+```
+
+###### Decomposition of axis
+```python
+# Decomposition is the inverse process - represent an axis as a combination of two axes
+# several decompositions are possible, so b1=2 is to decompose 6 into b1=2 and b2=6/2=3
+# (6, 96, 96, 3) -> (2, 3, 96, 96, 3)
+rearrange(imgs, '(b1 b2) h w c ->  b1 b2 h w c', b1=2).shape 
+```
+
+```python
+# Decompositions can also be used in combination with compositions:
+plt.imshow(rearrange(imgs, '(b1 b2) h w c ->  (b1 h) (b2 w) c', b1=2))
+plt.show()
+```
+
+```python
+# For a slightly different rearrangement (vertical-wise):
+plt.imshow(rearrange(imgs, '(b1 b2) h w c ->  (b2 h) (b1 w) c', b1=2))
+plt.show()
+```
+
+###### Order of axes matters
+```python
+# Compare with example below:
+plt.imshow(rearrange(imgs, 'b h w c ->  h (b w) c'))
+plt.show()
+```
+
+```python
+# order of axes composition is different
+# rule is just as for digits in the number: leftmost digit is the most significant
+plt.imshow(rearrange(imgs, 'b h w c ->  h (w b) c'))
+plt.show()
+```
+
+###### Meet `einops.reduce`
+In einops-land, you dont need to guess what happened:
+```python
+x.mean(-1)
+```
+
+Beacuse you write what the operation does.
+
+```python
+reduce(x, 'b h w c -> b h w', 'mean')
+```
+
+If axis is not present in the input - you guessed it - axis was reduced.
+
+```python
+# average over batch dimension
+plt.imshow(reduce(imgs, 'b h w c ->  h w c', 'mean'))
+plt.show()
+```
+
+And the above is the equivalent of the pythonic
+
+```python
+plt.imshow(imgs.mean(axis=0))
+plt.show()
+```
+
+But it is much more readable.
+
+```python
+# multiple axes reduction
+# Besides mean, there are also min, max, sum and prod operations
+plt.imshow(reduce(imgs, 'b h w c -> h w', 'min'), cmap='grey')
+plt.show()
+```
+
+Pooling operations can be carried out through `einops.reduce` operations too:
+```python
+# this is mean-pooling with a 2x2 kernel (we do axis decomposition with h2,w2 and slide the window across the image)
+# image is split into 2x2 patches, each one is then averaged.
+plt.imshow(reduce(imgs, 'b (h h2) (w w2) c -> h (b w) c', 'mean', h2=2, w2=2))
+plt.show()
+```
+
+```python
+# max-pooling is similar, but clearly results are less smooth 
+plt.imshow(reduce(imgs, 'b (h h2) (w w2) c -> h (b w) c', 'max', h2=2, w2=2))
+plt.show()
+```
+###### Stack and Concatenate
+```python
+# rearrange can also take care of lists of arrays with the same shape
+x = list(imgs)
+print(type(x), 'with', len(x), 'tensors of shape', x[0].shape)
+# this is equal to stacking: "list axis" (i.e., its length) becomes first ('b' in this case) and we leave it there
+print(rearrange(x, 'b h w c -> b h w c').shape)
+```
+
+`rearrange` over a list has the same effect as `concatenate` or `stack`:
+
+```python
+# rearranging a python list to set the lenght ( = batch size) to be the last element has the same effect as numpy.stack
+x = list(imgs)
+print(np.array_equal(rearrange(x, 'b h w c -> h w c b'), np.stack(x, axis=3))) # yields True
+```
+
+```python
+# similarly, if we concatenate along axes
+x = list(imgs)
+print(np.array_equal(rearrange(x, 'b h w c -> h (b w) c'), np.concatenate(x, axis=1))) # yields True
+```
+
+###### Addition or removal of axes
+You can write 1 to create a new axis of length one (similarly to what `torch.unsqueeze` does). in the same way, you can remove such axis too.
+
+```python
+x = rearrange(imgs, 'b h w c -> b 1 h w 1 c') # identical behavior to numpy.expand_dims(1,3) or torch.unsqueeze(1,3)
+print(x.shape)
+```
+###### Repeating elements
+The last operation we will introduce is the `repeat` operation
+
+```python
+repeat(imgs[0], 'h w c -> h new_axis w c ', new_axis=5).shape
+```
+
+```python
+# repeating along an existing axis is possible too
+plt.imshow(repeat(imgs[0], 'h w c -> h (repeat w) c ', repeat=3))
+plt.show()
+```
+
+```python
+# repeating along multiple axes is possible too
+plt.imshow(repeat(imgs[0], 'h w c -> (r1 h) (r2 w) c ', r1=2, r2=2))
+plt.show()
+```
+
+As usual, the order of the axes to be concatenated matters:
+
+```python
+# This time around, if we swap the terms in the parentheses, we get as a result each pixel repeated 3 times
+plt.imshow(repeat(imgs[0], 'h w c -> h (w repeat) c ', repeat=3))
+plt.show()
+```
+
+In summary, 
+- `rearrange` doesn't change the number of elements and covers different numpy functions, like `transpose`, `reshape`, `stack`, and so on;
+- `reduce` combines same reordering syntax with reductions (`mean`, `min`, `max`, and many more);
+- `repeat` additionally covers repeating and tiling.
+
+#### `einops` and deep learning
+With `einops` converting tensors to numpy is very easy, since it performs the pull from GPU automatically, if necessary:
+
+```python
+from einops import asnumpy
+y3_np = asnumpy(y3)
+```
+###### Common building blocks of deep learning
+Let's check how some familiar ops can be re-written with `einops`.
+
+**Flattening** is one of the most common ops, at the boundary between convolutions and fully connected layers:
+```python
+from einops import rearrange
+y = rearrange(x, 'b c h w -> b (c h w)')
+```
+
+**Space-to-depth**, a data transformation technique that rearranges blocks of spatial data (height and width) into the depth (channel) dimension. This operation is useful for increasing the depth of the data while reducing its spatial resolution, without losing information. It's commonly applied in convolutional neural networks (CNNs), especially in models designed for computer vision tasks. Here's how it works in detail:
+- **Input**: Assume you have an input tensor of shape $[H,W,C],$ where $H$ is the height, $W$ is the width, and $C$ is the number of channels (depth) of the input image or feature map.
+- **Block Size** ($\boldsymbol{B}$): This is a parameter of the space-to-depth operation that specifies the size of the spatial block to be rearranged. Each block is of size $[B,B]$.
+- **Operation**: The operation takes each $[B,B]$ block of spatial data and rearranges it into the depth dimension. Thus, each block is flattened and stacked along the depth axis.
+- **Output**: The output tensor will have a shape $[H/B,W/B,C \times B^2]$, effectively reducing the spatial dimensions by a factor of $B$ while increasing the depth by a factor of $B^2$.
+
+```python
+from einops import rearrange
+y = rearrange(x, 'b c (h h1) (w w1) -> b (h1 w1 c) h w', h1=2, w1=2)
+```
+
+**depth-to-space** (notice that it's reverse of the previous)
+```python
+from einops import rearrange
+y = rearrange(x, 'b (h1 w1 c) h w -> b c (h h1) (w w1)', h1=2, w1=2)
+```
+
+**Simple global average pooling**
+```python
+from einops import reduce
+y = reduce(x, 'b c h w -> b c', reduction='mean')
+```
+
+**Max pooling** with 2x2 kernel
+```python
+from einops import reduce
+y = reduce(x, 'b c (h h1) (w w1) -> b c h w', reduction='max', h1=2, w1=2)
+```
+
+**Squeezing and unsqueezing**
+```python
+from einops import rearrange
+# models typically work only with batches, so to predict a single image...
+
+image = rearrange(x[0, :3], 'c h w -> h w c') # Usually CNNs require channel dimension to go last...
+
+# ... create a dummy 1-element axis ...
+y = rearrange(image, 'h w c -> () c h w') #... and in batches of 1!
+# ... imagine you predicted this with a convolutional network for classification, we'll just flatten axes ...
+
+predictions = rearrange(y, 'b c h w -> b (c h w)')
+
+# ... finally, decompose (remove) dummy axis
+predictions = rearrange(predictions, '() classes -> classes')
+```
+
+The `()` operation provides a dimension of length 1, which can be broadcasted. `1` can be used as well to introduce a new axis.
+
+**Per channel mean-normalization** *for each image*
+```python
+from einops import reduce
+y = x - reduce(x, 'b c h w -> b c 1 1', reduction='mean') #calculate mean value over width and height for each image of the batch
+```
+
+**Per channel mean-normalization** *for the whole batch*
+```python
+from einops import reduce
+y = x - reduce(x, 'b c h w -> 1 c 1 1', reduction='mean') #calculate mean value over width and height over all images in the batch
+```
+
+**Stacking** involves using a list of tensors
+```python
+from einops import rearrange
+list_of_tensors = list(x)
+tensors = rearrange(list_of_tensors, 'b c h w -> b h w c') 
+# New axis (tensor list len) appears first on LHS
+```
+
+**Concatenating** 
+```python
+from einops import rearrange
+tensors = rearrange(list_of_tensors, 'b c h w -> (b h) w c') 
+# Concatenating always involves 'condensating' all data of a batch into one along a dimension
+```
+
+#### `einsum` is all you need
+`einsum` notation, consequently, is an elegant way to express linear algebra operations such as dot products, outer products, transposes and so on. What `einsum` allows for is basically the use of a domain-specific language. This allows us to write more compact, elegant and efficient code, as well as shedding light on the operations happening under the hood in our models. What I believe is most important, is that `einsum` is *intuitive*, in the sense that it allows to track the flow of data through the network, and to understand the operations happening at each step. In some ways, `einsum` is a more *declarative* way of writing code, as opposed to the more *imperative* style of writing code that we are used to. What I mean by [imperative programming](https://en.wikipedia.org/wiki/Imperative_programming), is that we are telling the computer *how* to do something, whereas in [declarative programming](https://en.wikipedia.org/wiki/Declarative_programming) we are telling the computer *what* to do. In this sense, `einsum` is a more declarative way of writing code, as it allows us to express the operations that we want to perform in a more intuitive way. Thus, some may argue that `einsum` is *clearer*, *more explicit*, *self-documenting*, *declarative* in style and *less convoluted* than normal ops, which I tend to agree with.
+
+
+Furthermore, domain-specific languages like einsum can sometimes be compiled to high-performing code, and an einsum-like domain-specific language is in fact the basis for Tensor Comprehensions in PyTorch, which automatically generate GPU code and auto-tune that code for specific input sizes. 
+
+Let's say we want to multiply two matrices $A \in \mathbb{R}^{I \times K}$ and $B \in \mathbb{R}^{K \times J}$ followed by calculating the sum of each column, resulting in the final vector $\boldsymbol{c} \in \mathbb{R}^j$. Using Einstein summation notation, we can write this as
+$$
+c_j = \sum_i \sum_k A_{i,k} B_{k,j} = A_{i,k} B_{k,j}
+$$
+
+which specifies that all individual elements $c_i$ in $\boldsymbol{c}$ are calculated from multiplying values in the column vectors $A_{i:}$ and row vectors $B_{:j}$ and summing them up. Note that for Einstein notation (RHS of the last equality), the summation Sigmas can be dropped, as we implicitly sum over repeated indices ($k$ in this example) and indices not mentioned in the output specification ($i$ in this example). So far so good, but we can also express more basic operations with `einsum`. For instance, calculating the dot product of two vectors $\boldsymbol{a} , \boldsymbol{b} \in \mathbb{R}^I$ can be written as
+$$c = \sum_i a_i b_i = a_i b_i$$
+
+A classic problem in Deep Learning is mapping a higher-order tensor to a new dimension. For example, let us assume to have a tensor that contains $T$-long sequences of $K$-dimensional word vectors for $N$ training examples in a batch, and we wanted to project the word vectors to a different dimension $Q$. Let $T \in \mathbb{R}^{N \times T \times K}$ be an order-3 tensor where the first dimension corresponds to the `batch_size`, the second to the `sequence_length` and the last to `word_embeddings`. In addition, let $W \in \mathbb{R}^K \times Q$ be a projection matrix (i.e., a mapping). The desired computation can be expressed using `einsum`
+$$C_{ntq} = \sum_k T_{ntk} W_{kq} = T_{ntk} W_{kq}$$
+
+As a final example, say you are given an order-4 tensor $T \in \mathbb{R}^{N \times T \times K \times M}$ and you are supposed to project vectors in the 3rd dimension to Q using $W$ defined above. However, let's say I also ask you to sum over the 2nd dimension and transpose the first and last dimension in the result, yielding a tensor $C \in M \times Q \times N$. 
+$$C_{mqn} = \sum_t \sum_k T_{ntkm} W_{kq} = T_{ntkm} W_{kq} $$
+(note that the transposition is obtained by swapping the indices $n$ and $m$.)
+
+#### Applications of `einsum`
+*Caveat*: Always remember that `torch.einsum` (any `einsum` method really) requires the tensor to be **within a list**!
+###### Sum
+$$b = \sum_i \sum_j A_{i,j} = A_{i,j}$$
+```python
+a = torch.arange(6).reshape(2,3)
+torch.einsum('ij->', [a]) # mapping ij-> means going to a 0-dim tensor, i.e., a scalar-tensor
+```
+
+###### Column Sum
+$$b_j = \sum_i A_{i,j} = A_{i,j}$$
+```python
+a = torch.arange(6).reshape(2,3)
+torch.einsum('ij->j', [a]) # Column sum means looping over the rows (or preserving the column dimension j)
+```
+
+###### Row Sum
+$$b_i = \sum_j A_{i,j} = A_{i,j}$$
+```python
+a = torch.arange(6).reshape(2,3)
+torch.einsum('ij->i', [a]) # Column sum means looping over the columns (or preserving the row dimension i)
+```
+
+###### Matrix-vector multiplication
+$$c_i = \sum_k A_{i,k} b_k = A_{i,k} b_k$$
+```python
+a = torch.arange(6).reshape(2,3)
+b = torch.arange(3) # [0, 1, 2]
+torch.einsum('ik,k->i', [a, b])
+```
+
+###### Matrix-matrix multiplication
+$$C_{i,j} = \sum_k A_{i,k} B_{k,j} = A_{i,k} B_{k,j}$$
+```python
+a = torch.arange(6).reshape(2,3)
+b = torch.arange(15).reshape(3,5)
+torch.einsum('ik,kj->ij', [a, b])
+```
+
+###### Dot product - Vectors
+$$c = \sum_i a_{i} b_i = a_{i} b_i$$
+```python
+a = torch.arange(6)
+b = torch.arange(15)
+torch.einsum('i,i->', [a, b])
+```
+
+###### Dot product - Matrices
+$$ c = \sum_i \sum_j A_{i,j} B_{i,j} = A_{i,j} B_{i,j} $$
+```python
+a = torch.arange(6).reshape(2,3)
+b = torch.arange(15).reshape(3,5)
+torch.einsum('ij,ij->', [a, b])
+```
+
+###### Hadamard Product
+$$C_{i,j} = A_{i,j} B_{i,j}$$
+```python
+a = torch.arange(6).reshape(2,3)
+b = torch.arange(15).reshape(3,5)
+torch.einsum('ij,ij->ij', [a, b])
+```
+
+###### Outer Product
+$$C_{i,j} = a_{i} b_{j}$$
+```python
+a = torch.arange(6)
+b = torch.arange(15)
+torch.einsum('i,j->ij', [a, b])
+```
+
+###### Batch matrix multiplication
+$$C_{b,i,j} = \sum_k A_{b,i,k} B_{b_k,j}$$
+```python
+a = torch.randn(3,2,5)
+b = torch.randn(3,2,5)
+torch.einsum('bik,bkj->bij', [a, b])
+```
+
+###### Case study: attention
+Another real world example of for using `einsum` is the attention mechanism defined by Waswani et al. (2017):
+
+$$Attention(Q,K,V) = softmax\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+
+```python
+class MultiHeadAttention(nn.Module):
+	def __init__(self, 
+				n_head, d_model, d_k, d_v, dropout=0.1):
+		super().__init__()
+		self.n_head = n_head
+		self.w_qs = nn.Linear(d_model, n_head * d_k) 
+		# weight matrix for the queries, having shapes (d_model, n_head * d_k) due to stacking of the heads
+		self.w_ks = nn.Linear(d_model, n_head * d_k) 
+		self.w_vs = nn.Linear(d_model, n_head * d_v)
+
+		nn.init.normal_(self.w_qs.weight, mean=0, std=np.sqrt(2.0 / (d_model + d_k))
+		nn.init.normal_(self.w_ks.weight, mean=0, std=np.sqrt(2.0 / (d_model + d_k))
+		nn.init.normal_(self.w_vs.weight, mean=0, std=np.sqrt(2.0 / (d_model + d_v))
+
+		self.fc = nn.Linear(n_head * d_v, d_model)
+		nn.init.xavier_normal_(self.fc.weight)
+		self.dropout = nn.Dropout(dropout)
+		self.layer_norm = nn.LayerNorm(d_model)
+
+	def forward(self, q, k, v, mask=None):
+		residual = q
+		q = rearrange(self.w_qs(q), 'b l (head k) = head b l k', head=self.n_head) # here, we unstack for the number of heads!
+		k = rearrange(self.w_ks(k), 'b t (head k) = head b t k', head=self.n_head)
+		v = rearrange(self.w_vs(v), 'b t (head v) = head b t v', head=self.n_head)
+		attn = torch.einsum('hblk, hbtk -> hblt', [q, k]) / np.sqrt(q.shape[-1]) #scaled dot product attention
+
+		if mask is not None:
+			attn = attn.masked_fill(mask[None], -np.inf)
+
+		attn = torch.softmax(attn, dim=3)
+		output = torch.einsum('hblt, hbtv -> hblv', [attn, v]) # outer product
+		output = rearrange(output, 'head b l v -> b l (head v)') # concatenation
+		output = self.dropout(self.fc(output))
+		output = self.layer_norm(output + residual)
+		return output, attn
+```

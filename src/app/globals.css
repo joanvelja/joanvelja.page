@@ -1,0 +1,72 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply font-mono;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    @apply bg-neutral-900;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  body {
+    @apply bg-neutral-50;
+  }
+}
+
+/* Code block styles */
+pre {
+    @apply p-4 rounded-lg overflow-x-auto bg-neutral-900 dark:bg-neutral-800;
+}
+
+pre::-webkit-scrollbar {
+    width: 2px;
+    height: 8px;
+}
+
+pre::-webkit-scrollbar-track {
+    background: rgb(229 229 229);
+    border-radius: 9999px;
+}
+
+pre::-webkit-scrollbar-thumb {
+    background: rgb(163 163 163);
+    border-radius: 9999px;
+}
+
+.dark pre::-webkit-scrollbar-track {
+    background: rgb(38 38 38);
+}
+
+.dark pre::-webkit-scrollbar-thumb {
+    background: rgb(82 82 82);
+}
+
+pre > code {
+    @apply grid;
+    counter-reset: line;
+}
+
+pre > code > [data-line] {
+    @apply border-l-2 border-l-transparent px-4;
+    counter-increment: line;
+}
+
+pre > code > [data-line]::before {
+    @apply text-neutral-500 mr-4;
+    content: counter(line);
+}
+
+pre > code > [data-line][data-highlighted] {
+    @apply bg-neutral-800 dark:bg-neutral-700 border-l-blue-500;
+}
+
+/* Inline code styles */
+:not(pre) > code {
+    @apply bg-neutral-100 dark:bg-neutral-800 rounded px-1.5 py-0.5 text-sm font-mono;
+}
+
