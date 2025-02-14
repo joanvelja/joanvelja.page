@@ -62,7 +62,7 @@ export async function getPhotos() {
     
     // Filter for image files
     const imageFiles = files.filter(file => 
-        /\.(jpg|jpeg|png|webp|HEIC)$/i.test(file)
+        /\.(jpg|jpeg|png|webp)$/i.test(file)
     );
 
     // Get image dimensions and create photo objects
