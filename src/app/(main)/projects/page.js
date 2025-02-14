@@ -152,38 +152,47 @@ const WorkDetailPanel = ({ project, onClose }) => {
     );
 
     return (
-        <div className={`fixed top-0 right-0 h-screen w-[400px] bg-white dark:bg-neutral-900 shadow-2xl p-6 
-            transform transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] origin-right
+        <div className={`fixed top-0 right-0 h-screen w-[400px] bg-white dark:bg-neutral-900 shadow-2xl 
+            transform transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] origin-right overflow-hidden
             ${project ? 'translate-x-0 scale-x-100 opacity-100' : 'translate-x-[50%] scale-x-0 opacity-0'}`}
         >
             <button
                 onClick={onClose}
                 className="absolute top-4 right-4 p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 
-                    transition-colors duration-300"
+                    transition-colors duration-300 z-10"
             >
                 <X className="w-5 h-5 text-neutral-500" />
             </button>
             
-            <div className={`mt-8 space-y-6 transition-all duration-500 delay-100
-                ${project ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'}`}>
-                <h2 className="text-2xl font-medium text-neutral-900 dark:text-white">{project.name}</h2>
-                <p className="text-neutral-600 dark:text-neutral-400 capitalize">{project.type} - {project.location}</p>
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">{project.period}</p>
-                
-                {project.links?.map(renderRelatedLink)}
-                
-                <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-neutral-900 dark:text-white">About</h3>
-                    <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">{project.description}</p>
+            <div className="h-full flex flex-col">
+                {/* Fixed Header */}
+                <div className="p-6 pb-2 bg-white dark:bg-neutral-900">
+                    <h2 className="text-2xl font-medium text-neutral-900 dark:text-white mt-8">{project.name}</h2>
+                    <p className="text-neutral-600 dark:text-neutral-400 capitalize mt-4">{project.type} - {project.location}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">{project.period}</p>
+                </div>
+
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto p-6 pt-2
+                    [&::-webkit-scrollbar]:w-2 
+                    [&::-webkit-scrollbar-track]:bg-neutral-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-800
+                    [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-600
+                    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+                    {project.links?.map(renderRelatedLink)}
                     
-                    {project.relatedWorks?.length > 0 && (
-                        <>
-                            <h4 className="text-lg font-medium text-neutral-900 dark:text-white mt-6">Publications & Projects</h4>
-                            <div className="space-y-4">
-                                {project.relatedWorks.map(renderRelatedWork)}
-                            </div>
-                        </>
-                    )}
+                    <div className="space-y-4 mt-4">
+                        <h3 className="text-lg font-medium text-neutral-900 dark:text-white">About</h3>
+                        <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">{project.description}</p>
+                        
+                        {project.relatedWorks?.length > 0 && (
+                            <>
+                                <h4 className="text-lg font-medium text-neutral-900 dark:text-white mt-6">Publications & Projects</h4>
+                                <div className="space-y-4">
+                                    {project.relatedWorks.map(renderRelatedWork)}
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
