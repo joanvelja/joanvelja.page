@@ -62,12 +62,12 @@ export default function MainLayout({ children }) {
                 <div className="max-w-[1200px] w-full flex flex-col items-center px-5 md:px-8">
                     <div className="flex flex-row justify-between w-full md:p-3 p-1">
                         <div className="w-[130px]">
-                            <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">Joan's Website</p>
+                            <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 font-sans">Joan's Website</p>
                         </div>
-                        <h1 className="text-xl font-medium md:block hidden text-neutral-900 dark:text-white"> {title} </h1>
+                        <h1 className="text-xl font-medium md:block hidden text-neutral-900 dark:text-white font-serif"> {title} </h1>
                         <div className="w-[130px] flex flex-col items-end">
                             <div className="flex items-center gap-6">
-                                <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base">
+                                <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">
                                     {time}
                                 </p>
                                 <button

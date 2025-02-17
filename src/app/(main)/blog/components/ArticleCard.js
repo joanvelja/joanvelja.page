@@ -27,27 +27,27 @@ export function ArticleCard({ post }) {
                         <span
                             key={tag}
                             className="px-2 py-1 text-xs rounded-full bg-neutral-100 dark:bg-neutral-800 
-                                     text-neutral-600 dark:text-neutral-400"
+                                     text-neutral-600 dark:text-neutral-400 font-sans"
                         >
                             {tag}
                         </span>
                     ))}
                 </div>
                 
-                <h2 className="text-lg font-medium text-neutral-900 dark:text-white mb-1 line-clamp-2">
+                <h2 className="text-lg font-medium text-neutral-900 dark:text-white mb-1 line-clamp-2 font-serif">
                     {post.title}
                 </h2>
 
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 font-serif">
                     {post.description}
                 </p>
                 <br></br>
 
-                <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans">
                     {format(new Date(post.date), 'MMMM d, yyyy')}
                 </p>
                 {/* Add time to read  (very small text) bottom right corner of the card */}
-                <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans">
                     {post.readingTime} min read
                 </p>
                 

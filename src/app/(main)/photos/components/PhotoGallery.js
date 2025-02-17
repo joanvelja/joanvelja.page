@@ -132,10 +132,10 @@ export function PhotoGallery({ photos }) {
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
                                           transition-opacity duration-300 rounded-2xl flex flex-col 
                                           justify-end p-4">
-                                <p className="text-white font-medium text-sm">
+                                <p className="text-white font-medium text-sm font-serif">
                                     {photo.title}
                                 </p>
-                                <p className="text-white/80 text-xs">
+                                <p className="text-white/80 text-xs font-sans">
                                     {formatDate(photo.date)}
                                 </p>
                             </div>
@@ -196,10 +196,10 @@ export function PhotoGallery({ photos }) {
                                 className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t 
                                          from-black/60 to-transparent"
                             >
-                                <h2 className="text-white text-lg font-medium mb-1">
+                                <h2 className="text-white text-lg font-medium mb-1 font-serif">
                                     {photos[selectedPhoto].title}
                                 </h2>
-                                <div className="flex items-center gap-4 text-sm text-white/80">
+                                <div className="flex items-center gap-4 text-sm text-white/80 font-sans">
                                     <span>{formatDate(photos[selectedPhoto].date)}</span>
                                     <span>•</span>
                                     <span>{photos[selectedPhoto].dimensions.width} × {photos[selectedPhoto].dimensions.height}</span>

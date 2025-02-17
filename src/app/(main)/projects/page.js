@@ -18,7 +18,7 @@ const Tag = ({ type }) => {
     };
 
     return (
-        <span className={`px-2 py-0.5 rounded-md text-sm font-medium ${colors[type] || 'bg-gray-100 text-gray-800'}`}>
+        <span className={`px-2 py-0.5 rounded-md text-sm font-medium font-sans ${colors[type] || 'bg-gray-100 text-gray-800'}`}>
             {type}
         </span>
     );
@@ -32,10 +32,10 @@ const WorkListItem = ({ name, type, location, isSelected, onClick }) => (
             border-b border-neutral-100 dark:border-neutral-800 last:border-b-0
             ${isSelected ? 'bg-neutral-50 dark:bg-neutral-800' : 'hover:bg-neutral-50/50 dark:hover:bg-neutral-800/50'}`}
     >
-        <span className="text-neutral-900 dark:text-white font-medium">{name}</span>
+        <span className="text-neutral-900 dark:text-white font-medium font-serif">{name}</span>
         <div className="flex flex-col items-end gap-1">
             <Tag type={type} />
-            <span className="text-neutral-500 dark:text-neutral-400 text-xs">{location}</span>
+            <span className="text-neutral-500 dark:text-neutral-400 text-xs font-sans">{location}</span>
         </div>
     </div>
 );
@@ -94,11 +94,11 @@ const WorkDetailPanel = ({ project, onClose }) => {
 
     const renderRelatedWork = (work) => (
         <div key={work.title} className="border-l-2 border-neutral-200 dark:border-neutral-700 pl-4 py-2">
-            <p className="text-neutral-900 dark:text-white font-medium">{work.title}</p>
+            <p className="text-neutral-900 dark:text-white font-medium font-serif">{work.title}</p>
             
             {/* Supervisor first - if exists */}
             {work.supervisor && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-serif">
                     Supervised by{' '}
                     <a 
                         href={work.supervisor_link} 
@@ -113,14 +113,14 @@ const WorkDetailPanel = ({ project, onClose }) => {
             
             {/* Description with inline links */}
             {work.description && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-serif">
                     {renderTextWithLinks(work.description)}
                 </p>
             )}
             
             {/* Co-authors with superscript dagger */}
             {work.coauthors && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-serif">
                     Authors: {work.coauthors.split('*').join('<sup>†</sup>').split(', ').map((author, i, arr) => (
                         <span key={author} dangerouslySetInnerHTML={{
                             __html: author + (i === arr.length - 1 ? '' : ', ')
@@ -130,21 +130,21 @@ const WorkDetailPanel = ({ project, onClose }) => {
             )}
 
             {work.publication_venue && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-serif">
                     Publication Venue: {work.publication_venue}
                 </p>
             )}
             
             {/* Links */}
             {work.links && (
-                <div className="flex flex-col gap-1 mt-2">
+                <div className="flex flex-col gap-1 mt-2 font-sans">
                     {work.links.map(renderRelatedLink)}
                 </div>
             )}
             
             {/* Equal contribution footnote - only if there are co-authors with asterisks */}
             {work.coauthors?.includes('*') && (
-                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2 italic">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2 italic font-serif">
                     <sup>†</sup> Equal contribution
                 </p>
             )}
@@ -167,9 +167,9 @@ const WorkDetailPanel = ({ project, onClose }) => {
             <div className="h-full flex flex-col">
                 {/* Fixed Header */}
                 <div className="p-6 pb-2 bg-white dark:bg-neutral-900">
-                    <h2 className="text-2xl font-medium text-neutral-900 dark:text-white mt-8">{project.name}</h2>
-                    <p className="text-neutral-600 dark:text-neutral-400 capitalize mt-4">{project.type} - {project.location}</p>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">{project.period}</p>
+                    <h2 className="text-2xl font-medium text-neutral-900 dark:text-white mt-8 font-serif">{project.name}</h2>
+                    <p className="text-neutral-600 dark:text-neutral-400 capitalize mt-4 font-serif">{project.type} - {project.location}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 font-sans">{project.period}</p>
                 </div>
 
                 {/* Scrollable Content */}
@@ -178,15 +178,17 @@ const WorkDetailPanel = ({ project, onClose }) => {
                     [&::-webkit-scrollbar-track]:bg-neutral-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-800
                     [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-600
                     [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
-                    {project.links?.map(renderRelatedLink)}
+                    <div className="font-sans">
+                        {project.links?.map(renderRelatedLink)}
+                    </div>
                     
                     <div className="space-y-4 mt-4">
-                        <h3 className="text-lg font-medium text-neutral-900 dark:text-white">About</h3>
-                        <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed">{project.description}</p>
+                        <h3 className="text-lg font-medium text-neutral-900 dark:text-white font-serif">About</h3>
+                        <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif">{project.description}</p>
                         
                         {project.relatedWorks?.length > 0 && (
                             <>
-                                <h4 className="text-lg font-medium text-neutral-900 dark:text-white mt-6">Publications & Projects</h4>
+                                <h4 className="text-lg font-medium text-neutral-900 dark:text-white mt-6 font-serif">Publications & Projects</h4>
                                 <div className="space-y-4">
                                     {project.relatedWorks.map(renderRelatedWork)}
                                 </div>
@@ -328,7 +330,7 @@ export default function ProjectsPage() {
                     [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
                     {/* Present Section */}
                     <div>
-                        <h3 className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2 px-4">Present</h3>
+                        <h3 className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2 px-4 font-sans">Present</h3>
                         <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 divide-y divide-neutral-100 dark:divide-neutral-800">
                             {projects.present.map((project) => (
                                 <WorkListItem
@@ -343,7 +345,7 @@ export default function ProjectsPage() {
 
                     {/* Past Section */}
                     <div>
-                        <h3 className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2 px-4">Past</h3>
+                        <h3 className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2 px-4 font-sans">Past</h3>
                         <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 divide-y divide-neutral-100 dark:divide-neutral-800">
                             {projects.past.map((project) => (
                                 <WorkListItem

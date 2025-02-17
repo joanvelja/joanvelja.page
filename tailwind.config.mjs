@@ -12,6 +12,21 @@ const config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        sans: ['var(--font-geist-sans)'],
+        mono: ['var(--font-geist-mono)'],
+        serif: ['var(--font-merriweather)'],
+      },
+      fontSize: {
+        'display-large': ['3.5rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
+        'display': ['2.5rem', { lineHeight: '1.3', letterSpacing: '-0.01em' }],
+        'h1': ['2rem', { lineHeight: '1.4', letterSpacing: '-0.01em' }],
+        'h2': ['1.5rem', { lineHeight: '1.4', letterSpacing: '-0.01em' }],
+        'h3': ['1.25rem', { lineHeight: '1.5', letterSpacing: '-0.01em' }],
+        'body-large': ['1.125rem', { lineHeight: '1.75' }],
+        'body': ['1rem', { lineHeight: '1.75' }],
+        'small': ['0.875rem', { lineHeight: '1.5' }],
+      },
       animation: {
         'fade-in': 'fade-in 0.5s ease-in-out',
         'slide-up': 'slideUp 0.5s ease-out forwards',

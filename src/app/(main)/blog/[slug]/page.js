@@ -9,15 +9,15 @@ import 'prismjs/themes/prism-tomorrow.css';
 // Custom components for MDX
 const components = {
     // Override default elements with custom styling
-    h1: (props) => <h1 {...props} className="text-3xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white" />,
-    h2: (props) => <h2 {...props} className="text-2xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white" />,
-    h3: (props) => <h3 {...props} className="text-xl font-bold mt-6 mb-3 text-neutral-900 dark:text-white" />,
-    p: (props) => <p {...props} className="mb-4 text-neutral-700 dark:text-neutral-300 leading-relaxed" />,
-    ul: (props) => <ul {...props} className="mb-4 list-disc list-inside space-y-2 text-neutral-700 dark:text-neutral-300" />,
-    ol: (props) => <ol {...props} className="mb-4 list-decimal list-inside space-y-2 text-neutral-700 dark:text-neutral-300" />,
-    li: (props) => <li {...props} className="text-neutral-700 dark:text-neutral-300" />,
+    h1: (props) => <h1 {...props} className="text-3xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white font-serif" />,
+    h2: (props) => <h2 {...props} className="text-2xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white font-serif" />,
+    h3: (props) => <h3 {...props} className="text-xl font-bold mt-6 mb-3 text-neutral-900 dark:text-white font-serif" />,
+    p: (props) => <p {...props} className="mb-4 text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif" />,
+    ul: (props) => <ul {...props} className="mb-4 list-disc list-inside space-y-2 text-neutral-700 dark:text-neutral-300 font-serif" />,
+    ol: (props) => <ol {...props} className="mb-4 list-decimal list-inside space-y-2 text-neutral-700 dark:text-neutral-300 font-serif" />,
+    li: (props) => <li {...props} className="text-neutral-700 dark:text-neutral-300 font-serif" />,
     blockquote: (props) => (
-        <blockquote {...props} className="border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 my-4 italic text-neutral-600 dark:text-neutral-400" />
+        <blockquote {...props} className="border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 my-4 italic text-neutral-600 dark:text-neutral-400 font-serif" />
     ),
     a: (props) => (
         <a {...props} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" />
@@ -60,10 +60,10 @@ export default async function BlogPost({ params }) {
             
             {/* Header */}
             <header className="mb-8">
-                <h1 className="text-4xl font-bold text-neutral-900 dark:text-white mb-4">
+                <h1 className="text-4xl font-bold text-neutral-900 dark:text-white mb-4 font-serif">
                     {post.title}
                 </h1>
-                <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400">
+                <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400 font-sans">
                     <time dateTime={post.date}>
                         {new Date(post.date).toLocaleDateString('en-US', {
                             year: 'numeric',
@@ -105,7 +105,7 @@ export default async function BlogPost({ params }) {
                             <span
                                 key={tag}
                                 className="px-3 py-1 rounded-full text-sm bg-neutral-100 dark:bg-neutral-800 
-                                         text-neutral-600 dark:text-neutral-400"
+                                         text-neutral-600 dark:text-neutral-400 font-sans"
                             >
                                 {tag}
                             </span>
