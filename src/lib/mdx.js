@@ -8,6 +8,59 @@ import rehypeKatex from 'rehype-katex';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import { compileMDX } from 'next-mdx-remote/rsc';
+import { Sidenote } from '@/components/Sidenote';
+import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
+
+function slugify(text) {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+}
+
+// MDX components
+const components = {
+    h1: ({ children, ...props }) => {
+        const id = slugify(children?.toString() || '');
+        return (
+            <HeadingWithAnchor
+                as="h1"
+                id={id}
+                className="text-3xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white font-serif"
+                {...props}
+            >
+                {children}
+            </HeadingWithAnchor>
+        );
+    },
+    h2: ({ children, ...props }) => {
+        const id = slugify(children?.toString() || '');
+        return (
+            <HeadingWithAnchor
+                as="h2"
+                id={id}
+                className="text-2xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white font-serif"
+                {...props}
+            >
+                {children}
+            </HeadingWithAnchor>
+        );
+    },
+    h3: ({ children, ...props }) => {
+        const id = slugify(children?.toString() || '');
+        return (
+            <HeadingWithAnchor
+                as="h3"
+                id={id}
+                className="text-xl font-bold mt-6 mb-3 text-neutral-900 dark:text-white font-serif"
+                {...props}
+            >
+                {children}
+            </HeadingWithAnchor>
+        );
+    },
+    Sidenote,
+};
 
 // Configuration for MDX processing
 const options = {
@@ -76,6 +129,7 @@ export async function getPostBySlug(slug) {
     // Compile MDX content
     const { content } = await compileMDX({
         source: fileContents,
+        components,
         options: {
             ...options,
             mdxOptions: {
@@ -86,19 +140,6 @@ export async function getPostBySlug(slug) {
                         keepBackground: true,
                         theme: 'one-dark-pro',
                         defaultLang: 'plaintext',
-                        // Add scrollbar styling to code blocks
-                        onVisitLine(node) {
-                            // Prevent lines from wrapping
-                            if (node.children.length === 0) {
-                                node.children = [{type: 'text', value: ' '}];
-                            }
-                        },
-                        onVisitHighlightedLine(node) {
-                            node.properties.className.push('highlighted');
-                        },
-                        onVisitHighlightedWord(node) {
-                            node.properties.className = ['word'];
-                        },
                     }],
                     rehypeSlug,   // Add IDs to headings
                 ],

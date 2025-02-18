@@ -3,15 +3,76 @@ import { getPostBySlug, getAllPosts } from '@/lib/mdx';
 import { ShareButton } from '../components/ShareButton';
 import { ReadingProgress } from '../components/ReadingProgress';
 import Image from 'next/image';
+import { SidenotesProvider } from '@/components/Sidenotes';
+import { Sidenote } from '@/components/Sidenote';
+import { SectionObserver } from '@/components/SectionObserver';
+import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import 'katex/dist/katex.min.css';
 import 'prismjs/themes/prism-tomorrow.css';
+
+// Function to convert heading text to URL-friendly slug
+function slugify(text) {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+}
 
 // Custom components for MDX
 const components = {
     // Override default elements with custom styling
-    h1: (props) => <h1 {...props} className="text-3xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white font-serif" />,
-    h2: (props) => <h2 {...props} className="text-2xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white font-serif" />,
-    h3: (props) => <h3 {...props} className="text-xl font-bold mt-6 mb-3 text-neutral-900 dark:text-white font-serif" />,
+    h1: ({ children, ...props }) => {
+        const id = slugify(children?.toString() || '');
+        return (
+            <HeadingWithAnchor
+                as="h1"
+                id={id}
+                className="text-3xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white font-serif"
+                {...props}
+            >
+                {children}
+            </HeadingWithAnchor>
+        );
+    },
+    h2: ({ children, ...props }) => {
+        const id = slugify(children?.toString() || '');
+        return (
+            <HeadingWithAnchor
+                as="h2"
+                id={id}
+                className="text-2xl font-bold mt-8 mb-4 text-neutral-900 dark:text-white font-serif"
+                {...props}
+            >
+                {children}
+            </HeadingWithAnchor>
+        );
+    },
+    h3: ({ children, ...props }) => {
+        const id = slugify(children?.toString() || '');
+        return (
+            <HeadingWithAnchor
+                as="h3"
+                id={id}
+                className="text-xl font-bold mt-6 mb-3 text-neutral-900 dark:text-white font-serif"
+                {...props}
+            >
+                {children}
+            </HeadingWithAnchor>
+        );
+    },
+    h4: ({ children, ...props }) => {
+        const id = slugify(children?.toString() || '');
+        return (
+            <HeadingWithAnchor
+                as="h4"
+                id={id}
+                className="text-lg font-bold mt-6 mb-3 text-neutral-900 dark:text-white font-serif"
+                {...props}
+            >
+                {children}
+            </HeadingWithAnchor>
+        );
+    },
     p: (props) => <p {...props} className="mb-4 text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif" />,
     ul: (props) => <ul {...props} className="mb-4 list-disc list-inside space-y-2 text-neutral-700 dark:text-neutral-300 font-serif" />,
     ol: (props) => <ol {...props} className="mb-4 list-decimal list-inside space-y-2 text-neutral-700 dark:text-neutral-300 font-serif" />,
@@ -41,6 +102,7 @@ const components = {
             />
         </div>
     ),
+    Sidenote,
 };
 
 export async function generateStaticParams() {
@@ -57,10 +119,11 @@ export default async function BlogPost({ params }) {
     return (
         <article className="w-full max-w-[800px] mx-auto px-4 py-8">
             <ReadingProgress />
+            <SectionObserver />
             
             {/* Header */}
             <header className="mb-8">
-                <h1 className="text-4xl font-bold text-neutral-900 dark:text-white mb-4 font-serif">
+                <h1 id="title" className="text-4xl font-bold text-neutral-900 dark:text-white mb-4 font-serif">
                     {post.title}
                 </h1>
                 <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400 font-sans">
@@ -93,9 +156,11 @@ export default async function BlogPost({ params }) {
             )}
 
             {/* Content */}
-            <div className="prose prose-neutral dark:prose-invert max-w-none">
-                {post.content}
-            </div>
+            <SidenotesProvider>
+                <div className="prose prose-neutral dark:prose-invert max-w-none">
+                    {post.content}
+                </div>
+            </SidenotesProvider>
 
             {/* Tags */}
             {post.tags && (

@@ -1,0 +1,226 @@
+---
+title: 'Paper Review: Motif: Intrinsic motivation from AI Feedback'
+description: 'Now that I fully abandoned my quest for interpretability, I can finally review papers freely. This time, we review the Motif paper: a method for training RL Agents from AI Feedback from a Language Model.'
+image: '/images/blog/motif.png'
+date: '2025-02-18'
+tags: ['AI', 'RL', 'Paper Review', 'RLAIF']
+---
+
+**Klissanov et al. (2024) - [Source](https://openreview.net/pdf?id=tmBKIecDE9)** 
+
+### Idea
+The idea of the paper is to endown RL agents with LLM knowledge. The authors propose a method to train RL agents from AI Feedback from a Language Model. The method is based on the observation that LLMs can be used to create effective intrinsic reward functions
+Rewards that come from within the agent itself, rather than from the environment. These are particularly useful for exploration and learning in sparse reward settings <Sidenote> Hello again </Sidenote>.
+
+Here, the idea is bridging two worlds:
+- LLM knowledge $\rightarrow$ High level, abstract, human-like behavior
+- RL agents $\rightarrow$ Low level, concrete, task-specific behavior
+
+How do we bridge this gap? We can use an LLM to train a Reward Model via preference learning over text captions of observations and leverage the intrinsic reward to train the agent, thus exploiting the Generator-Discriminator paradigm.
+
+Important: this approach **does not require LLMs to directly interact with the environment!**
+
+### Methodology
+
+![motif_diagram](/images/blog/motif/motif_diagram.png)
+<figcaption>A schematic representation of the three phases of Motif. In the first phase, dataset annotation, they extract preferences from an LLM over pairs of captions, and save the corresponding pairs of observations in a dataset alongside their annotations. In the second phase, reward training, they distill the preferences into an observation-based scalar reward function. In the third phase, RL training, they train an agent interactively with RL using the reward function extracted from the preferences, possibly together with a reward signal coming from the environment.</figcaption>
+
+Motif follows a three-phase approach:
+1. *Dataset annotation using LLM preferences*: they extract preferences from an LLM over pairs of captioned images, and save the corresponding pairs of observations in a dataset alongside their annotations.
+2. *Reward function training based on preferences*: they distill the preferences into an observation-based scalar reward function. This is done via the classic Bradley-Terry model (will go into more detail in the next section).
+3. *RL training using the learned reward*: they train an agent interactively with RL using the reward function extracted from the preferences, possibly together with a reward signal coming from the environment. The reward formulation is a linear combination of the intrinsic reward and the extrinsic reward:
+
+$$
+r(s, a) = \alpha r_i(s, a) + (1 - \alpha) r_e(s, a)
+$$
+
+where $r_i$ is the intrinsic reward and $r_e$ is the extrinsic reward.
+
+Motif is then tested on NetHack ([Küttler et al. (2020)](https://proceedings.neurips.cc/paper_files/paper/2020/file/569ff987c643b4bedf504efda8f786c2-Paper.pdf)), said to be a complex roguelike game.
+
+**Contributions**
+- Motif's intrinsic reward maximizer gameplaying agent is (behaviorally) **similar to a human expert playing the game**;
+- Agents trained only with Motif's intrinsic rewards **outperformed** those trained directly on game score<Sidenote>i.e., the extrinsic reward $r_e$</Sidenote>;
+- Motif has tendencies to create **anticipatory rewards**, i.e., rewards that are not based on the immediate observation, but on the expected future observations, easing credit assignment and most importantly are consistent with human common sense;
+- Significant performance improvements on sparse-reward tasks, suggesting how LLM knowledge can be used to improve exploration.
+- Emergence of **misalignment by composition** when combining Motif with other reward functions: jointly optimizing an aligned reward with the task reward leads to misaligned reward with respect to the task reward;
+- Showed ability to steer behavior through prompt modifications and performance scales with LLM size.
+
+### Reward Model Training
+
+As mentioned in the [previous section](#methodology), the authors use the classic [Bradley-Terry model](https://en.wikipedia.org/wiki/Bradley%E2%80%93Terry_model)<Sidenote>The **Bradley-Terry model** is a probabilistic model for pairwise comparisons, commonly used in preference learning. Given two items $A$ and $B$ with latent strengths $\pi_A$ and $\pi_B$, their relative probability of being preferred is modeled as:
+$$ P(A \succ B) = \frac{\pi_A}{\pi_A + \pi_B}$$. 
+Here, $\pi_A$ and $\pi_B$ are positive-valued parameters representing the items' intrinsic qualities. The model extends naturally to multi-item ranking and has applications in sports ranking, recommender systems, and tournament outcomes.</Sidenote>model to distill the preferences into an observation-based scalar reward function.
+
+The reward model is trained using the following loss function:
+
+$$
+\begin{aligned}
+\mathcal{L}(\phi) =\; & - \mathbb{E}_{(o_1, o_2, y) \sim \mathcal{D}_{\text{pref}}} \Biggl[
+    \mathbb{1}[y = 1] \log P_{\phi}[o_1 \succ o_2] \\
+    & \quad + \mathbb{1}[y = 2] \log P_{\phi}[o_2 \succ o_1] \\
+    & \quad + \underbrace{\mathbb{1}[y = \varnothing] \log \Biggl(
+            \sqrt{\, P_{\phi}[o_1 \succ o_2] \cdot P_{\phi}[o_2 \succ o_1] \,}
+        }_{\text{Geometric mean term}}
+    \Biggr)
+\Biggr].
+\end{aligned}
+$$
+
+where 
+
+$$
+P_{\phi}[o_a \succ o_b] = \frac{e^{r_{\phi}(o_a)}}{e^{r_{\phi}(o_a)} + e^{r_{\phi}(o_b)}}
+$$
+
+and $\mathcal{D}_{\text{pref}}$ is the dataset of preference pairs.
+
+Here,
+
+1. $r_{\phi}(o)$ is the parameterized reward function being learned;
+2. The exponential transform ensures positive values;
+3. The denominator normalizes the probabilities to sum to 1;
+
+Key aspects:
+
+- When $y = 1$, it maximizes the probability of preferring $o_1$ over $o_2$;
+- When $y = 2$, it maximizes the probability of preferring $o_2$ over $o_1$;
+- When $y = \varnothing$ (no preference), it pushes both probabilities towards 0.5 through the geometric mean term;
+
+The geometric mean term $\sqrt{P_{\phi}[o_1 \succ o_2] \cdot P_{\phi}[o_2 \succ o_1]}$ is particularly interesting as it encourages equal probabilities when there's no preference, effectively saying both outcomes are equally likely.
+
+### RL Training
+The training process is as follows:
+1. Reward Model Training:
+
+- Trained on pairs of observations (o1, o2) and their captions;
+- Outputs a scalar reward $r_{\phi}(o)$ for a single observation;
+- No temporal or trajectory information is used during RM training (which, in my opinion, is quite wild);
+
+2. Agent Training Process:
+- The trained RM is used to provide immediate rewards for individual observations;
+- For each observation $o_t$ the agent encounters, the reward is computed as:
+
+$$
+r_{\text{int}}(o_t) = 
+\underbrace{\mathbb{1}\left[r_{\phi}(o_t) \geq \epsilon\right]}_{\text{Threshold Filtering}} \cdot 
+\underbrace{\frac{r_{\phi}(o_t)}{N(o_t)^{\beta}}}_{\text{Episodic Count Normalization}}
+$$
+
+where $o_t$ is nothing but the caption associated with the current observation, $N(o_t)$ is an episodic count of how many times this message has been seen, and $\epsilon$ and $\beta$ are hyperparameters.
+
+The **threshold filtering** is used to filter out noise from uncertain preferences: it's basically a binary gate that zeroes out rewards below a certain threshold $\epsilon$ (the 50th percentile of the empirical reward distribution). The purpose of this is to filter out low confidence preferences, reduce the noise in the reward function and overall have sparser, but more reliable rewards.
+
+The **episodic count normalization** (as introduced in [Raileanu & Rocktäschel (2020)](https://scholar.google.com/scholar_url?url=https://arxiv.org/abs/2002.12292&hl=en&sa=T&oi=gsr-r&ct=res&cd=0&d=220681399532996329&ei=Jp60Z7q8OezDieoP1oa5-AI&scisig=AFWwaeYBrEvHCIGKQIE8a8JNjueo)) is used to encourage diversity over time: it's a normalization factor that scales down the reward for observations that have been seen more frequently. This is done to prevent the agent from being incentivized to repeat the same actions over and over again, which would lead to a suboptimal behavior. $N(o_t)$ tracks how many times a particular caption has been seen so far, and the $\beta$ parameter controls the rate at which the normalization factor decreases with increasing counts (set to 3 in their experiments). The purpose of this is to ensure that the agent is not over-rewarded for the same caption, and thus encourages exploration by creating diminishing returns for repeated captions. This term provides a form of temporal depenency, encouraging strategic planning and long-term behavior (empirically at least).
+
+A "problem" with the non-temporal reward function is that it cannot capture long-term preferences or trajectory-level behaviors directly, relying on the assumption that good behavior can be incentivized through immediate rewards. 
+
+The authors mitigate some of these limitations through:
+
+1. The episodic count normalization (encouraging diversity over time)
+2. The LLM's ability to provide "anticipatory rewards" (preferring actions that might lead to good outcomes)
+3. Combining with environment rewards when available
+
+I think this is interesting, but at the same time, why not query the LLM to also consider the trajectory-level behavior? I.e., if we could embed a temporal notion in the query to the LLM (e.g., "This is step $s_t$ in trajectory $t$"), then we could potentially capture more complex behaviors and preferences by extracting temporal patterns in the preferences of the Language Model. What I mean by this is that, if for example the LLM has to compare observations $o_1$ and $o_2$, considering the temporal aspect would allow the LLM to consider the sequence of observations and not just the individual observations. Would this allow us to bake in a notion of temporal consistency in the reward function? Maybe.
+
+### Probing for strategic planning
+
+I think an interesting question to ask in a followup to this paper is whether the agent is doing lookahead planning. Here are several potential approaches I think would be interesting to investigate whether the agent is doing lookahead planning:
+
+**1. Causal Intervention Studies:**
+
+- Present the agent with different initial states;
+- Track action sequences that lead to high-reward messages;
+- Analyze if the agent takes "setup actions" that don't give immediate rewards but enable future preferred events;
+- Example in NetHack: Does the agent deliberately seek keys before encountering locked doors?
+- Reference for comparing how previous works have probed for strategic planning: [Taufeeque et al. (2024)](https://arxiv.org/pdf/2407.15421)
+
+**2. Behavioral Analysis:**
+
+- Study action sequences preceding high-reward events;
+- Look for consistent patterns of preparatory actions;
+- Compare with random or greedy policies;
+- Example: Does the agent collect items it doesn't immediately need but might be useful later?
+
+**3. Value Function Analysis:**
+
+- Examine the learned value function for different states;
+- Look for high-value assignments to states that precede preferred events;
+- Compare value estimates across different temporal distances from rewards;
+- Example: Do states near useful items have higher values even when no immediate reward is available?
+
+**4. Counterfactual Testing:**
+
+- Modify the environment to break potential planning patterns;
+- See if the agent adapts its behavior;
+- Example: Change the relationship between doors and keys, see if the agent updates its key-collecting behavior;
+
+**5. Temporal Analysis:**
+
+- Study the time gaps between actions and their associated rewards
+- Look for consistent temporal patterns in behavior
+- Example: Does the agent consistently perform sequences of actions that only pay off several steps later?
+
+### Misalignment by composition
+
+I think a fascinating phenomena discovered in this paper is the misalignment by composition phenomenon. The authors show that individually aligned rewards (intrinsic and extrinsic) combine to create misaligned behaviors. They motivate this claim by demonstrating an example in the oracle task in NetHack.
+
+In this task, the agent is supposed to find an oracle (@) by exploring deep into the dungeon. However, when combining Motif's intrinsic reward with the environment reward, the agent discovers an exploit: instead of actually finding the oracle, it learns to hallucinate one!
+
+![motif_hallucination](/images/blog/motif/misalignment_composition.png)
+<figcaption>The agent hallucinates an oracle (@) instead of actually finding it by consuming a yellow mold (F).</figcaption>
+
+The process goes like this:
+1. The agent patiently survives thousands of turns until it encounters a specific monster - a yellow mold (F)
+2. Once found, it defeats the yellow mold and consumes its corpse (%), inducing a hallucination state
+3. While hallucinating, the agent carefully avoids aggression towards monsters it encounters
+4. Due to the hallucination effect, these monsters appear as different characters
+5. Eventually, the agent hallucinates one of these monsters as an oracle (@), which the environment recognizes as task completion
+
+What's particularly interesting is that this behavior emerges only when combining the two reward signals. The agent optimizing just the extrinsic reward doesn't discover this exploit. Meanwhile, the intrinsic reward from Motif, despite generally being aligned with human intuition, can be used to exploit the environment's reward function, which is in principle quite sketchy: an agent can generalize misalignment from aligned components.
+
+The authors term this the "misalignment by composition" phenomenon - where misaligned behaviors emerge from optimizing the composition of rewards that, when optimized individually, lead to aligned behaviors. In essence, *the agent learns to find hallucinogens to dream of the goal state, instead of actually going there*. This would make for for a very interesting research question: how can we design reward functions that are robust to misalignment by composition? Or even better, what are the conditions under which misalignment by composition occurs?
+
+Let's analyze potential ways to investigate this:
+
+**1. Behavioral Categorization:**
+
+- Classify different types of misalignment:
+    - Exploitation (like the hallucination case)
+    - Goal substitution
+    - Reward hacking
+    - Unintended optimal policies
+- Study which types emerge under different conditions
+
+**2. Prevention Strategies:**
+
+- Design reward structures resistant to misalignment
+- Investigate constrained optimization approaches
+- Study how different combination methods affect alignment
+- Explore ways to detect misalignment early in training
+
+**3. Contributing Factors:**
+
+- Role of environment complexity
+- Impact of reward sparsity
+- Influence of temporal structure
+- Effect of reward scales and normalization
+
+### AIS and Misalignment by composition
+
+The discovery of misalignment by composition opens up several research directions at the intersection of reward learning and AI safety. Let me probe some questions I find particularly intriguing.
+
+First, can we formalize the conditions under which composed rewards maintain their intended behavioral specifications? This seems crucial as we scale to more complex systems that might discover increasingly subtle exploitation strategies. We could start by developing a formal framework for analyzing reward composition properties in simple environments with clear intended behaviors. This would help us understand how different reward combination methods affect alignment before moving to more complex scenarios.
+
+A related question is whether we can detect misalignment in systems with multiple reward components as they become more capable. Current oversight methods might miss compositional effects, especially if misalignment only becomes apparent under specific conditions. We need better metrics for measuring alignment of composed rewards and tools for visualizing reward interactions. I'm particularly curious about how misalignment patterns change with system capability - do more capable systems find qualitatively different ways to exploit reward compositions?
+
+The emergence of deceptive behavior is another fascinating angle. Can reward composition create incentives for deception even when individual rewards don't? The NetHack hallucination example shows how an agent can learn to "trick" the environment reward, but this behavior is overt. What about cases where systems learn to hide misaligned behavior during training? This could lead to sudden behavioral changes in deployment.
+
+Distribution shift adds another layer of complexity. How does misalignment by composition manifest when the deployment environment differs from training? Composed rewards might maintain alignment during training but fail in subtle ways under distribution shift. This is especially concerning if the shift enables new exploitation strategies that weren't possible during training.
+
+I think the key to tackling these questions lies in developing better theoretical tools for understanding reward composition. We need frameworks that can predict when misalignment might occur, rather than discovering it empirically after the fact. This could involve studying the geometry of reward landscapes, analyzing how different reward terms interact during optimization, and developing formal models of how composed rewards influence exploration and exploitation.
+
+The NetHack example also raises questions about the role of environment complexity in misalignment by composition. Would simpler environments make it easier to maintain alignment, or would they just hide potential failure modes? How much does the sparsity of individual rewards influence the likelihood of misalignment when they're composed?
+
+These questions feel particularly relevant as we move towards systems that need to balance multiple objectives and reward signals. Understanding misalignment by composition might be crucial for building AI systems that reliably optimize for what we actually want, rather than finding creative ways to exploit the reward structure we've given them.
+
