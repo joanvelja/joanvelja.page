@@ -59,18 +59,20 @@ export default function AboutPage() {
                     </div>
                 </div>
 
+                {/* Greeting */}
+                <div className="space-y-2 animate-slide-up" style={{ animationDelay: '200ms' }}>
+                        <h1 className="text-2xl font-medium text-neutral-800 dark:text-neutral-200 text-center font-serif">
+                            Hi! I'm Joan.
+                        </h1>
+                        <br></br>
+                    </div>
+
                 {/* Scrollable Content Section */}
                 <div className="overflow-y-auto max-h-[500px] pr-4 space-y-6 text-neutral-800 dark:text-neutral-200 
                     [&::-webkit-scrollbar]:w-2 
                     [&::-webkit-scrollbar-track]:bg-neutral-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-800
                     [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-600
                     [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
-                    {/* Greeting */}
-                    <div className="space-y-2 animate-slide-up" style={{ animationDelay: '200ms' }}>
-                        <h1 className="text-2xl font-medium text-center font-serif">
-                            Hi! I'm Joan.
-                        </h1>
-                    </div>
 
                     {/* Main Text */}
                     <div className="space-y-4 animate-slide-up" style={{ animationDelay: '400ms' }}>
