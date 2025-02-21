@@ -1,0 +1,66 @@
+---
+title: 'A Chrome Extension for the Tab-Hoarding Academic'
+description: 'A Chrome extension that transforms your cryptic tab wasteland into a properly labeled research library.'
+image: '/images/blog/arxiv.png'
+date: '2025-02-21'
+tags: ['Utility', 'Chrome Extension', 'Academic', 'Research']
+---
+
+# A Chrome Extension for the Tab-Hoarding Academic
+
+If your browser tabs look like the bibliography section of a survey paper, you're probably a PhD student. After the nth time of playing "find that one methodology section in the sea of PDFs," I decided to solve this peculiarly academic problem. Enter the Academic Paper Tab Renamer: a Chrome extension that transforms your cryptic tab wasteland into a properly labeled research library.
+
+## The Before/After
+
+Current state of affairs:
+```
+PDF | PDF | PDF | arxiv.org/abs/2402.1... | openreview.net/pdf?id=...
+```
+
+What you actually want to see:
+```
+Attention Is All You Need | BERT: Pre-training of Deep Bidirectional Transformers | An Image is Worth 16x16 Words
+```
+
+The extension does exactly what it says on the tin - renames your tabs to show actual paper titles. Because let's face it, pattern matching arxiv IDs isn't the kind of pattern recognition we should be spending our PhD on.
+
+## Core Features
+
+1. **Title Extraction**: Automatically pulls paper titles from:
+   - arXiv
+   - OpenReview
+   - IEEE Xplore
+   - ACM Digital Library
+   - Semantic Scholar
+   - SpringerLink
+   - ScienceDirect
+
+2. **Research-Oriented Design**:
+   - Handles batch paper opening (for those "this looks relevant" sprees)
+   - Local caching (because you'll definitely revisit that paper you skimmed)
+   - Works with both repository pages and direct PDFs
+   - Clean interface that stays out of your way
+
+## Roadmap
+
+Future features (when not writing my thesis):
+- Support for more academic platforms
+- Quick-search across open papers
+- Keyboard shortcuts
+- Paper grouping by topic/conference
+- Citation export
+
+## Installation
+
+For the early adopters:
+1. Clone the [repository](https://github.com/joanvelja/arxiv_extension)
+2. `npm install && npm run build`
+3. Load in Chrome
+
+Chrome Web Store version coming after peer review (just kidding, soon).
+
+---
+
+Consider this my contribution to reducing the cognitive load of academic paper management. Star the repo if it saves you from tab-induced chaos, and feel free to contribute - pull requests are the best form of peer review.
+
+*P.S. Yes, it's open source (MIT licensed). No, it won't write your related work section for you. Yet.* 
