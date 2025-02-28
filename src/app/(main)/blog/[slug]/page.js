@@ -7,6 +7,9 @@ import { SidenotesProvider } from '@/components/Sidenotes';
 import { Sidenote } from '@/components/Sidenote';
 import { SectionObserver } from '@/components/SectionObserver';
 import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
+import { TableOfContents } from '@/components/TableOfContents';
+import { MarginNote } from '@/components/MarginNote';
+import { MarginNotesProvider } from '@/components/MarginNotes';
 import 'katex/dist/katex.min.css';
 import 'prismjs/themes/prism-tomorrow.css';
 
@@ -103,6 +106,7 @@ const components = {
         </div>
     ),
     Sidenote,
+    MarginNote,
 };
 
 export async function generateStaticParams() {
@@ -117,67 +121,70 @@ export default async function BlogPost({ params }) {
     const post = await getPostBySlug(slug);
 
     return (
-        <article className="w-full max-w-[800px] mx-auto px-4 py-8">
-            <ReadingProgress />
-            <SectionObserver />
-            
-            {/* Header */}
-            <header className="mb-8">
-                <h1 id="title" className="text-4xl font-bold text-neutral-900 dark:text-white mb-4 font-serif">
-                    {post.title}
-                </h1>
-                <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400 font-sans">
-                    <time dateTime={post.date}>
-                        {new Date(post.date).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                        })}
-                    </time>
-                    <div className="flex items-center gap-4">
-                        <span>{post.readingTime} min read</span>
-                        <ShareButton post={post} />
-                    </div>
-                </div>
-            </header>
-
-            {/* Cover Image */}
-            {post.image && (
-                <div className="relative aspect-[2/1] mb-8">
-                    <Image
-                        src={post.image}
-                        alt={post.title}
-                        fill
-                        className="object-cover rounded-xl"
-                        priority
-                        sizes="(max-width: 768px) 100vw, 800px"
-                    />
-                </div>
-            )}
-
-            {/* Content */}
+        <MarginNotesProvider>
             <SidenotesProvider>
-                <div className="prose prose-neutral dark:prose-invert max-w-none">
-                    {post.content}
-                </div>
-            </SidenotesProvider>
+                <article className="w-full max-w-[800px] mx-auto px-4 py-8">
+                    <ReadingProgress />
+                    <SectionObserver />
+                    <TableOfContents />
+                    
+                    {/* Header */}
+                    <header className="mb-8">
+                        <h1 id="title" className="text-4xl font-bold text-neutral-900 dark:text-white mb-4 font-serif">
+                            {post.title}
+                        </h1>
+                        <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400 font-sans">
+                            <time dateTime={post.date}>
+                                {new Date(post.date).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}
+                            </time>
+                            <div className="flex items-center gap-4">
+                                <span>{post.readingTime} min read</span>
+                                <ShareButton post={post} />
+                            </div>
+                        </div>
+                    </header>
 
-            {/* Tags */}
-            {post.tags && (
-                <div className="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-800">
-                    <div className="flex flex-wrap gap-2">
-                        {post.tags.map(tag => (
-                            <span
-                                key={tag}
-                                className="px-3 py-1 rounded-full text-sm bg-neutral-100 dark:bg-neutral-800 
-                                         text-neutral-600 dark:text-neutral-400 font-sans"
-                            >
-                                {tag}
-                            </span>
-                        ))}
+                    {/* Cover Image */}
+                    {post.image && (
+                        <div className="relative aspect-[2/1] mb-8">
+                            <Image
+                                src={post.image}
+                                alt={post.title}
+                                fill
+                                className="object-cover rounded-xl"
+                                priority
+                                sizes="(max-width: 768px) 100vw, 800px"
+                            />
+                        </div>
+                    )}
+
+                    {/* Content */}
+                    <div className="prose prose-neutral dark:prose-invert max-w-none">
+                        {post.content}
                     </div>
-                </div>
-            )}
-        </article>
+
+                    {/* Tags */}
+                    {post.tags && (
+                        <div className="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+                            <div className="flex flex-wrap gap-2">
+                                {post.tags.map(tag => (
+                                    <span
+                                        key={tag}
+                                        className="px-3 py-1 rounded-full text-sm bg-neutral-100 dark:bg-neutral-800 
+                                                 text-neutral-600 dark:text-neutral-400 font-sans"
+                                    >
+                                        {tag}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </article>
+            </SidenotesProvider>
+        </MarginNotesProvider>
     );
 } 
