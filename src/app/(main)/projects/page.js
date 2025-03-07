@@ -311,7 +311,7 @@ export default function ProjectsPage() {
                         links: [
                             {
                                 type: 'pdf',
-                                url: '/papers/BSc_Thesis.pdf',
+                                url: 'public/pdf/BSc_Thesis.pdf',
                                 text: 'See my BSc Thesis PDF'
                             }
                         ]
