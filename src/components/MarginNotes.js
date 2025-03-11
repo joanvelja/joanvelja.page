@@ -9,6 +9,7 @@ export function MarginNotesProvider({ children }) {
     const [visibleNotes, setVisibleNotes] = useState([]);
     const notePositions = useRef(new Map());
     const observerRef = useRef(null);
+    const contentRef = useRef(null);
 
     // Register a new note
     const registerNote = (note) => {
@@ -49,12 +50,22 @@ export function MarginNotesProvider({ children }) {
             { threshold: 0.1 }
         );
 
+        // Add hover effects for margin notes
+        const addHoverEffects = () => {
+            const noteElements = document.querySelectorAll('[data-margin-note-id]');
+            noteElements.forEach(element => {
+                // Add hover class to make notes subtly detectable
+                element.classList.add('hover:bg-blue-50', 'dark:hover:bg-blue-900/10', 'transition-colors', 'cursor-help');
+            });
+        };
+
         // Start observing any existing notes
         const updateObservedElements = () => {
             const noteElements = document.querySelectorAll('[data-margin-note-id]');
             noteElements.forEach(element => {
                 observerRef.current.observe(element);
             });
+            addHoverEffects();
         };
 
         // Initial observation
@@ -77,47 +88,53 @@ export function MarginNotesProvider({ children }) {
         mutationObserver.observe(document.body, { childList: true, subtree: true });
 
         return () => {
-            observerRef.current.disconnect();
-            mutationObserver.disconnect();
+            observerRef.current?.disconnect();
+            mutationObserver?.disconnect();
         };
     }, []);
 
     return (
         <MarginNotesContext.Provider value={{ notes, registerNote }}>
-            {children}
+            <div ref={contentRef} className="relative max-w-full">
+                {children}
             
-            {/* Margin notes container */}
-            {notes.length > 0 && (
-                <div className="fixed right-4 top-0 w-64 h-full pointer-events-none">
-                    <div className="relative w-full h-full">
-                        {notes.filter(note => visibleNotes.includes(note.id)).map(note => {
-                            // Calculate position based on the original element's position
-                            const position = notePositions.current.get(note.id) || 0;
-                            
-                            return (
-                                <div
-                                    key={note.id}
-                                    className="absolute right-0 w-64 bg-white dark:bg-neutral-800 border border-neutral-200 
-                                               dark:border-neutral-700 rounded-md p-3 shadow-md text-sm pointer-events-auto
-                                               text-neutral-700 dark:text-neutral-300 font-serif"
-                                    style={{
-                                        transform: `translateY(${position}px)`,
-                                        maxWidth: '16rem',
-                                        transition: 'transform 0.3s ease'
-                                    }}
-                                >
-                                    <div className="font-bold text-xs mb-1 text-neutral-500 dark:text-neutral-400">
-                                        {note.label}
+                {/* Margin notes container - positioned outside the content container */}
+                {notes.length > 0 && (
+                    <div className="absolute top-0 right-0 w-64 h-full hidden xl:block" 
+                         style={{ left: 'calc(50% + 400px)', marginLeft: '2rem' }}>
+                        <div className="relative w-full h-full">
+                            {notes.filter(note => visibleNotes.includes(note.id)).map(note => {
+                                // Calculate position based on the original element's position
+                                const position = notePositions.current.get(note.id) || 0;
+                                const contentTop = contentRef.current?.getBoundingClientRect().top || 0;
+                                const adjustedPosition = position - window.scrollY - contentTop;
+                                
+                                return (
+                                    <div
+                                        key={note.id}
+                                        className="absolute left-0 w-64 text-sm
+                                                border-l-2 border-neutral-200 dark:border-neutral-700 pl-4
+                                                text-neutral-600 dark:text-neutral-400 font-serif opacity-80 hover:opacity-100 transition-opacity"
+                                        style={{
+                                            top: `${adjustedPosition}px`,
+                                            maxWidth: '16rem'
+                                        }}
+                                    >
+                                        {note.label && note.label !== 'Note' && (
+                                            <div className="font-medium text-xs mb-1 text-neutral-500 dark:text-neutral-500">
+                                                {note.label}
+                                            </div>
+                                        )}
+                                        <div className="prose prose-sm prose-neutral dark:prose-invert">
+                                            {note.content}
+                                        </div>
                                     </div>
-                                    <div>
-                                        {note.content}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </MarginNotesContext.Provider>
     );
 } 

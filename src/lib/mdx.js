@@ -10,6 +10,7 @@ import rehypeSlug from 'rehype-slug';
 import { compileMDX } from 'next-mdx-remote/rsc';
 import { Sidenote } from '@/components/Sidenote';
 import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
+import { MarginNote } from '@/components/MarginNote';
 
 function slugify(text) {
     return text
@@ -59,7 +60,40 @@ const components = {
             </HeadingWithAnchor>
         );
     },
+    h4: ({ children, ...props }) => {
+        const id = slugify(children?.toString() || '');
+        return (
+            <HeadingWithAnchor
+                as="h4"
+                id={id}
+                className="text-lg font-bold mt-6 mb-3 text-neutral-900 dark:text-white font-serif"
+                {...props}
+            >
+                {children}
+            </HeadingWithAnchor>
+        );
+    },
+    p: (props) => <p {...props} className="mb-6 text-neutral-700 dark:text-neutral-300 leading-[1.8] tracking-[0.01em] text-[1.05rem] font-serif" />,
+    ul: (props) => <ul {...props} className="mb-6 list-disc ml-4 space-y-2 text-neutral-700 dark:text-neutral-300 leading-[1.8] text-[1.05rem] font-serif" />,
+    ol: (props) => <ol {...props} className="mb-6 list-decimal ml-4 space-y-2 text-neutral-700 dark:text-neutral-300 leading-[1.8] text-[1.05rem] font-serif" />,
+    li: (props) => <li {...props} className="text-neutral-700 dark:text-neutral-300 leading-[1.8] text-[1.05rem] font-serif" />,
+    blockquote: (props) => (
+        <blockquote {...props} className="border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 my-6 italic text-neutral-600 dark:text-neutral-400 leading-[1.8] text-[1.05rem] font-serif" />
+    ),
+    a: (props) => (
+        <a {...props} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" />
+    ),
+    code: (props) => {
+        if (typeof props.children === 'string') {
+            return <code {...props} className="bg-neutral-100 dark:bg-neutral-800 rounded px-1 py-0.5 text-sm font-mono" />;
+        }
+        return <code {...props} />;
+    },
+    pre: (props) => (
+        <pre {...props} className="bg-neutral-900 rounded-lg p-4 mb-4 overflow-x-auto" />
+    ),
     Sidenote,
+    MarginNote,
 };
 
 // Configuration for MDX processing
@@ -77,6 +111,11 @@ const options = {
                 keepBackground: true,
                 theme: 'one-dark-pro',
                 defaultLang: 'plaintext',
+                getHighlighter: (options) => {
+                    return import('shiki').then(({ getSingletonHighlighter }) =>
+                        getSingletonHighlighter(options)
+                    );
+                }
             }],
             rehypeSlug,   // Add IDs to headings
         ],
@@ -100,9 +139,33 @@ export async function getAllPosts() {
 
                 // Calculate reading time (rough estimate)
                 const wordsPerMinute = 200;
-                const wordCount = content.split(/\s+/g).length;
-                const readingTime = Math.ceil(wordCount / wordsPerMinute);
+                
+                // For protected posts, use a placeholder reading time or estimate from excerpt
+                let readingTime;
+                if (data.isProtected) {
+                    // Use either a fixed reading time or estimate from non-encrypted parts
+                    readingTime = data.estimatedReadingTime || 5; // Default to 5 minutes for protected posts
+                } else {
+                    const wordCount = content.split(/\s+/g).length;
+                    readingTime = Math.ceil(wordCount / wordsPerMinute);
+                }
 
+                // For protected posts, return only safe metadata
+                if (data.isProtected) {
+                    return {
+                        slug,
+                        title: data.title,
+                        date: data.date,
+                        excerpt: data.excerpt || 'This post is password protected.',
+                        tags: data.tags || [],
+                        image: data.image || null,
+                        readingTime,
+                        isProtected: true,
+                        // Don't include sensitive fields like passwordHash
+                    };
+                }
+
+                // For regular posts, return all metadata
                 return {
                     slug,
                     ...data,
@@ -119,38 +182,74 @@ export async function getAllPosts() {
 export async function getPostBySlug(slug) {
     const filePath = path.join(process.cwd(), 'content/blog', `${slug}.mdx`);
     const fileContents = fs.readFileSync(filePath, 'utf8');
-    const { data } = matter(fileContents);
+    const { data, content: rawContent } = matter(fileContents);
 
     // Calculate reading time (rough estimate)
     const wordsPerMinute = 200;
-    const wordCount = fileContents.split(/\s+/g).length;
-    const readingTime = Math.ceil(wordCount / wordsPerMinute);
+    
+    let readingTime;
+    let content;
+    
+    // Handle protected posts differently
+    if (data.isProtected) {
+        // For protected posts, don't compile MDX yet (it will be compiled after decryption)
+        // Return the encrypted content data
+        content = null; // Content will be decrypted client-side
+        readingTime = data.estimatedReadingTime || 5;
+        
+        // Return necessary data for protected post
+        return {
+            slug,
+            title: data.title,
+            date: data.date,
+            excerpt: data.excerpt || 'This post is password protected.',
+            tags: data.tags || [],
+            image: data.image || null,
+            readingTime,
+            isProtected: true,
+            // Include encryption metadata needed for decryption, but never the passwordHash directly
+            iv: data.iv,
+            authTag: data.authTag,
+            // Include encrypted content for client-side decryption
+            encryptedContent: data.encryptedContent,
+            // Never include the actual password or hash in the response
+        };
+    } else {
+        // For regular posts, process as normal
+        const wordCount = rawContent.split(/\s+/g).length;
+        readingTime = Math.ceil(wordCount / wordsPerMinute);
 
-    // Compile MDX content
-    const { content } = await compileMDX({
-        source: fileContents,
-        components,
-        options: {
-            ...options,
-            mdxOptions: {
-                ...options.mdxOptions,
-                rehypePlugins: [
-                    rehypeKatex,  // LaTeX rendering
-                    [rehypePrettyCode, {
-                        keepBackground: true,
-                        theme: 'one-dark-pro',
-                        defaultLang: 'plaintext',
-                    }],
-                    rehypeSlug,   // Add IDs to headings
-                ],
-            },
-        }
-    });
+        // Compile MDX content
+        const compiledContent = await compileMDX({
+            source: fileContents,
+            components,
+            options: {
+                ...options,
+                mdxOptions: {
+                    ...options.mdxOptions,
+                    rehypePlugins: [
+                        rehypeKatex,  // LaTeX rendering
+                        [rehypePrettyCode, {
+                            keepBackground: true,
+                            theme: 'one-dark-pro',
+                            defaultLang: 'plaintext',
+                            getHighlighter: (options) => {
+                                return import('shiki').then(({ getSingletonHighlighter }) =>
+                                    getSingletonHighlighter(options)
+                                );
+                            }
+                        }],
+                        rehypeSlug,   // Add IDs to headings
+                    ],
+                },
+            }
+        });
 
-    return {
-        slug,
-        content,
-        ...data,
-        readingTime,
-    };
+        return {
+            slug,
+            content: compiledContent.content,
+            ...data,
+            readingTime,
+        };
+    }
 } 

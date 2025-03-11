@@ -36,7 +36,7 @@ export function SidenotesProvider({ children }) {
         <SidenotesContext.Provider value={{ notes, addNote }}>
             {children}
             {notes.length > 0 && (
-                <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+                <div className="mt-16 pt-8 pb-8 mb-8 border-t border-neutral-200 dark:border-neutral-800">
                     <h2 className="text-2xl font-bold mb-4 text-neutral-900 dark:text-white font-serif">Notes</h2>
                     <div className="space-y-4">
                         {notes.map(({ number, content }) => (

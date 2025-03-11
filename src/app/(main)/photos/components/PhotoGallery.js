@@ -117,17 +117,23 @@ export function PhotoGallery({ photos }) {
                                 transition: { duration: 0.2, ease: "easeOut" }
                             }}
                         >
-                            <Image
-                                src={photo.src}
-                                alt={photo.alt}
-                                fill
-                                className="absolute inset-0 object-cover rounded-2xl transition-all duration-300
-                                         group-hover:shadow-lg"
-                                sizes={isFullSpan 
-                                    ? "(max-width: 768px) 100vw, 1200px"
-                                    : "(max-width: 768px) 50vw, 33vw"
-                                }
-                            />
+                            {photo.src ? (
+                                <Image
+                                    src={photo.src}
+                                    alt={photo.alt}
+                                    fill
+                                    className="absolute inset-0 object-cover rounded-2xl transition-all duration-300
+                                             group-hover:shadow-lg"
+                                    sizes={isFullSpan 
+                                        ? "(max-width: 768px) 100vw, 1200px"
+                                        : "(max-width: 768px) 50vw, 33vw"
+                                    }
+                                />
+                            ) : (
+                                <div className="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center rounded-2xl">
+                                    <span className="text-neutral-400 dark:text-neutral-600">No image</span>
+                                </div>
+                            )}
                             {/* Hover overlay with metadata */}
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
                                           transition-opacity duration-300 rounded-2xl flex flex-col 
@@ -178,14 +184,20 @@ export function PhotoGallery({ photos }) {
                             }}
                         >
                             <div className="relative w-full h-full rounded-3xl overflow-hidden">
-                                <Image
-                                    src={photos[selectedPhoto].src}
-                                    alt={photos[selectedPhoto].alt}
-                                    fill
-                                    className="object-contain rounded-3xl"
-                                    sizes="90vw"
-                                    priority
-                                />
+                                {photos[selectedPhoto].src ? (
+                                    <Image
+                                        src={photos[selectedPhoto].src}
+                                        alt={photos[selectedPhoto].alt}
+                                        fill
+                                        className="object-contain rounded-3xl"
+                                        sizes="90vw"
+                                        priority
+                                    />
+                                ) : (
+                                    <div className="w-full h-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center">
+                                        <span className="text-neutral-400 dark:text-neutral-600">No image available</span>
+                                    </div>
+                                )}
                             </div>
                             {/* Metadata overlay */}
                             <motion.div 

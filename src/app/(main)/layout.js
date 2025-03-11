@@ -86,6 +86,7 @@ export default function MainLayout({ children }) {
                     <div className="flex flex-col max-w-screen overflow-visible w-full py-2 items-center">
                         {children}
                     </div>
+                    <div className="w-full h-24 md:h-32"></div>
                 </div>
                 <div className="w-full flex flex-col items-center pointer-events-none">
                     <div className="fixed bottom-8 inset-y-0 flex flex-col justify-end">

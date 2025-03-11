@@ -18,6 +18,46 @@ body {
   }
 }
 
+/* Blog content styles */
+.blog-content {
+  @apply font-serif;
+}
+
+.blog-content p,
+.blog-content ul,
+.blog-content ol,
+.blog-content li,
+.blog-content blockquote {
+  @apply font-serif !important;
+  font-family: var(--font-merriweather) !important;
+  line-height: 1.8rem !important;
+  letter-spacing: 0.01em !important;
+  font-size: 1.05rem !important;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4 {
+  @apply font-serif !important;
+  font-family: var(--font-merriweather) !important;
+  letter-spacing: -0.01em !important;
+}
+
+/* Additional blog typography adjustments */
+.blog-content p {
+  margin-bottom: 1.5rem !important;
+}
+
+.blog-content blockquote p {
+  font-style: italic;
+}
+
+.blog-content ul, 
+.blog-content ol {
+  margin-left: 1rem;
+}
+
 /* Code block styles */
 pre {
     @apply p-4 rounded-lg overflow-x-auto bg-neutral-900 dark:bg-neutral-800;

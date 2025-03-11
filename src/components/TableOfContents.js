@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-
 export function TableOfContents() {
     const [headings, setHeadings] = useState([]);
     const [activeId, setActiveId] = useState('');
@@ -75,35 +74,45 @@ export function TableOfContents() {
     
     return (
         <div className={`
-            fixed left-0 top-1/2 transform -translate-y-1/2 z-40
+            fixed left-4 top-32 z-40
             transition-all duration-300 ease-in-out
-            ${isOpen ? 'translate-x-0' : '-translate-x-[calc(100%-30px)]'}
+            xl:block hidden
+            ${isOpen ? 'translate-x-0' : '-translate-x-[calc(100%-24px)]'}
         `}>
             <div className="flex">
-                <nav className="bg-white dark:bg-neutral-900 border-y border-r border-neutral-200 dark:border-neutral-800 p-1 shadow-md rounded-r-md max-h-[60vh] overflow-y-auto
-                              scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700
-                              scrollbar-track-transparent hover:scrollbar-thumb-neutral-400 dark:hover:scrollbar-thumb-neutral-600">
-                    <h2 className="text-sm font-bold mb-3 text-neutral-800 dark:text-neutral-200 uppercase">
-                        Table of Contents
-                    </h2>
-                    <ul className="space-y-2 min-w-[220px] max-w-[220px]">
+                <nav className="bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm
+                              border-y border-l border-neutral-200/50 dark:border-neutral-800/50
+                              p-4 rounded-l-md max-h-[70vh] overflow-y-auto w-64
+                              shadow-[0_4px_16px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_16px_rgba(0,0,0,0.1)]
+                              scrollbar-thin scrollbar-thumb-neutral-300/50 dark:scrollbar-thumb-neutral-700/50
+                              scrollbar-track-transparent">
+                    <div className="text-center mb-5">
+                        <div className="inline-block h-[1px] w-10 bg-neutral-300 dark:bg-neutral-700 mb-3"></div>
+                        <h2 className="text-sm font-medium text-neutral-800 dark:text-neutral-200 uppercase font-serif tracking-[0.2em]">
+                            Contents
+                        </h2>
+                        <div className="inline-block h-[1px] w-10 bg-neutral-300 dark:bg-neutral-700 mt-3"></div>
+                    </div>
+                    
+                    <ul className="space-y-2.5">
                         {headings.map(heading => (
                             <li 
                                 key={heading.id}
                                 style={{ 
                                     paddingLeft: `${(heading.level - 1) * 0.75}rem`,
                                 }} 
-                                className="text-sm"
+                                className="text-[0.95rem] font-serif"
                             >
                                 <a
                                     href={`#${heading.id}`}
                                     onClick={(e) => handleClick(e, heading.id)}
                                     className={`
-                                        block py-1 px-2 rounded transition-colors
-                                        hover:bg-neutral-100 dark:hover:bg-neutral-800
+                                        block py-1.5 px-2 rounded transition-colors
+                                        hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50
                                         ${activeId === heading.id ? 
-                                            'text-blue-600 dark:text-blue-400 font-medium' : 
-                                            'text-neutral-700 dark:text-neutral-300'}
+                                            'text-blue-600/90 dark:text-blue-400/90 font-medium' : 
+                                            'text-neutral-700/90 dark:text-neutral-300/90'}
+                                        leading-snug tracking-[0.01em]
                                     `}
                                 >
                                     {heading.text}
@@ -112,15 +121,63 @@ export function TableOfContents() {
                         ))}
                     </ul>
                 </nav>
+                
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex items-center justify-center h-10 w-6 self-center
-                              bg-white dark:bg-neutral-800 border-y border-r border-neutral-200 
-                              dark:border-neutral-800 rounded-r-md shadow-md"
+                    className="flex items-center justify-center h-10 w-6 self-start mt-2
+                              bg-white/80 dark:bg-neutral-900/80 backdrop-blur-sm
+                              border-y border-r border-neutral-200/50 dark:border-neutral-800/50
+                              rounded-r-md shadow-sm"
                     aria-label={isOpen ? "Collapse table of contents" : "Expand table of contents"}
                 >
-                    {isOpen ? <ChevronLeft className="text-neutral-800 dark:text-neutral-200" size={14} /> : <ChevronRight className="text-neutral-800 dark:text-neutral-200" size={14} />}
+                    {isOpen ? <ChevronLeft className="text-neutral-600 dark:text-neutral-400" size={14} /> : <ChevronRight className="text-neutral-600 dark:text-neutral-400" size={14} />}
                 </button>
+            </div>
+            
+            {/* Mobile/Inline TOC for smaller screens */}
+            <div className="xl:hidden block mt-6 mb-8 mx-auto max-w-[800px] px-4">
+                <details className="group">
+                    <summary className="flex items-center justify-between cursor-pointer list-none
+                                      py-2 px-4 bg-neutral-50/80 dark:bg-neutral-800/80 backdrop-blur-sm
+                                      border border-neutral-200/40 dark:border-neutral-700/40 rounded-md">
+                        <h2 className="text-sm font-medium text-neutral-800 dark:text-neutral-200 uppercase font-serif tracking-wider">
+                            Table of Contents
+                        </h2>
+                        <span className="transform group-open:rotate-180 transition-transform duration-200">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-neutral-500 dark:text-neutral-400">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </span>
+                    </summary>
+                    <div className="mt-2 py-3 px-4 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm
+                                 border border-neutral-200/40 dark:border-neutral-700/40 rounded-md">
+                        <ul className="space-y-2">
+                            {headings.map(heading => (
+                                <li 
+                                    key={heading.id}
+                                    style={{ 
+                                        paddingLeft: `${(heading.level - 1) * 0.75}rem`,
+                                    }} 
+                                    className="text-[0.95rem] font-serif"
+                                >
+                                    <a
+                                        href={`#${heading.id}`}
+                                        className={`
+                                            block py-1.5 px-1 rounded transition-colors
+                                            hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50
+                                            ${activeId === heading.id ? 
+                                                'text-blue-600/90 dark:text-blue-400/90 font-medium' : 
+                                                'text-neutral-700/90 dark:text-neutral-300/90'}
+                                            leading-snug tracking-[0.01em]
+                                        `}
+                                    >
+                                        {heading.text}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </details>
             </div>
         </div>
     );

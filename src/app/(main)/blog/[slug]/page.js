@@ -10,6 +10,8 @@ import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import { TableOfContents } from '@/components/TableOfContents';
 import { MarginNote } from '@/components/MarginNote';
 import { MarginNotesProvider } from '@/components/MarginNotes';
+import { ProtectedContent } from '../components/ProtectedContent';
+import { LockClosedIcon } from '@heroicons/react/24/outline';
 import 'katex/dist/katex.min.css';
 import 'prismjs/themes/prism-tomorrow.css';
 
@@ -76,12 +78,12 @@ const components = {
             </HeadingWithAnchor>
         );
     },
-    p: (props) => <p {...props} className="mb-4 text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif" />,
-    ul: (props) => <ul {...props} className="mb-4 list-disc list-inside space-y-2 text-neutral-700 dark:text-neutral-300 font-serif" />,
-    ol: (props) => <ol {...props} className="mb-4 list-decimal list-inside space-y-2 text-neutral-700 dark:text-neutral-300 font-serif" />,
-    li: (props) => <li {...props} className="text-neutral-700 dark:text-neutral-300 font-serif" />,
+    p: (props) => <p {...props} className="mb-6 text-neutral-700 dark:text-neutral-300 leading-[1.8] tracking-[0.01em] text-[1.05rem] font-serif" />,
+    ul: (props) => <ul {...props} className="mb-6 list-disc ml-4 space-y-2 text-neutral-700 dark:text-neutral-300 leading-[1.8] text-[1.05rem] font-serif" />,
+    ol: (props) => <ol {...props} className="mb-6 list-decimal ml-4 space-y-2 text-neutral-700 dark:text-neutral-300 leading-[1.8] text-[1.05rem] font-serif" />,
+    li: (props) => <li {...props} className="text-neutral-700 dark:text-neutral-300 leading-[1.8] text-[1.05rem] font-serif" />,
     blockquote: (props) => (
-        <blockquote {...props} className="border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 my-4 italic text-neutral-600 dark:text-neutral-400 font-serif" />
+        <blockquote {...props} className="border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 my-6 italic text-neutral-600 dark:text-neutral-400 leading-[1.8] text-[1.05rem] font-serif" />
     ),
     a: (props) => (
         <a {...props} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" />
@@ -95,16 +97,23 @@ const components = {
     pre: (props) => (
         <pre {...props} className="bg-neutral-900 rounded-lg p-4 mb-4 overflow-x-auto" />
     ),
-    img: (props) => (
-        <div className="relative aspect-[16/9] my-8">
-            <Image
-                {...props}
-                fill
-                className="object-cover rounded-lg"
-                sizes="(max-width: 768px) 100vw, 800px"
-            />
-        </div>
-    ),
+    img: (props) => {
+        // Don't render if src is missing, empty string, or an empty object
+        if (!props.src || props.src === '' || (typeof props.src === 'object' && Object.keys(props.src).length === 0)) {
+            return null;
+        }
+        
+        return (
+            <div className="relative aspect-[16/9] my-8">
+                <Image
+                    {...props}
+                    fill
+                    className="object-cover rounded-lg"
+                    sizes="(max-width: 768px) 100vw, 800px"
+                />
+            </div>
+        );
+    },
     Sidenote,
     MarginNote,
 };
@@ -142,7 +151,15 @@ export default async function BlogPost({ params }) {
                                 })}
                             </time>
                             <div className="flex items-center gap-4">
-                                <span>{post.readingTime} min read</span>
+                                {!post.isProtected && (
+                                    <span>{post.readingTime} min read</span>
+                                )}
+                                {post.isProtected && (
+                                    <span className="flex items-center text-amber-600 dark:text-amber-500">
+                                        <LockClosedIcon className="w-4 h-4 mr-1" />
+                                        Protected
+                                    </span>
+                                )}
                                 <ShareButton post={post} />
                             </div>
                         </div>
@@ -163,19 +180,23 @@ export default async function BlogPost({ params }) {
                     )}
 
                     {/* Content */}
-                    <div className="prose prose-neutral dark:prose-invert max-w-none">
-                        {post.content}
-                    </div>
+                    {post.isProtected ? (
+                        <ProtectedContent post={post} />
+                    ) : (
+                        <div className="prose prose-neutral dark:prose-invert max-w-none blog-content">
+                            {post.content}
+                        </div>
+                    )}
 
                     {/* Tags */}
-                    {post.tags && (
-                        <div className="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+                    {post.tags && post.tags.length > 0 && (
+                        <div className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+                            <h2 className="text-lg font-medium text-neutral-900 dark:text-white mb-3">Tags</h2>
                             <div className="flex flex-wrap gap-2">
                                 {post.tags.map(tag => (
-                                    <span
+                                    <span 
                                         key={tag}
-                                        className="px-3 py-1 rounded-full text-sm bg-neutral-100 dark:bg-neutral-800 
-                                                 text-neutral-600 dark:text-neutral-400 font-sans"
+                                        className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-full text-sm"
                                     >
                                         {tag}
                                     </span>

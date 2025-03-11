@@ -53,6 +53,19 @@ const config = {
           '100%': { transform: 'translateX(0)' },
         },
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            'p, ul, ol, li, blockquote': {
+              fontFamily: 'var(--font-merriweather)',
+              lineHeight: '1.75rem',
+            },
+            'h1, h2, h3, h4': {
+              fontFamily: 'var(--font-merriweather)',
+            },
+          },
+        },
+      },
     },
   },
   plugins: [

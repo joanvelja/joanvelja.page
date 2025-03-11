@@ -37,10 +37,8 @@ export function MarginNote({ children, label }) {
     if (!id) return null;
 
     return (
-        <span id={id} className="relative inline-block">
-            <mark className="bg-yellow-100 dark:bg-yellow-900/30 px-0.5 cursor-help">
-                {children}
-            </mark>
+        <span id={id} className="relative inline-block" data-margin-note-id={id}>
+            <span className="sr-only">{children}</span>
         </span>
     );
 } 
