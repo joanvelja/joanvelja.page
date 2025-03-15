@@ -1,4 +1,3 @@
-import { MDXRemote } from 'next-mdx-remote/rsc';
 import { getPostBySlug, getAllPosts } from '@/lib/mdx';
 import { ShareButton } from '../components/ShareButton';
 import { ReadingProgress } from '../components/ReadingProgress';
@@ -12,6 +11,8 @@ import { MarginNote } from '@/components/MarginNote';
 import { MarginNotesProvider } from '@/components/MarginNotes';
 import { ProtectedContent } from '../components/ProtectedContent';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
+import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
+import { ImageThemeAdjuster } from '@/components/ImageThemeAdjuster';
 import 'katex/dist/katex.min.css';
 import 'prismjs/themes/prism-tomorrow.css';
 
@@ -103,17 +104,26 @@ const components = {
             return null;
         }
         
+        // Use our dark mode image wrapper component for better dark mode support
         return (
-            <div className="relative aspect-[16/9] my-8">
-                <Image
-                    {...props}
-                    fill
-                    className="object-cover rounded-lg"
-                    sizes="(max-width: 768px) 100vw, 800px"
+            <div className="my-4">
+                <DarkModeImageWrapper
+                    src={props.src}
+                    alt={props.alt || "Image"}
+                    className="w-full"
+                    rounded="rounded-lg"
                 />
+                {props.alt && props.alt !== "Image" && (
+                    <p className="text-xs text-center text-neutral-500 dark:text-neutral-400 mt-1 italic font-serif">
+                        {props.alt}
+                    </p>
+                )}
             </div>
         );
     },
+    // Add our ImageThemeAdjuster component to be directly usable in MDX
+    ImageThemeAdjuster,
+    DarkModeImageWrapper,
     Sidenote,
     MarginNote,
 };
@@ -167,14 +177,13 @@ export default async function BlogPost({ params }) {
 
                     {/* Cover Image */}
                     {post.image && (
-                        <div className="relative aspect-[2/1] mb-8">
-                            <Image
+                        <div className="relative mb-8">
+                            <DarkModeImageWrapper
                                 src={post.image}
                                 alt={post.title}
-                                fill
-                                className="object-cover rounded-xl"
-                                priority
-                                sizes="(max-width: 768px) 100vw, 800px"
+                                className="w-full aspect-[2/1] object-cover"
+                                rounded="rounded-xl"
+                                isCoverImage={true}
                             />
                         </div>
                     )}

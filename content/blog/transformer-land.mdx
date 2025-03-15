@@ -39,7 +39,15 @@ Self-attention is an attention mechanism relating different positions of a singl
 #### Model Architecture
 Most competitive neural sequence models have an encoder-decoder structure (Bahdanau et al., 2016). Here, the encoder maps an input sequence of symbol representations $\left(x_1, \dots, x_n\right)$ to a sequence of continuous representations $\boldsymbol{z} =\left(z_1, \dots, x_n\right)$. Given $\boldsymbol{z}$, the decoder then generates an output sequence $\left(y_1, \dots, y_m\right)$ of symbols one element at a time. At each step, the mode is said to be **autoregressive** (Graves, 2014), "consuming" the previously generated symbols as additional input when generating the text. 
 
-![transformer](/static/blogs/transformer/attention_research_1.png)
+<ImageThemeAdjuster
+  src="/images/blog/transformer/attention_research_1.png"
+  alt="Transformer Architecture"
+  strategy="invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="Source: Attention is All You Need (2017)"
+/>
 
 ### Encoder and Decoder stacks
 #### Encoder

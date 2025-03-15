@@ -4,12 +4,14 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User, Mail, Briefcase, BookText, Image, Moon, Sun } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 export default function MainLayout({ children }) {
     const [time, setTime] = useState('');
-    const [theme, setTheme] = useState('');
     const [title, setTitle] = useState('');
     const pathname = usePathname();
+    const { theme, setTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         // Set title based on current path
@@ -21,14 +23,6 @@ export default function MainLayout({ children }) {
             '/photos': 'Photos'
         };
         setTitle(pathToTitle[pathname] || '');
-
-        // Initialize theme based on system preference
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-            setTheme('dark');
-            document.documentElement.classList.add('dark');
-        } else {
-            setTheme('light');
-        }
 
         // Update time every second
         const updateTime = () => {
@@ -42,19 +36,30 @@ export default function MainLayout({ children }) {
         };
         updateTime();
         const interval = setInterval(updateTime, 1000);
+        
+        // Mark as mounted
+        setMounted(true);
 
         return () => clearInterval(interval);
     }, [pathname]);
 
+    // Use next-themes toggle
     const toggleTheme = () => {
-        if (theme === 'light') {
-            setTheme('dark');
-            document.documentElement.classList.add('dark');
-        } else {
-            setTheme('light');
-            document.documentElement.classList.remove('dark');
-        }
+        setTheme(theme === 'dark' ? 'light' : 'dark');
     };
+
+    // Handle mounting (prevent hydration mismatch)
+    if (!mounted) {
+        return (
+            <div className="min-h-screen bg-white dark:bg-neutral-900 transition-colors duration-300">
+                <div className="flex min-h-screen flex-col items-center">
+                    <div className="max-w-[1200px] w-full flex flex-col items-center px-5 md:px-8">
+                        {/* Content will be shown after mounting */}
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-white dark:bg-neutral-900 transition-colors duration-300">

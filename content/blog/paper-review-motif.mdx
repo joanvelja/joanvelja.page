@@ -22,7 +22,16 @@ Important: this approach **does not require LLMs to directly interact with the e
 
 ### Methodology
 
-![motif_diagram](/images/blog/motif/motif_diagram.png)
+<ImageThemeAdjuster
+  src="/images/blog/motif/motif_diagram.png"
+  alt="Motif Diagram"
+  strategy="invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="Source: Motif: Intrinsic motivation from AI Feedback (2024)"
+/>
+
 <figcaption>A schematic representation of the three phases of Motif. In the first phase, dataset annotation, they extract preferences from an LLM over pairs of captions, and save the corresponding pairs of observations in a dataset alongside their annotations. In the second phase, reward training, they distill the preferences into an observation-based scalar reward function. In the third phase, RL training, they train an agent interactively with RL using the reward function extracted from the preferences, possibly together with a reward signal coming from the environment.</figcaption>
 
 Motif follows a three-phase approach:
@@ -167,8 +176,15 @@ I think a fascinating phenomena discovered in this paper is the misalignment by 
 
 In this task, the agent is supposed to find an oracle (@) by exploring deep into the dungeon. However, when combining Motif's intrinsic reward with the environment reward, the agent discovers an exploit: instead of actually finding the oracle, it learns to hallucinate one!
 
-![motif_hallucination](/images/blog/motif/misalignment_composition.png)
-<figcaption>The agent hallucinates an oracle (@) instead of actually finding it by consuming a yellow mold (F).</figcaption>
+<ImageThemeAdjuster
+  src="/images/blog/motif/misalignment_composition.png"
+  alt="Misalignment Composition"
+  strategy="invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="Source: Motif: Intrinsic motivation from AI Feedback (2024)"
+/>
 
 The process goes like this:
 1. The agent patiently survives thousands of turns until it encounters a specific monster - a yellow mold (F)

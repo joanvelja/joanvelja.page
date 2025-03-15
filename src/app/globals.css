@@ -2,8 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --transition-duration: 0.3s;
+}
+
+/* Global transition for theme change */
+*, *::before, *::after {
+  transition: background-color var(--transition-duration) ease,
+              border-color var(--transition-duration) ease,
+              color var(--transition-duration) ease,
+              fill var(--transition-duration) ease,
+              stroke var(--transition-duration) ease;
+}
+
 body {
   @apply font-mono;
+  transition: background-color var(--transition-duration) ease;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -56,6 +70,52 @@ body {
 .blog-content ul, 
 .blog-content ol {
   margin-left: 1rem;
+}
+
+/* Dark mode image treatments */
+.dark-mode-image {
+  /* Add soft mask to edges */
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 85%,
+    rgba(0, 0, 0, 0.9)
+  );
+  
+  /* Slightly reduce brightness and contrast */
+  filter: brightness(0.98) contrast(0.98) saturate(0.98);
+  
+  /* Add subtle shadow effect */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  
+  /* Smooth transition when switching between modes */
+  transition: filter var(--transition-duration) ease, 
+              box-shadow var(--transition-duration) ease, 
+              mask-image var(--transition-duration) ease,
+              background-color var(--transition-duration) ease,
+              border-color var(--transition-duration) ease;
+}
+
+/* Optional vignette effect for images - can be applied with a specific class */
+.img-vignette {
+  position: relative;
+}
+
+.img-vignette::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  border-radius: inherit;
+  transition: box-shadow var(--transition-duration) ease;
+}
+
+/* Disable transitions for pre/code blocks where it can cause visual issues */
+pre, code, pre *, code * {
+  transition: none !important;
 }
 
 /* Code block styles */

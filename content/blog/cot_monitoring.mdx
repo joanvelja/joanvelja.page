@@ -1,0 +1,36 @@
+---
+title: Paper Review - Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation
+description: Proof of concept of why tampering with the Chain-of-Thought may be dangerous
+image: /images/blog/monitoring.png
+date: '2025-03-12'
+tags:
+  - AGI
+  - AI
+  - Safety
+  - Scalable Oversight
+---
+
+<ImageThemeAdjuster
+  src="/images/blog/cot_monitoring/spikes.png"
+  alt="Spikes"
+  strategy="invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="Source: Monitoring Reasoning Models for Misbehavior and the Risks of Promoting Obfuscation (2025)"
+/>
+
+Note how the spikes grow organically in the first $$\texttt{exit(0)}$$ hack, whereas they "spike" much earlier in the second $$\texttt{raise SkipTest}$$, which can be weak evidence that although the manual patch addresses the specific instance, the hacky nature stays latent and figures an exploit much faster the second time around.
+
+**Possible research question #1**: rate at which hacks happen? Do hacks generalize? (I believe Sycophancy to Subterfuge shows somethink like this already). The solution would be that once we figure out an exploit, then we would have to restart training. --> That is very expensive, but we could study, in toy experiments, given the strengthening of a monitor, time-to-first exploit. Say for example, a naive monitor is broken in time-to-first exploit $$t$$. Say we improve monitor and retrain, how much does time-to-first exploit increase? does the exploit involve the same function? If yes, we'd expect it to be more subtle. How can we improve robustness of a monitor? PVG-style approaches are more and more compelling by the day as far as I am concerned. 
+
+
+**Possible research question #2**: How should we design a robust spec that enforces the model not to hack? **INCENTIVE ALIGNMENT**: Training the model itself to disentangle its own hacks (or proofs of concept of what a hack looks like) induces a signal to reason about hacks in the content of the spec. This means we would have a signal that is reinforced when possibility_to_hack --x--> enforcement of spec<MarginNote label="Spec Training">This bit requires a little more nuance: what kind of training should we do here? Rewarding good prevention of hacking via spec reflection? ORM on dataset of hacks --> $\mathcal{D}_{\text{hacks}}$ may be expensive to obtain. How can we get it by design? Just ask the model! Adversarial pressure anyone? --> encourage subtlety? PVG...</MarginNote>
+
+**Possible research question #3**: Weak model supervising large model... There have to be some properties that characterize the generation-verification gap. 
+
+**Possible research question #4**: Because zero-shot prompted monitors were able to detect so many reward hacks in coding environments, it is clear that the CoTs are not devoid of signal. However, it may be the case that there are many hacks that our CoT monitors do not detect and we are still unaware of. Anecdotally, our researchers have not found many reward hacks in programming environments that our monitor did not flag; however, we would like to do a more systematic study in the future.
+
+**Possible research question #5**: Moreover, there may be methods to productively use process-based supervision while retaining the monitoring benefits of unrestricted CoTs, e.g. by only applying process-supervision to part of the CoT. Understanding the cost-benefit trade-offs of using process-based supervision while retaining, or possibly even improving, the monitorability of CoTs remains an exciting and open area for future research.
+
+**Possible research question #6**: Implicit CoT optimization pressures. Directly pressuring CoTs with a monitor is a very blunt and strong optimization pressure. There are many more subtle and implicit pressures on the CoT that could also cause obfuscation. For instance, in our frontier runs, we have used samples flagged by our CoT monitor to prioritize investigating and patching bugs in our training environments. This constitutes a very small evolutionary optimization pressure on the CoT—we only patch bugs that our CoT monitor flags but not those that it does not flag,and insofar as the model naturally produces some fraction of CoT-obfuscated hacks, those hacks could be gradually reinforced.

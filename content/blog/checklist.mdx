@@ -1,0 +1,110 @@
+---
+title: What I make of Sam Bowman’s Checklist
+description: A reflection on Sam Bowman's checklist for AGI Safety.
+image: /images/blog/checklist.jpg
+date: '2025-03-12'
+tags:
+  - AGI
+  - AI
+  - Safety
+  - TAI
+---
+
+This piece was initially meant to be a doc of notes to digest Sam Bowman’s [blogpost](https://sleepinyourhat.github.io/checklist/) about his personal checklist of what *succeeding at AI Safety will involve*. 
+My perspective on this writeup may be biased, as I resonate with its content, although I try to be critical about some of the claims made and the positions held by the author.
+
+
+For those who have not read the writeup, the TLDR is that AI Alignment research will likely involve 3 temporal phases: dealing with current frontier systems, dealing with quasi *transformative AIs* (TAIs from here onwards), and TAI systems. These three stages are based on the assumption that TAIs –defined in the piece as *broadly human-level AIs*– is plausible and likely to come sooner than later (Bowman goes as far as saying this is likely to be developed within this decade). 
+
+I used to immediately reject timeline claims as baseless speculation. And while I sometimes still find myself frustrated at the pitfalls that frontier models are yet not able to address, I also think that taking a birds-eye-view approach towards the rate of improvement we have been experiencing in the past ~5-10 can be quite humbling. 
+To put things into context a bit more, I will make use of this amazing trend analysis made by Epoch AI. 
+
+<ImageThemeAdjuster
+  src="/images/blog/checklist/trends.png"
+  alt="Trends in AI"
+  strategy="invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="Source: Epoch AI (2024)"
+/>
+
+Whether you believe in exponentials or not, consider this: we are roughly halfway between the introduction of the Transformer and the end of the decade. To internalize the claim that TAIs will likely be developed within this decade, reflect on our current position in this timeline. As someone who was in high school in 2017, I may not be the best judge of whether this rate of improvement was *predictable*. However, if you were to place our current AI capabilities on a spectrum from pre-Transformer AI to TAIs, where would you place them? Considering this perspective, along with the efficiency and productivity enhancements provided by these tools – and I use that term deliberately – to which hand of the spectrum are we closest to? 
+
+<ImageThemeAdjuster
+  src="/images/blog/checklist/scalable.png"
+  alt="Scalable AI"
+  strategy="invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={false}
+/>
+
+In order to flesh out to these scenarios, Bowman outlines 3 chapters:
+* **Preparation**: current days, when most of the Alignment research will have to take place;
+* **Automation**: sometime in the (near?) future, when AI R&D Automation will take place
+* **Transformation**: the time when AI becomes broadly superhuman, and fundamentally altering our world and decision-making processes.
+
+I find the stages, regardless of the probabilities one places on them happening or the horizon over which they unfold, at least plausible.
+
+# Chapter 1: Preparation
+
+The first claim made in this section stresses the importance of not missing the boat on capabilities. In Sam’s words,
+
+> Our ability to do our safety work depends in large part on our access to frontier technology.
+
+While these statements have merit, they also highlight a troubling trend: the growing divide between large AI companies and other research entities. 
+
+This gap is manifesting in several ways:
+* **Compute requirements**: Academia and smaller organizations struggle to match the computational resources needed for frontier model research.
+* **Black-box access through API**: Access to frontier models through APIs is already prohibitively expensive –e.g., re: o1-preview can be >30X more expensive than GPT-4o, despite the per token price being ~6X higher.
+* **Timing of cost reductions**: There seems to be a pattern where, when API costs do decrease, it often coincides with efficiency gains that precede new capability developments, potentially widening the gap further.
+
+This situation creates a self-reinforcing cycle where frontier labs maintain their lead in both capabilities and safety research, while other institutions fall behind. The result is a concentration of critical AI alignment work within a small number of well-funded companies. Will this mean less and less people will be able to do alignment research going forward? This is likely not a desired outcome, although it is a plausible one. Moreover, is it possible to have this level of trust in these actors?  This disparity threatens to concentrate critical AI safety work within a handful of well-funded companies, potentially stifling diverse perspectives and approaches. 
+
+My gut feeling for this situation tells me that it will become increasingly crucial to address this imbalance and ensure that the broadest possible range of people can contribute to AI alignment efforts, possibly through new funding models, collaborative initiatives, and most importantly – I believe – policy interventions.
+
+Digging deeper into the technical claims made by Bowman, he believes that 
+
+> we’ll need to know how to [‘[get] a lot of useful work out of AIs’](https://www.alignmentforum.org/posts/kcKrE9mzEHrdqtDpE/the-case-for-ensuring-that-powerful-ais-are-controlled) without anything going off the rails, and in a way that takes advantage of AI capabilities that are at or somewhat beyond those of human domain experts.
+
+I find this claim quite compelling and reasonable. Current models are yet to be deployed in high stakes situations, especially without tight human supervision, so in theory this is the period in which AI Safety research can still in my opinion be explorative and most importantly fairly speculative. The latter point most importantly seems reasonable to prepare and red-team preparedness towards worst-case scenarios. This approach, often called "black swan" planning or "high-impact, low-probability" event preparation, is crucial in various domains – Disaster Preparedness, National Security, Public Health, but also Financial Institutions are among some of the many places where these kind of conversations are entertained – and shouldn’t be discounted a priori. In these fields, speculative thinking about potential future threats has indeed proven to be a successful strategy. 
+
+In this context, I am starting to see more and more the value of Control-style approaches, aimed at stress-testing the safeguards in place and the assumptions we currently deem reasonable to be for future models too. Further iterating on automation, I agree – to an extent – with the claim that non-frontier models can be quite valuable to bootstrap current safeguards. 
+
+My skepticism towards the Control Agenda though, is the assumption that capability trends will roughly be smoothly increasing. This is a strong assumption, in that even a small step change in the aforementioned can be disruptive. 
+For this purpose, I will draw from experiments we have conducted in our Steganography project. Setting up an oversight infrastructure can be quite cumbersome and finicky, as well as it being relatively easy to bypass or exploit when optimized against it. In what I would call a relatively constrained setup (i.e., small OSS models), we were able to see that oversight carried out with models of equal parameter count/capabilities was easily hackable and very much prompt sensitive. A posteriori, some of the strategies the colluding team would converge to were quite dumb and easily detectable by humans. Post-hoc evaluating and error correcting is fine now, but likely not a basket we should put all our eggs into. Ideally, we should optimize against a world where systems are deployed at massive scales, and allowed to be interactive with an environment or even other agents, thus making Control-style oversight overwhelmingly complex. 
+
+<ImageThemeAdjuster
+  src="/images/blog/checklist/swiss.png"
+  alt="Swiss Cheese Model"
+  strategy="invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={false}
+/>
+
+
+The biggest takeaway that I make of the empirical results we had is that clearly there is no silver bullet for this, and that the adoption of multiple layers of security is our best shot at having robust measures in place for future systems. This may come across as an obvious statement, but bearing in mind possible concentration of AIS research and mode collapse on a less diverse set of approaches to tackle the problem, I feel this is a legitimate concern to have.
+
+# Adequate and well calibrated RSPs for risks through Early TAI
+
+A strong claim is made after introducing these chapters which I will quote:
+
+> This structure bakes in the assumption that risk levels and capability levels track each other in a relatively predictable way. The first models to reach TAI pose ASL-4-level risks. The first substantially superhuman models pose ASL-5-level risks. The ASLs are defined in terms of the levels of protection that are warranted, so this is not guaranteed to be the case. I take the list of goals here more seriously than the division into chapters.
+
+This claim is strong in the sense that the assumption made on the predictability of the capabilities-risk is quite a big one.
+Moreover, several points are raised about the Responsible Scaling Policies (RSPs) and how Anthropic –but I would assume every frontier lab– should go about holding themselves accountable towards respecting these policies.
+
+> The RSP aims to make it consistently the case that our model training and deployment meets a high, clearly-specified bar for safety and that there is publicly accessible evidence that we have met this bar. Roughly speaking, we run tests (‘frontier risk evaluations’) meant to assess the level of risk that our systems could pose if deployed without safeguards and, if we aren’t able to fully and demonstrably mitigate that risk through our safeguards, we pause further deployments and/or further scaling.
+
+I think the RSPs are a very noble formalism in spirit, but may suffer from the aforementioned “hacking” or circumvention issues outlined for model alignment. First off, they rely heavily on self-reporting and internal evaluations. In an environment where multiple actors are involved, other actors (competitors, regulators, public) have no way to independently verify a given lab’s claims. Information asymmetry is very dangerous in nature in any game-theoretical scenario, even more in this case. 
+
+We had a warning shot in this context too; reporting from Wikipedia, as to attempt to be as objective as possible (hard challenge), this happened exactly on November 17, 2023. If this period of time rings a bell to you, it’s when OpenAI's board of directors “ousted co-founder and chief executive Sam Altman after the board had no confidence in his leadership. The removal was caused by concerns about his handling of artificial intelligence safety, and allegations of abusive behavior. Altman was reinstated on November 22 after pressure from employees and investors.”
+This leads me to the following point, namely First-Mover Disadvantage. By setting a high bar for safety and transparency, labs undoubtedly put themselves in a situation of competitive disadvantage. The equilibrium in this is quite weak, in that other AI companies might benefit from cautious stances from competitors without incurring the same costs, potentially outpacing them in development while learning from the publicly shared safety measures (Does optimizing against a static safety measure ring a bell already?). 
+Finally, the last point of contention I have with RSPs and their a priori definition is what I like to call Calibration Challenges. The difficulty in calibrating the commitments "in both detail and strictness" opens up room for subjective interpretation. In a scenario like the one we find ourselves in, this subjectivity could be exploited to justify actions that may not align with the spirit of the policy.
+While I still find the RSPs extremely well intentioned and necessary, I find them flawed if taken as are and I believe they potentially create a complex landscape of incentives and strategic considerations that could undermine the effectiveness. Drawing from well established practices in politics and economics, I believe a further layer of security needs to be set in place, via a system of external audits and multi-stakeholder governance to verify safety claims and decisions, reducing information asymmetry and the potential for manipulation. (and tbf, a great point made by Bowman about this too is the following: 
+
+> On that note, I think the most urgent safety-related issue that Anthropic can’t directly address is the need for one or, ideally, several widely respected third-party organizations that can play this adjudication role competently. These organizations collectively need to be so widely known and widely trusted (across any relevant ideological lines) that it’s viewed as highly suspicious if a frontier AI developer avoids working with any of them.
+
+This is all the amount of politics and governance I will go into, a) because I am not knowledgeable enough to push it further – I think I went overboard already– and b) because I feel advice from far more skilled and experienced people than me is much more valuable.

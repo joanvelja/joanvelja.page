@@ -1,0 +1,98 @@
+---
+title: Image Treatment in Dark Mode
+description: Testing different strategies for making light background images work well in dark mode
+image: /images/blog/checklist.jpg
+date: '2025-03-14'
+tags:
+  - Design
+  - UI
+  - Dark Mode
+---
+
+# Dark Mode Image Treatment Strategies
+
+When displaying images with light backgrounds on dark-themed websites, we need special approaches to avoid the jarring visual effect. Here are some different strategies for treating images in dark mode:
+
+## 1. Default Markdown Image
+
+This image uses the standard Markdown syntax and will automatically use our `DarkModeImageWrapper` component with subtle adjustments:
+
+![Swiss cheese model](/images/blog/checklist/swiss.png)
+
+## 2. Frame Strategy 
+
+The frame strategy adds a dark border around the image, creating visual separation without altering the image itself:
+
+<ImageThemeAdjuster
+  src="/images/blog/checklist/trends.png"
+  alt="Trend analysis chart"
+  strategy="frame"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="This chart uses the 'frame' strategy to preserve readability of data visualizations"
+/>
+
+## 3. Subtle Strategy
+
+The subtle strategy slightly reduces brightness and contrast:
+
+<ImageThemeAdjuster
+  src="/images/blog/checklist/scalable.png"
+  alt="Scalable diagram"
+  strategy="subtle"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="This image uses the 'subtle' strategy - notice the gentle reduction in brightness"
+/>
+
+## 4. Vignette Strategy
+
+The vignette strategy adds a soft shadow around the edges of the image:
+
+<ImageThemeAdjuster
+  src="/images/blog/checklist/swiss.png"
+  alt="Swiss cheese model with vignette"
+  strategy="vignette"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="The 'vignette' strategy adds a subtle shadow around the edges"
+/>
+
+## 5. Dim Strategy
+
+The dim strategy significantly reduces brightness for very bright images:
+
+<ImageThemeAdjuster
+  src="/images/blog/checklist/swiss.png"
+  alt="Swiss cheese model with dim effect"
+  strategy="dim"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="The 'dim' strategy is good for very bright images that need more darkening"
+/>
+
+## 6. Invert Strategy (Extreme Solution)
+
+The invert strategy inverts colors and applies a hue rotation. This is a more extreme solution but can work well for certain types of images like screenshots:
+
+<ImageThemeAdjuster
+  src="/images/blog/checklist/trends.png"
+  alt="Inverted trend analysis"
+  strategy="invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="The 'invert' strategy completely inverts the image colors - best for certain UI screenshots"
+/>
+
+## When to Use Each Strategy
+
+- **Default/Subtle**: Good for most images with light backgrounds
+- **Frame**: Best for data visualizations, charts, or diagrams where color accuracy is important
+- **Vignette**: Works well for photos or images where you want to maintain the original look
+- **Dim**: Best for very bright images or screenshots with white backgrounds
+- **Invert**: Use sparingly for UI screenshots or technical diagrams where contrast is more important than color accuracy 

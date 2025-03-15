@@ -11,6 +11,8 @@ import { compileMDX } from 'next-mdx-remote/rsc';
 import { Sidenote } from '@/components/Sidenote';
 import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import { MarginNote } from '@/components/MarginNote';
+import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
+import { ImageThemeAdjuster } from '@/components/ImageThemeAdjuster';
 
 function slugify(text) {
     return text
@@ -92,8 +94,33 @@ const components = {
     pre: (props) => (
         <pre {...props} className="bg-neutral-900 rounded-lg p-4 mb-4 overflow-x-auto" />
     ),
+    img: (props) => {
+        // Don't render if src is missing, empty string, or an empty object
+        if (!props.src || props.src === '' || (typeof props.src === 'object' && Object.keys(props.src).length === 0)) {
+            return null;
+        }
+        
+        // Use our dark mode image wrapper component
+        return (
+            <div className="my-4">
+                <DarkModeImageWrapper
+                    src={props.src}
+                    alt={props.alt || "Image"}
+                    className="w-full"
+                    rounded="rounded-lg" 
+                />
+                {props.alt && props.alt !== "Image" && (
+                    <p className="text-xs text-center text-neutral-500 dark:text-neutral-400 mt-1 italic font-serif">
+                        {props.alt}
+                    </p>
+                )}
+            </div>
+        );
+    },
     Sidenote,
     MarginNote,
+    DarkModeImageWrapper,
+    ImageThemeAdjuster,
 };
 
 // Configuration for MDX processing

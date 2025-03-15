@@ -15,6 +15,8 @@ import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { Sidenote } from '@/components/Sidenote';
 import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import { MarginNote } from '@/components/MarginNote';
+import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
+import { ImageThemeAdjuster } from '@/components/ImageThemeAdjuster';
 
 function slugify(text) {
   return text
@@ -102,16 +104,26 @@ const components = {
       return null;
     }
     
+    // Use our dark mode image wrapper component for better dark mode support
     return (
-      <div className="relative w-full h-64 md:h-96 my-6">
-        <img
-          {...props}
-          className="object-cover rounded-lg"
-          sizes="(max-width: 768px) 100vw, 800px"
+      <div className="my-4">
+        <DarkModeImageWrapper
+          src={props.src}
+          alt={props.alt || "Image"}
+          className="w-full"
+          rounded="rounded-lg"
         />
+        {props.alt && props.alt !== "Image" && (
+          <p className="text-xs text-center text-neutral-500 dark:text-neutral-400 mt-1 italic font-serif">
+            {props.alt}
+          </p>
+        )}
       </div>
     );
   },
+  // Add our ImageThemeAdjuster component to be directly usable in MDX
+  ImageThemeAdjuster,
+  DarkModeImageWrapper,
   Sidenote,
   MarginNote,
 };
