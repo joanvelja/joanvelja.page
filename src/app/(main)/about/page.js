@@ -78,7 +78,8 @@ export default function AboutPage() {
                     <div className="space-y-4 animate-slide-up" style={{ animationDelay: '400ms' }}>
                         <p className="text-lg leading-relaxed font-serif">
                             {renderTextWithLinks(`
-                            If you stumbled upon this page, you might have a lot in common with me. I am a second-year MSc student in Artificial Intelligence at the University of Amsterdam, currently visiting the University of Oxford to work on [Prover-Verifier Games](https://arxiv.org/abs/2407.13692). I am broadly interested in AI Alignment, Reinforcement Learning, AI Control and LLM post-training. If anything catches your eye, or if you have thoughts/ideas to share or if you'd like to work with me on something, don't hesitate to 
+                            If you stumbled upon this page, you might have a lot in common with me. I muse on the alignment problem, particularly trying to understand the role of the priors in this endeavour. What are the true priors AIs have? How do we know they are true? What are the implications of these priors?
+                            I am currently visiting the University of Oxford to work on [Prover-Verifier Games](https://arxiv.org/abs/2407.13692) with [Alessandro Abate](https://www.cs.ox.ac.uk/people/alessandro.abate/). I am broadly interested in AI Alignment and Safety, Reinforcement Learning, Generalization and anything in between. If anything catches your eye, or if you have thoughts/ideas to share or if you'd like to work with me on something, don't hesitate to 
                             `)}
                             <Link 
                                 href="/contact" 

@@ -210,7 +210,7 @@ export default function ProjectsPage() {
             {
                 name: 'University of Oxford',
                 type: 'Visiting Researcher',
-                description: 'Writing my MSc thesis, supervised by Prof. Alessandro Abate, on Prover-Verifier Games.',
+                description: 'Working on Prover-Verifier Games, supervised by Prof. Alessandro Abate.',
                 location: 'Oxford, UK',
                 period: 'Jan 2025 - Present',
                 links: [
@@ -244,7 +244,7 @@ export default function ProjectsPage() {
                 type: 'Masters',
                 description: 'Masters in Artificial Intelligence',
                 location: 'Amsterdam, Netherlands',
-                period: 'Sept 2023 - Present',
+                period: 'Sept 2023 - 2025',
                 relatedWorks: [
                     {
                         title: 'Dynamic Vocabulary Pruning in Early-Exit LLMs',
@@ -268,7 +268,7 @@ export default function ProjectsPage() {
                 name: 'LASR Labs (London Initiative for Safe AI)',
                 type: 'Researcher', 
                 description: 'Wrote a cool paper on steganographic collusion between Language Models!', location: 'London, UK', 
-                period:'Jul 2024 - Oct 2024',
+                // period:'Jul 2024 - Oct 2024',
                 relatedWorks: [
                     {
                         title: 'Hidden in Plain Text: Emergence & Mitigation of Steganographic Collusion in LLMs',
