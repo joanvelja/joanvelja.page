@@ -1,33 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import probe from 'probe-image-size';
-import sharp from 'sharp';
-
-async function convertHeicToJpeg(filePath) {
-    const outputPath = filePath.replace(/\.HEIC$/i, '.jpg');
-    
-    // Only attempt conversion in development
-    if (process.env.NODE_ENV === 'development') {
-        if (!fs.existsSync(outputPath)) {
-            try {
-                await sharp(filePath)
-                    .jpeg({ quality: 90 })
-                    .toFile(outputPath);
-            } catch (error) {
-                console.warn(`Warning: Could not convert HEIC file: ${filePath}`, error);
-                return null;
-            }
-        }
-        return outputPath;
-    }
-    
-    // In production, check if a JPG version exists
-    if (fs.existsSync(outputPath)) {
-        return outputPath;
-    }
-    
-    return null;
-}
 
 // Parse title and date from filename
 // Format: "Title, Date.ext" or "Title.ext"
@@ -60,9 +33,9 @@ export async function getPhotos() {
     const photosDir = path.join(process.cwd(), 'public', 'images', 'photos');
     const files = fs.readdirSync(photosDir);
     
-    // Filter for image files
+    // Filter for image files - adjust to exclude .HEIC or ensure .jpg twin exists
     const imageFiles = files.filter(file => 
-        /\.(jpg|jpeg|png|webp)$/i.test(file)
+        /\.(jpg|jpeg|png|webp)$/i.test(file) // Only process web-friendly formats directly
     );
 
     // Get image dimensions and create photo objects
@@ -70,26 +43,15 @@ export async function getPhotos() {
         const filePath = path.join(photosDir, file);
         const stats = fs.statSync(filePath);
         
-        // Handle HEIC files
-        let processedPath = filePath;
-        if (/\.HEIC$/i.test(file)) {
-            const jpegPath = await convertHeicToJpeg(filePath);
-            if (!jpegPath) {
-                // Skip this photo if we can't process it
-                return null;
-            }
-            processedPath = jpegPath;
-        }
-        
         try {
-            // Get image dimensions
-            const dimensions = await probe(fs.createReadStream(processedPath));
+            // Get image dimensions using the original filePath
+            const dimensions = await probe(fs.createReadStream(filePath));
             
             // Parse title and date from filename
             const { title, date } = parsePhotoInfo(file);
 
-            // Use the JPEG path for HEIC images
-            const publicPath = processedPath
+            // Use the original filePath for publicPath
+            const publicPath = filePath
                 .replace(process.cwd(), '')
                 .replace('/public', '')
                 .replace(/\\/g, '/');

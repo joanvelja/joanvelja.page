@@ -138,10 +138,13 @@ const options = {
                 keepBackground: true,
                 theme: 'one-dark-pro',
                 defaultLang: 'plaintext',
-                getHighlighter: (options) => {
-                    return import('shiki').then(({ getSingletonHighlighter }) =>
-                        getSingletonHighlighter(options)
-                    );
+                getHighlighter: async (highlighterOpts) => {
+                    // For shiki@1.x, we use getHighlighter directly
+                    const shiki = await import('shiki');
+                    return shiki.getHighlighter({
+                        ...highlighterOpts, // This usually includes theme passed by rehype-pretty-code
+                        langs: highlighterOpts.langs || ['javascript', 'typescript', 'jsx', 'tsx', 'python', 'html', 'css', 'json', 'yaml', 'markdown', 'bash', 'shell', 'diff']
+                    });
                 }
             }],
             rehypeSlug,   // Add IDs to headings
@@ -254,20 +257,6 @@ export async function getPostBySlug(slug) {
                 ...options,
                 mdxOptions: {
                     ...options.mdxOptions,
-                    rehypePlugins: [
-                        rehypeKatex,  // LaTeX rendering
-                        [rehypePrettyCode, {
-                            keepBackground: true,
-                            theme: 'one-dark-pro',
-                            defaultLang: 'plaintext',
-                            getHighlighter: (options) => {
-                                return import('shiki').then(({ getSingletonHighlighter }) =>
-                                    getSingletonHighlighter(options)
-                                );
-                            }
-                        }],
-                        rehypeSlug,   // Add IDs to headings
-                    ],
                 },
             }
         });
