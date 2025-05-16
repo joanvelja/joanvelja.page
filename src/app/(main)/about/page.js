@@ -41,7 +41,7 @@ export default function AboutPage() {
     return (
         <main className="flex flex-col items-center justify-start w-full animate-fade-in">
             {/* Profile Section */}
-            <section className="w-full max-w-[540px] px-4 py-16 flex flex-col">
+            <section className="w-full px-4 py-16 flex flex-col">
                 {/* Profile Image */}
                 <div className="flex justify-center w-full mb-12">
                     <div className="relative group">
@@ -67,15 +67,11 @@ export default function AboutPage() {
                         <br></br>
                     </div>
 
-                {/* Scrollable Content Section */}
-                <div className="overflow-y-auto max-h-[500px] pr-4 space-y-6 text-neutral-800 dark:text-neutral-200 
-                    [&::-webkit-scrollbar]:w-2 
-                    [&::-webkit-scrollbar-track]:bg-neutral-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-800
-                    [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-600
-                    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+                {/* Scrollable Content Section is now just Content Section */}
+                <div className="space-y-6 text-neutral-800 dark:text-neutral-200">
 
                     {/* Main Text */}
-                    <div className="space-y-4 animate-slide-up" style={{ animationDelay: '400ms' }}>
+                    <div className="space-y-4">
                         <p className="text-lg leading-relaxed font-serif">
                             {renderTextWithLinks(`
                             If you stumbled upon this page, you might have a lot in common with me. I muse on the alignment problem, particularly trying to understand the role of the priors in this endeavour. What are the true priors AIs have? How do we know they are true? What are the implications of these priors?
