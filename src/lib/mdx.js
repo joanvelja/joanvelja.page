@@ -11,8 +11,10 @@ import { compileMDX } from 'next-mdx-remote/rsc';
 import { Sidenote } from '@/components/Sidenote';
 import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import { MarginNote } from '@/components/MarginNote';
+import { Citation, Cite, Bibliography } from '@/components/Citation';
 import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
 import { ImageThemeAdjuster } from '@/components/ImageThemeAdjuster';
+import { InteractiveEmbed } from '@/components/InteractiveEmbed';
 
 function slugify(text) {
     return text
@@ -121,6 +123,11 @@ const components = {
     MarginNote,
     DarkModeImageWrapper,
     ImageThemeAdjuster,
+    InteractiveEmbed,
+    // Citation components
+    Citation,
+    Cite,
+    Bibliography,
 };
 
 // Configuration for MDX processing

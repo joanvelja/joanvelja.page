@@ -63,11 +63,12 @@ export default function MainLayout({ children }) {
 
     return (
         <div className="min-h-screen bg-white dark:bg-neutral-900 transition-colors duration-300">
-            <div className="flex min-h-screen flex-col items-center">
-                <div className="max-w-[1200px] w-full flex flex-col items-center px-5 md:px-8">
+            {/* Fixed Header */}
+            <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200/50 dark:border-neutral-800/50">
+                <div className="max-w-[1200px] mx-auto px-5 md:px-8">
                     <div className="flex flex-row justify-between w-full md:p-3 p-1">
-                        <div className="w-[130px]">
-                            <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400 font-sans">Joan's Website</p>
+                        <div className="w-[130px] flex flex-col justify-center">
+                            <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">Joan's Website</p>
                         </div>
                         <h1 className="text-xl font-medium md:block hidden text-neutral-900 dark:text-white font-serif"> {title} </h1>
                         <div className="w-[130px] flex flex-col items-end">
@@ -88,6 +89,12 @@ export default function MainLayout({ children }) {
                             </div>
                         </div>
                     </div>
+                </div>
+            </header>
+
+            {/* Main Content with top padding to account for fixed header */}
+            <div className="flex min-h-screen flex-col items-center pt-16">
+                <div className="max-w-[1200px] w-full flex flex-col items-center px-5 md:px-8">
                     <div className="flex flex-col max-w-screen overflow-visible w-full py-2 items-center">
                         {children}
                     </div>

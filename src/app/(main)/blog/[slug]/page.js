@@ -9,6 +9,7 @@ import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import { TableOfContents } from '@/components/TableOfContents';
 import { MarginNote } from '@/components/MarginNote';
 import { MarginNotesProvider } from '@/components/MarginNotes';
+import { CitationProvider, Citation, Bibliography, Cite } from '@/components/Citation';
 import { ProtectedContent } from '../components/ProtectedContent';
 import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
@@ -22,6 +23,74 @@ function slugify(text) {
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
+}
+
+// Generate metadata for social sharing
+export async function generateMetadata({ params }) {
+    const { slug } = await params;
+    const post = await getPostBySlug(slug);
+    
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://joanvelja.page';
+    const postUrl = `${baseUrl}/blog/${slug}`;
+    
+    // Handle the image URL - ensure it's absolute
+    let imageUrl = null;
+    if (post.image) {
+        imageUrl = post.image.startsWith('http') 
+            ? post.image 
+            : `${baseUrl}${post.image}`;
+    }
+    
+    return {
+        title: post.title,
+        description: post.excerpt || post.description || 'Read more about this topic on Joan\'s blog.',
+        
+        // Open Graph tags for general social sharing
+        openGraph: {
+            title: post.title,
+            description: post.excerpt || post.description || 'Read more about this topic on Joan\'s blog.',
+            url: postUrl,
+            siteName: 'Joan Velja',
+            type: 'article',
+            publishedTime: post.date,
+            authors: ['Joan Velja'],
+            tags: post.tags,
+            ...(imageUrl && {
+                images: [
+                    {
+                        url: imageUrl,
+                        width: 1200,
+                        height: 630,
+                        alt: post.title,
+                    }
+                ]
+            })
+        },
+        
+        // Twitter Card tags for X/Twitter sharing
+        twitter: {
+            card: 'summary_large_image',
+            title: post.title,
+            description: post.excerpt || post.description || 'Read more about this topic on Joan\'s blog.',
+            creator: '@joanvelja',
+            site: '@joanvelja',
+            ...(imageUrl && {
+                images: [imageUrl]
+            })
+        },
+        
+        // Additional meta tags
+        alternates: {
+            canonical: postUrl,
+        },
+        
+        // Article-specific metadata
+        other: {
+            'article:author': 'Joan Velja',
+            'article:published_time': post.date,
+            ...(post.tags && { 'article:tag': post.tags.join(', ') }),
+        }
+    };
 }
 
 // Custom components for MDX
@@ -126,6 +195,10 @@ const components = {
     DarkModeImageWrapper,
     Sidenote,
     MarginNote,
+    // Citation components
+    Citation,
+    Cite,
+    Bibliography,
 };
 
 export async function generateStaticParams() {
@@ -140,12 +213,13 @@ export default async function BlogPost({ params }) {
     const post = await getPostBySlug(slug);
 
     return (
-        <MarginNotesProvider>
-            <SidenotesProvider>
-                <article className="w-full max-w-[800px] mx-auto px-4 py-8">
-                    <ReadingProgress />
-                    <SectionObserver />
-                    <TableOfContents />
+        <CitationProvider>
+            <MarginNotesProvider>
+                <SidenotesProvider>
+                    <article className="w-full max-w-[800px] mx-auto px-4 py-8">
+                        <ReadingProgress />
+                        <SectionObserver />
+                        <TableOfContents />
                     
                     {/* Header */}
                     <header className="mb-8">
@@ -197,6 +271,9 @@ export default async function BlogPost({ params }) {
                         </div>
                     )}
 
+                    {/* Bibliography */}
+                    <Bibliography />
+
                     {/* Tags */}
                     {post.tags && post.tags.length > 0 && (
                         <div className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
@@ -216,5 +293,6 @@ export default async function BlogPost({ params }) {
                 </article>
             </SidenotesProvider>
         </MarginNotesProvider>
+    </CitationProvider>
     );
 } 

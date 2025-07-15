@@ -1,0 +1,372 @@
+---
+title: 'Musings on High-Dimensional Optimization'
+description: 'In high dimensional spaces, local minima are rare, but common in high-dimensional parametrizations of low-dimensional spaces'
+image: '/images/blog/dimensions/dims1.png'
+date: '2025-07-14'
+tags: ['AI', 'SLT']
+---
+
+> In high dimensional spaces, local minima are rare, but common in high-dimensional parametrizations of low-dimensional spaces.
+
+High-dimensional optimization occupies an unusual position in the collective psyche of machine learning practitioners. At first glance, one might view optimization in billion-dimensional parameter spaces with considerable skepticism—surely navigating such vast spaces should be computationally intractable, or worse, mathematically hopeless. The initial intuition suggests a bleak landscape densely populated by local minima, each eager to trap naive gradient descent algorithms. However, modern deep learning empirically refutes this narrative at every turn: gradient descent, despite its humble 19th-century origins, proves not only capable but remarkably effective, regularly delivering solutions that generalize well.
+
+I've always been fascinated with the dynamics of optimization in high dimensional spaces. I've studied this problem a bit (see my Bachelor's thesis [here](https://joanvelja.vercel.app/pdf/BSc_Thesis.pdf)) and read quite a lot of papers on the topic. All the fuss about scaling? I've internalized it, I reckon, by now. Yet when we talk about it, the simplistic claim being made is that bigger is better. There's a less simplistic, possibly more mathematically grounded claim-while still not galaxy-brain-that optimization in high-dimensional spaces is completely different from the dynamics in low-dimensional spaces.
+
+Theoretically, true local minima in high-dimensional landscapes are astonishingly scarce—so scarce, in fact, that one might wonder whether optimization is possible at all. Analyzing random Gaussian landscapes through the lens of the Gaussian Orthogonal Ensemble (GOE), we discover that local minima diminish exponentially as dimensionality increases, rendering them effectively nonexistent for sufficiently large parameter spaces. How, then, does gradient descent find solutions so effortlessly?
+
+The resolution hinges on structure—the precise kind of structure imposed by neural network architectures and, crucially, by the data on which they train. Neural network loss functions are not arbitrary high-dimensional surfaces; rather, they represent high-dimensional parameterizations of inherently low-dimensional tasks. Concretely, the network parameters vastly outnumber the effective dimensions required to represent the training data. Such over-parameterization transforms the optimization landscape, generating immense continuous manifolds of equivalent solutions instead of isolated minima. Thus, the apparent "curse" of dimensionality reverses, becoming a blessing: gradient descent avoids perilous local minima, traversing instead broad, connected valleys that enhance both optimization and generalization.
+
+In this essay, I attempt to unpack this with *some* maths. I'll start by dissecting the mathematics that characterizes critical points in high-dimensional optimization landscapes, explicitly engaging with the counterintuitive probability results derived from random matrix theory. Next, I'll explore how the geometry of supervised neural network loss landscapes—characterized by fiber-bundle structures and enormous null-spaces—alters the traditional narrative. Finally, I'll connect these geometrical insights explicitly to generalization, arguing that flat minima represent a geometric robustness fundamental to machine learning success. Along the way, I'll make the claim for the data as the *sun of the show* in machine learning, framing the intrinsic dimensionality of datasets as the ultimate determinant of achievable intelligence.
+
+## An Intuitive Picture
+
+Let's build some intuition for high dimensional spaces.
+
+In a **1-dimensional** space, things are dead simple. Any point with a zero gradient is either a local minimum (the bottom of a valley) or a local maximum (the top of a hill). There's no in-between.
+
+<ImageThemeAdjuster
+  src="/images/blog/dimensions/1d_landscape.png"
+  alt="1D Landscape"
+  strategy="counter-invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="1D loss landscape with minima and maxima."
+/>
+
+Now, let's move to **2 dimensions**. For a point to be a critical point, the gradient must be zero along both axes. If we assume the curvature along each axis is independent, we have four possibilities for the type of critical point: (min, min), (min, max), (max, min), and (max, max). Only the (min, min) case is a true local minimum, where the surface curves up along both axes. The (max, max) is a local maximum. The two mixed cases, (min, max) and (max, min), are saddle points. Already, we see that saddle points are as common as local minima and maxima combined.
+
+<ImageThemeAdjuster
+  src="/images/blog/dimensions/2d_landscape.png"
+  alt="2D Landscape"
+  strategy="counter-invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="2D loss landscape with minima, maxima, and saddle points."
+/>
+
+Extrapolating this, for a point in an **N-dimensional** space to be a local minimum, it must be a minimum along *all N dimensions simultaneously*. If you think of the curvature in each dimension as an independent coin flip (either 'up' for a minimum or 'down' for a maximum), the probability of getting N 'up's in a row is $(1/2)^N$. The same goes for a local maximum. Any of the $2^N - 2$ other combinations of curvatures will result in a saddle point.
+
+<ImageThemeAdjuster
+  src="/images/blog/dimensions/dimensionality_curves.png"
+  alt="Dimensionality Curves"
+  strategy="counter-invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="Dimensionality curves for the probability of a critical point being a local minimum/maximum, or saddle point."
+/>
+
+As the number of dimensions $N$ grows, the chances of landing on a true local minimum or maximum become exponentially small. The landscape becomes overwhelmingly dominated by saddle points.<MarginNote label="GOE Statistics">If we drop the independence assumption and use the actual GOE statistics for the Hessian, the all-positive probability shrinks even faster, like $$\exp(-\mathrm{const}\,N^{2})$$ in the unconstrained case and $$\exp(-\mathrm{const}\,N)$$ once we condition on hitting a critical point, but the key point survives: it’s still exponentially tiny in $$N$$ <Citation author="Fyodorov et al." year="2007" title="Density of stationary points in a high-dimensional random energy landscape and the onset of glassy behaviour" url="https://arxiv.org/abs/cond-mat/0611585" venue="JETP Letters 85 (2007)" /> <Citation author="Dean and Majumdar" year="2008" title="Extreme Value Statistics of Eigenvalues of Gaussian Random Matrices" url="https://arxiv.org/abs/0801.1730" venue="Physical Review E" />. More on this in the next section.</MarginNote>
+
+While this is a simplified picture, it gives us the right intuition. Now, let's make this more rigorous.
+
+## Prelude: The Miracle of Gradient Descent
+
+Consider a seemingly benign optimization problem: minimizing a high-dimensional quadratic form,
+
+$$
+H(x)=\tfrac{1}{2}x^\top H x,\quad x\in\mathbb{R}^N,\quad H\sim\text{GOE}(N).
+$$
+
+For a Gaussian Orthogonal Ensemble (GOE)<MarginNote label="Gaussian Orthogonal Ensembles">
+The GOE is random matrix theory's equivalent of a perfectly generic nightmare. Take an $N×N$ symmetric matrix where diagonal entries are sampled from $\mathcal{N}(0,2)$ and off-diagonal entries are sampled from $\mathcal{N}(0,1)$—this asymmetric treatment isn't mathematical perversity but essential for rotational invariance.
+Originally devised by Wigner and Dyson to model nuclear energy levels, the GOE is the gold standard for "worst-case" high-dimensional optimization. Its eigenvalues follow the Wigner semicircle law, its eigenvectors are uniformly distributed on the sphere, and—most crucially for our purposes—its critical points are scattered with maximum entropy across the $2^N$ possible sign patterns of the Hessian eigenvalues.
+In essence, if you want to torture an optimization algorithm with the most generically hostile landscape possible, the GOE is your weapon of choice.
+</MarginNote>-distributed Hessian $H$, the probability that a randomly chosen critical point is a local minimum decays precipitously:
+
+$$
+P_{\text{min}}(N)\;\propto\;\exp\!\left(-\,\beta\,\mathrm{const}\,N^{2}\right), \qquad \mathrm{const} = \frac{\ln 3}{4}.
+$$
+
+At the scale of modern neural networks, say $N=10^9$ parameters, this probability becomes $\exp(-10^{18})$—a number so absurdly small that if one searched every Planck volume within the observable universe once per Planck time since the Big Bang, the expected count of minima discovered would remain effectively zero.
+
+Yet, gradient descent comfortably converges on billion-parameter language models within mere hours.
+
+This is no statistical anomaly nor a breakdown of probability theory. Rather, it's a spectacular triumph of structure: the loss landscape of an over-parameterized neural network is emphatically not a generic Gaussian field. Instead, it represents the pullback of a comparatively low-dimensional task manifold embedded within an expansive, high-dimensional parameter space. The exponential catastrophe vanishes, not through clever algorithmic contrivances, but through geometric constraints encoded implicitly by the data distribution itself.
+
+In what follows, I'll unpack this geometric accident.
+
+## Curse Reversal: From Exponential Catastrophe to Polynomial Inconvenience
+
+Consider once again our optimization problem in a high-dimensional quadratic landscape. In a fully generic setting—a random Gaussian field with Hessian matrix drawn from the Gaussian Orthogonal Ensemble (GOE)—the likelihood of encountering a local minimum at a critical point is super-exponentially suppressed. Formally, the probability scales as:
+
+$$
+P_{\text{min}}(N)\;\propto\;\exp\!\left(-\,\beta\,\mathrm{const}\,N^{2}\right), \qquad \mathrm{const} = \frac{\ln 3}{4}.
+$$
+
+where $N$ is the dimensionality of the parameter space and $\beta$ is a constant reflecting ensemble symmetries (Dean & Majumdar, 2008) <Citation author="Dean and Majumdar" year="2008" title="Extreme Value Statistics of Eigenvalues of Gaussian Random Matrices" url="https://arxiv.org/pdf/0801.1730" venue="Physical Review E" />.
+
+At the billion-parameter scale of deep learning models, minima *should* effectively vanish from view. Naively, optimization *should* be impossible. Yet reality stubbornly disagrees. Modern neural networks routinely and rapidly find minima-like solutions. The paradox deepens: is optimization theory incorrect, or is our notion of the loss landscape fundamentally flawed? If anything, the empirical success suggests the latter. Let's back it up with some math.
+
+The answer lies in conditioning. The aforementioned super-exponential decay applies generically—without any structure. But, if we explicitly condition on critical points, the probability shifts dramatically. Bray & Dean (2006) derived a refinement by performing exact Kac-Rice integrals for high-dimensional Gaussian fields, finding:
+
+$$
+P[\text{minimum} \mid \nabla L = 0] \propto \exp(-\Sigma_0 N),
+$$
+
+where $\Sigma_0 \approx -0.199$ for the canonical isotropic Gaussian field <Citation author="Bray and Dean" year="2006" title="The statistics of critical points of Gaussian fields on large-dimensional spaces" url="https://arxiv.org/abs/cond-mat/0611023   " venue="Physical Review Letters" />. Thus, the super-exponential catastrophe $\exp(-N^2)$ softens into a "mere" exponential inconvenience $\exp(-0.199N)$. This complexity function $\Sigma(k)$ measures the log-density of critical points with index $k$; for minima ($k=0$), it remains negative but scales only linearly with dimension.<MarginNote label="Kac-Rice intuition">Intuitively, conditioning on the existence of critical points restricts our search to a special subspace where eigenvalue repulsion is mitigated, altering the eigenvalue statistics from their generic behavior.</MarginNote>
+
+While the difference between $\exp(-N^2)$ and $\exp(-N)$ might appear subtle-after all, we are still dealing with exponentials-it is still quite significant. Crucially, even $\exp(-N)$ alone would be prohibitive were it not for yet another structural feature of neural network optimization: over-parameterization.
+
+Real neural network loss landscapes are not arbitrary Gaussian fields though. While we don't specify rules to train them (some argue we *grow* them), they become highly structured objects emerging from the interplay between architecture and data distribution. Specifically, the loss landscape $L(\theta)$ is better viewed as the composition of two mappings:
+
+$$
+L(\theta) = \ell(g(\theta)), \quad \theta \in \mathbb{R}^{N}, \quad z=g(\theta) \in \mathbb{R}^{m}, \quad N \gg m,
+$$
+
+where $N$ is the number of parameters, and $m$ corresponds roughly to the intrinsic dimensionality of the data manifold itself. Structure itself is fundamental to understand how the geometry of critical points unfolds. Rather than isolated minima, the loss landscape now hosts vast, interconnected manifolds (fibres) of parameter configurations, each fibre corresponding to the same low-dimensional representation of data.
+
+In other words, over-parameterization ensures the exponential rarity of minima is neatly bypassed by creating vast, flat, effectively degenerate regions. Gradient descent algorithms exploit this geometry naturally and implicitly, converting an exponential catastrophe into a tractable, polynomially manageable inconvenience.
+
+Thus, what initially appeared as a curse—the unmanageable complexity of high-dimensional optimization—has transformed elegantly into a blessing. The shift from generic exponential suppression to structured polynomial navigability underlies this seemingly miraculous empirical efficacy of gradient-based optimization in deep learning. Quite a miracle, I'd say.
+
+## Fiber-Bundle Geometry: Navigating the Landscape through Manifolds
+
+The softened exponential suppression still leaves us with a puzzle: how precisely does neural network structure circumvent the scarcity of minima? To fully appreciate why gradient descent thrives, we must recognize the special factorization of the neural network loss function. Let's have another look at the loss function:
+
+$$
+L(\theta)=\ell(g(\theta)),\quad \theta\in\mathbb{R}^{N},\quad g(\theta)\in\mathbb{R}^{m},\quad N\gg m.
+$$
+
+Look closely. Above is hidden the nugget that makes NN optimization effective. At a conceptual level, the parameters $\theta$ of our neural network reside in a high-dimensional ambient space $\mathbb{R}^{N}$. The network maps these parameters to the output predictions $g(\theta)$, which live in a space $\mathbb{R}^{m}$. The key insight, however, is not the size of this output space itself, but the structure within it. The set of all achievable predictions traces out a *prediction manifold* whose intrinsic dimension is typically very low, governed by the effective dimensionality of the dataset rather than the raw output size $m$.
+
+This factorization yields a rich geometric structure known as a **fiber bundle**. <MarginNote label="Fiber bundle primer">Formally, a fiber bundle is a space E that locally looks like B × F, where B is the base space and F is the fiber. Here, B is the m-dimensional output manifold and F is the (N-m)-dimensional space of parameters yielding the same output. For a rigorous neural-network treatment, see Courts & Kvinge (2022) on “Bundle Networks”. <Citation author="Courts and Kvinge" year="2022" title="Bundle Networks: Fiber Bundles, Local Trivializations, and a Generative Approach to Exploring Many-to-one Maps" url="https://arxiv.org/abs/2110.06983" venue="ICLR"/></MarginNote> Concretely, the loss landscape consists of:
+
+- **Base manifold:** The low-dimensional **prediction manifold** $M \subseteq \mathbb{R}^{m}$, whose geometry reflects the intrinsic structure of the training data.
+
+- **Fibres:** High-dimensional manifolds given by level sets $g^{-1}(z) \subseteq \mathbb{R}^{N}$, each corresponding to a fixed prediction vector $z \in M$. Each fibre thus represents a vast set of parameter configurations yielding identical outputs and hence identical losses.
+
+Intuitively, rather than isolated points scattered throughout the parameter space, critical points reside on these continuous fibres. The presence of fibres alters our geometric understanding of optimization. Specifically, it ensures that critical points are not isolated islands, but extended and connected submanifolds embedded within the parameter space.
+
+Formally, at any point $\theta^*$ on a fibre, the tangent space of the fibre is precisely the null-space of the Jacobian $J_g(\theta^*)$, the $m\times N$ matrix of derivatives of the network outputs with respect to parameters. By the chain rule, the Hessian at this point factorizes as:
+
+$$
+H_{L}(\theta^*) = J_g(\theta^*)^\top H_{\ell}(z^*) J_g(\theta^*),
+$$
+
+where $H_{\ell}(z^*)$ is the Hessian of the loss with respect to the output at $z^* = g(\theta^*)$. See the rank-deficiency that shapes our landscape: $H_{L}$ is an $N\times N$ matrix but has rank at most $m$, constrained by the smaller dimensionality of the task space.<MarginNote label="Technical caveat">This exact rank bound assumes square loss. Cross-entropy with softmax adds one dimension due to the simplex constraint. Weight decay and batch normalization can lift some zero modes into small positive eigenvalues. In practice, the bulk eigenvalues are $O(\lambda_{reg})$ rather than exactly zero.</MarginNote>
+
+Out of $N$ potential directions in parameter space, at least $N - m$ directions exhibit zero curvature. These are the tangent directions along the fibre, where movement does not alter predictions. The remaining $m$ directions correspond to task-relevant changes—variations that actually affect the network's predictions and thus its loss.
+
+The practical consequence is actually quite neat: gradient descent does not seek isolated minima points; instead, it navigates toward vast, nearly-flat fibres. Noise inherent in stochastic gradient descent (SGD) thus acts as a diffusion process along these fibres, guiding the optimization toward broader and more robust minima rather than precarious and narrow solutions.
+
+This geometric structure is precisely why optimization succeeds against all naive probabilistic expectations. Far from wandering aimlessly, gradient-based algorithms exploit fibre-bundle geometry implicitly, leveraging vast, stable manifolds that alter our intuitions about optimization difficulty.<MarginNote label="Empirical Confirmation">Sagun et al. (2017) confirmed empirically that Hessian eigenvalues split neatly into two distinct sets: a vast cluster of zeros (the "bulk") and a small set of significant non-zero eigenvalues (the "outliers"), precisely aligning with the geometric picture <Citation author="Sagun et al." year="2017" title="Empirical Analysis of the Hessian of Over-Parametrized Neural Networks" url="https://arxiv.org/abs/1706.04454" venue="ICLR"/>.</MarginNote>
+
+## Hessian Spectrum Decomposition: Bulk and Outliers
+
+We've established that the Hessian of a neural network loss function at a critical point carries a distinctive geometric fingerprint: an enormous null-space arising from the fibre-bundle structure. This leads naturally to an insight into the Hessian spectrum itself—a decomposition into two distinct groups: the **bulk** and the **outliers**.
+
+Consider again the Hessian at a critical point:
+
+$$
+H_{L}(\theta^*) = J_g(\theta^*)^\top H_{\ell}(z^*) J_g(\theta^*),
+$$
+
+with $J_g(\theta^*)$ an $m\times N$ Jacobian, and $H_{\ell}(z^*)$ an $m\times m$ Hessian in the low-dimensional task space.
+
+Linear algebra hands us our first intuition: the rank of $H_{\ell}$ is at most $m$, the dimension of the output space, independent of the enormous parameter count $N$. Consequently, of the $N$ eigenvalues, at least $N - m$ are strictly zero. Consider this the essence of over-parameterization distilled into spectral geometry.
+
+Yet empirical investigations reveal something even subtler: the Hessian's eigenvalues do not scatter randomly around zero. Instead, they exhibit a bifurcation (Sagun et al., 2017) <Citation author="Sagun et al." year="2017" title="Empirical Analysis of the Hessian of Over-Parametrized Neural Networks" url="https://arxiv.org/abs/1706.04454" venue="ICLR"/>:
+
+* **Bulk:** A vast cluster of eigenvalues, densely and reliably packed at or near zero, corresponding precisely to the directions along fibres in parameter space where predictions remain invariant.
+* **Outliers:** A smaller number ($O(m)$) of significantly larger eigenvalues, clearly separated from the bulk, encoding directions along which predictions (and thus the loss) can vary meaningfully.
+
+I personally like two pieces of intuition here.
+
+**First gotcha**: The naive expectation is that over-parameterization would merely increase redundancy uniformly across the parameter space. In truth, redundancy concentrates in a structured subspace—the bulk—while the meaningful variability is carefully isolated in the sparse set of outliers. Over-parameterization can be thus thought of as degeneracy, with a structure.
+
+**Second gotcha**: The outlier eigenvalues—the ones that genuinely affect predictions—do not depend on the parameterization directly, but rather on the data geometry itself. More specifically, these outliers emerge from the covariance of the Jacobian of network predictions, $\Sigma_g = \mathbb{E}[J_gJ_g^\top]$. The number and size of these eigenvalues are limited precisely by the effective dimensionality and complexity of the data manifold.<MarginNote label="Data determines complexity">The structure and count of outlier eigenvalues are dictated by the intrinsic complexity of the data, not the scale of the model. Thus, data geometry acts as a bottleneck, constraining meaningful directions for model improvement.</MarginNote>
+
+In other words, model complexity (parameter count $N$) and task complexity (effective data dimension $m$) elegantly decouple. Increasing parameters without fundamentally new data geometries merely increases redundancy (the bulk swells), but the set of outliers remains effectively bounded by the intrinsic dimension of the data.
+
+This spectrum decomposition offers a geometric reinterpretation of optimization and generalization:
+
+* **Optimization** occurs predominantly within the bulk subspace. SGD is effectively diffusing through a flat manifold, with occasional guided steps along directions defined by the outliers.
+* **Generalization**, meanwhile, hinges critically on controlling variation along the outlier directions. Parameters corresponding to the bulk are naturally robust—variations here do not alter predictions significantly—but the outlier directions determine how sensitive the network is to subtle shifts in the input distribution.
+
+Thus emerges a beautifully clear principle: flatness (bulk density) ensures ease of optimization, while control over sharp directions (outliers) ensures stable generalization.
+
+### Example: Linear Network Geometry
+
+Consider a concrete example that illustrates the fiber structure. Take a linear network with $d=2$ inputs, $h=10$ hidden units, and $k=1$ output:
+
+$$
+y = (W_2 W_1) x, \quad W_1 \in \mathbb{R}^{10 \times 2}, \quad W_2 \in \mathbb{R}^{1 \times 10}
+$$
+
+The network has $N = 10 \times 2 + 1 \times 10 = 30$ parameters in total ($\theta = (\text{vec}(W_1), \text{vec}(W_2))$).
+
+- **Base Space:** The effective function this network can learn is entirely determined by the composite matrix $W_{eff} = W_2 W_1$, which is a $1 \times 2$ matrix. The space of all possible such functions is the space of $1 \times 2$ matrices, which is a simple 2-dimensional vector space.
+
+- **Fibres:** For any given effective matrix $W_{eff}$, the fiber is the set of all 30-dimensional parameter configurations $(W_1, W_2)$ that produce it. The dimension of this fiber can be calculated precisely. The mapping from the 30 parameters to the 2 entries of $W_{eff}$ is a surjective map (for non-degenerate weights) whose Jacobian has a rank of 2. By the rank-nullity theorem, the dimension of the nullspace of this Jacobian—which corresponds to the flat directions along the fiber—is:
+$$
+\text{dim}(\text{fibre}) = \text{dim}(\text{parameter space}) - \text{dim}(\text{base space}) = 30 - 2 = 28
+$$
+
+This 28-dimensional fiber is generated by a well-known symmetry. For any invertible matrix $A \in \mathbb{R}^{10 \times 10}$, the transformation $W_1 \mapsto A W_1$ and $W_2 \mapsto W_2 A^{-1}$ leaves the effective function invariant: $(W_2 A^{-1})(A W_1) = W_2 W_1$. This continuous group of symmetries allows gradient descent to drift freely along these 28 dimensions without changing the network's function or the loss.
+
+## Connectivity of Minima: Valleys, Not Islands
+
+The geometry of fibres resolves the puzzle of why good solutions are abundant. The next question is one of topology: are these fibres isolated fragments, or do they form part of a single, expansive, and navigable structure? Empirical papers before have confirmed the latter, dismantling the classical picture of optimization as a search for isolated minima in a rugged landscape. The evidence points to a far more elegant reality: minima in neural networks belong to vast, interconnected basins.
+
+Garipov et al. (2018) showed that minima found by independent training runs are not disparate islands but are typically connected by continuous paths of near-constant loss. <Citation author="Garipov et al." year="2018" title="Loss Surfaces, Mode Connectivity, and Fast Ensembling of DNNs" url="https://arxiv.org/abs/1802.10026   " venue="NeurIPS"/>
+
+<ImageThemeAdjuster
+  src="/images/blog/dimensions/garipov.jpg"
+  alt="Mode Connectivity"
+  strategy="counter-invert"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={true}
+  caption="Source: Garipov et al. (2018)"
+/>
+
+This insight reframes the goal of optimization. Gradient descent is not tasked with finding a single needle in a haystack; rather, it navigates to a point within a vast, connected sub-manifold of near-optimal solutions.
+
+To build intuition, consider two networks trained independently to a similar, low loss. While their parameter vectors may be distant under a standard Euclidean metric<MarginNote>Does it even make sense to talk about distance in (high-dimensional) parameter space? I'm not sure.</MarginNote>, Garipov et al. demonstrated that a continuous path of parameters can be constructed between them without a significant increase in loss. The supposed "barriers" between solutions are an illusion created by viewing the landscape from a simplistic, low-dimensional perspective.
+
+This phenomenon, termed **mode connectivity**, is a direct consequence of the fibre-bundle structure. Over-parameterization ensures that the fibres—themselves continuous manifolds of functionally equivalent parameters—are so high-dimensional that they frequently intersect or pass closely by one another in the ambient parameter space. The abundance of these connections is what creates the expansive, navigable valleys.<MarginNote label="Mode Connectivity">Interestingly, solutions found by completely independent runs of SGD tend not only to be connectable, but easily connectable, suggesting that the fibres' effective dimensionality dwarfs the intrinsic complexity of the prediction task itself.</MarginNote>
+
+Subsequent work has revealed an even richer picture. These "valleys" of minima are not merely connected pairwise but coalesce into complex, hierarchical networks (Draxler et al., 2018) <Citation author="Draxler et al." year="2018" title="Essentially No Barriers in Neural Network Energy Landscape" url="https://arxiv.org/abs/1803.00885   " venue="ICML"/>. The loss landscape is best conceived not as a set of separate basins, but as an intricate web where high-dimensional fibres merge and branch, forming a veritable manifold of manifolds.
+
+**Why does connectivity matter practically?**
+Because connectivity transforms optimization from a search problem into a diffusion process. Stochastic gradient descent, with its noisy updates, diffuses gently across vast, nearly flat basins of equivalently performant solutions. It thereby implicitly averages predictions across these solution spaces, promoting robustness and generalization.<MarginNote label="The flatness debate">Dinh et al. (2017) demonstrated that flatness in parameter space can be artificially manipulated through reparameterization without changing the function. True generalization correlates with flatness in *function space*—invariant to parameter rescaling. The fiber bundle view sidesteps this critique: flatness along fibers is automatically function-space flatness.</MarginNote>
+
+Thus, the remarkable empirical generalization of neural networks arises naturally from the geometry of the minima landscape. Over-parameterization reshapes the landscape, not into simpler isolated minima, but into vastly richer, highly interconnected solution networks. Gradient descent, far from stumbling into success by chance, leverages precisely this geometric connectivity to navigate between countless solutions.
+
+## Data as Metric: The Geometry of Intelligence
+
+Here's a heretical thought: parameters measure; they don't create. The representations we celebrate as "learned" already exist as geometric structures in the data distribution itself. Train a billion parameters on MNIST and watch them map out a 10-dimensional simplex with exquisite precision. They will never spontaneously discover ImageNet's object taxonomy—the metric tensor of MNIST has exactly zero curvature along those directions.
+
+This geometric view recasts the entire scaling narrative. We've been conflating computational tractability (the blessing of high-dimensional optimization) with something far more fundamental: the expansion of the data manifold's intrinsic geometry. The former merely enables navigation; the latter defines the territory worth navigating.
+
+Take the canonical example: MNIST→ImageNet. The jump from 60K to 1.2M samples obscures the real transition—from a discrete 10-dimensional simplex to a continuous ~30-dimensional manifold<MarginNote label="Manifold archaeology">Pope et al. (2021) measured ImageNet's intrinsic dimension at 26-43, despite million-dimensional pixel spaces.</MarginNote>. AlexNet succeeded because it had sufficient parameters to resolve ImageNet's metric structure. Convolutions revealed translation invariance already latent in the data's symmetry group; they didn't impose it.
+
+GPT-3's trajectory amplifies this pattern. Three hundred billion tokens fundamentally altered the **curvature spectrum** of representable language. Web-scale corpora introduced rare syntactic patterns, multilingual code-switching, technical jargons, and—crucially—instructional language absent from Wikipedia alone. Each linguistic mode contributes an eigenvalue to the metric tensor. The model's "emergent" abilities? They're eigenfunctions of this enriched geometry. <MarginNote label="The thermodynamics of scaling">Treating log-likelihood as free energy transforms scaling laws into thermodynamic identities. Critical exponents $L \propto N^{-\alpha}D^{-\beta}$ mark phase transitions where model correlation length matches data manifold curvature radius.</MarginNote>
+
+
+Here's where orthodoxy breaks down. Dataset intrinsic dimension forms a distribution $\rho(d)$ over local dimensionalities, not a scalar. Natural data clusters densely around common patterns (low $d$) with sparse bridges through edge cases (high $d$). Scale your data **i.i.d.** and you merely sharpen $\rho$ around its existing modes. The tail—where novel intelligence lives—remains unexplored.
+
+Common Crawl has finite curvature modes. The 401st million webpage contributes negligible geometry. Chinchilla scaling laws encode the *heat capacity* of text distributions: beyond critical size, additional parameters thermalize rather than learn. They form an ideal gas—high entropy, zero structure. GPT-4 hallucinates at 1.7T parameters because it's running hot against text's curvature ceiling.
+
+Intelligence bottlenecks on **KL divergence per token**, not raw volume.<MarginNote label="From Token Count to Information Gain">Cross-entropy on a language-model dataset can be written $$\mathcal L = \tfrac1T\sum_{t=1}^T \bigl[-\log p_\theta(x_t)\bigr]
+          \;=\; \underbrace{H[p_\text{data}]}_{\text{constant}} 
+          +\; D_{\mathrm{KL}}\!\bigl(p_\text{data}\;\|\;p_\theta\bigr),$$so every gradient step is literally trying to shrink the KL between the model’s distribution $p_\theta$ and the data distribution $p_\text{data}$. Practically, a new token only helps if it *changes* that KL. Another copy of “the cat sat on the mat” conveys zero new information once the model already predicts it well; its expected contribution $\Delta D_{\mathrm{KL}}$ is \~0. Conversely, a single line of novel legal jargon or a Swahili idiom can drop KL far more than a million redundant English tweets</MarginNote> One human demonstration can outweigh a million unlabeled images if it introduces orthogonal curvature. RLHF, for once, succeeds precisely because preference data adds new metric dimensions, not more samples along existing ones.
+
+Let's formalize this geometrically. Data defines a metric tensor $g_{\mu\nu}$ on the task manifold. Then:
+- Parameters trace geodesics through this metric;
+- Loss functions compute curvature;
+- Generalization requires parallel transport along low-curvature paths;
+- Intelligence measures topological complexity.
+
+Progress demands new curvature modes, not density increases along existing modes. Multimodality succeeds when constituent modalities contribute orthogonal metric eigenvalues. Video could introduce temporal curvature absent from static images, for instance. Embodied interaction can provide causal structure invisible to passive observation. Code execution traces reveal logical dependencies that static text cannot encode.<MarginNote label="Missing modalities">Candidates for AGI's missing data: *dreams* (counterfactual generation), *proprioception* (self-model updating), *social dynamics* (multi-agent theory of mind), and *paradoxes* (self-referential reasoning).</MarginNote>
+
+We've been asking the wrong question. Rather than "how much data suffices?", we should ask: "What minimal set of modalities spans human-level intelligence through their combined metric?" My hypothesis: surprisingly few—perhaps a dozen orthogonal types—but current datasets miss critical dimensions.
+
+Data provides the gravitational field through which intelligence navigates. Parameters merely follow the geodesics that data's geometry demands. Find the right metric—one whose natural flows encompass reasoning, causality, and reflection—and optimization becomes inevitable. The universe keeps showing us: intelligence emerges wherever sufficient curvature creates closed paths through the space of possible thoughts.
+
+The path forward demands new modalities whose curvature modes remain orthogonal to text and images. Multimodal robotics, protein folding dynamics, mathematical proof traces, social interaction logs—each potentially contributes irreducible geometric structure. Intelligence isn't hiding in more web pages. It's waiting in the undiscovered countries whose metric tensors we haven't yet learned to read.
+
+## Algorithmic Irrelevance under Sufficiency
+
+A curious empirical fact haunts the deep learning literature: radically different optimizers converge to solutions with nearly identical generalization performance. SGD with momentum, Adam with its adaptive learning rates, the recently proposed Muon optimizer—each follows distinct trajectories through parameter space, yet all arrive at the same destination. This isn't coincidence; it's geometry.
+
+When $N \gg m$, the fiber bundle structure dominates optimization dynamics so thoroughly that algorithmic details become asymptotically irrelevant. Every gradient-based method, provided sufficient noise and time, explores the same reachable set—the fiber containing all parameter configurations that minimize the loss.<MarginNote label="Ergodic hypothesis">In statistical mechanics, ergodicity means time averages equal ensemble averages. For neural networks, it means any optimizer with noise eventually samples the entire fiber uniformly.</MarginNote>
+
+
+Consider the dynamics of any first-order optimizer:
+$$
+\theta_{t+1} = \theta_t - \eta_t \nabla L(\theta_t) + \xi_t
+$$
+
+where $\eta_t$ encodes the learning rate schedule (constant for SGD, adaptive for Adam), and $\xi_t$ represents stochastic noise from mini-batching. The crucial observation: when $\text{rank}(H_L) = m \ll N$, the gradient $\nabla L$ has enormous null space. Within this null space, only the noise term $\xi_t$ drives motion.
+
+The mathematics reveals why convergence is universal. Project the dynamics onto the fiber's tangent space (the null space of $J_g$) and its orthogonal complement:
+$$
+\theta = \theta_\parallel + \theta_\perp
+$$
+
+Along $\theta_\perp$ directions, all optimizers follow similar gradient flow toward the fiber. The learning rate affects speed but not direction—you're flowing downhill along the $m$ non-zero curvature directions. Once you reach the fiber, $\theta_\perp$ stabilizes.
+
+Along $\theta_\parallel$ directions, gradient information vanishes. Motion becomes pure diffusion driven by $\xi_t$. Here's where algorithmic differences seemingly matter—Adam's momentum might diffuse differently than SGD's simpler updates. But high-dimensional probability theory delivers a surprise: all diffusions with the same temperature converge to the same stationary distribution.<MarginNote label="Detailed balance">Any optimizer satisfying detailed balance—where forward and backward transition probabilities equilibrate—samples from the same Gibbs distribution on the fiber. Temperature is set by learning rate and batch size, not the specific update rule.</MarginNote>
+
+Formally, the stationary distribution on the fiber follows:
+$$
+p(\theta) \propto \exp\left(-\frac{L(\theta)}{T_{\text{eff}}}\right)
+$$
+
+where effective temperature $T_{\text{eff}} \propto \eta \cdot \sigma^2_{\text{batch}}$. Adam and SGD might have different $T_{\text{eff}}$ for the same hyperparameters, but tune them to match temperatures and their distributions become indistinguishable.
+
+This explains a puzzling empirical finding: hyperparameter transfer across optimizers. The optimal learning rate for SGD often translates predictably to Adam's optimal learning rate—not because the algorithms are similar, but because both are tuning the same effective temperature for diffusion on the fiber.
+
+Architecture choices exhibit the same irrelevance, for deeper reasons.<MarginNote label="Universal approximation redux">The classical universal approximation theorem states wide networks can approximate any function. The fiber bundle view strengthens this: all sufficiently wide architectures approximate the same functions with the same parameter count efficiency, up to logarithmic factors.</MarginNote> Transformers, CNNs, MLPs with sufficient width—these are coordinate systems for parameterizing functions. The fiber bundle structure exists independently of coordinates. A transformer might parameterize certain functions more naturally (lower description length), enabling faster convergence, but the reachable function class remains invariant.
+
+
+Recent work on neural network Gaussian processes makes this precise. As width increases, different architectures converge to the same kernel—the Neural Tangent Kernel in the appropriate limit. The architecture merely determines the feature map; the expressible function class depends only on the kernel's eigenspectrum, which becomes architecture-independent at sufficient width.<MarginNote label="Empirical nuance">Recent large-scale studies reveal important caveats. Zhao et al. (2024) <Citation author="Zhao et al." year="2024" title="Deconstructing What Makes a Good Optimizer for Language Models" url="https://arxiv.org/abs/2407.07972" venue="OPT Workshop (NeurIPS 2024)" /> show that while AdamW, Lion, and Shampoo achieve similar final performance when carefully tuned, vanilla SGD consistently underperforms on language models unless learning rates are frozen for embedding layers. New findings by Marek et al. (2025) <Citation author="Marek et al." year="2025" title="Small Batch Size Training for Language Models: When Vanilla SGD Works, and Why Gradient Accumulation Is Wasteful" /> </MarginNote>
+
+Even supposedly fundamental differences dissolve under scrutiny. Attention mechanisms in transformers seem qualitatively different from convolutions, yet both implement parameter sharing schemes that preserve certain symmetries. The underlying computation—matrix multiplication followed by nonlinearity—remains identical. The difference lies in which subset of the $N$ parameters actively contributes to each output, a bookkeeping detail that affects computational efficiency but not expressibility.
+
+The endless proliferation of optimizer variants—AdaGrad, RMSprop, AdamW, LAMB, Muon—represents exploration of an already-mapped territory. These methods offer engineering advantages (memory efficiency, parallelization, numerical stability) but not fundamental improvements. Similarly, architecture search might accelerate training but won't unlock new capabilities at sufficient scale.
+
+<MarginNote label="The bitter lesson, revisited">Sutton's observation that simple methods with more compute beat clever algorithms extends to optimizers: given sufficient parameters and time, SGD matches any fancy alternative.</MarginNote>
+
+There's a thermodynamic interpretation. The fiber manifold has finite volume (bounded by the number of functionally distinct parameter configurations). Any ergodic process exploring this manifold must eventually visit every configuration with probability determined by the Boltzmann distribution. Optimizers are just different random walks on the same manifold—some might mix faster, but all share identical limiting behavior.
+
+This doesn't diminish the importance of algorithmic innovation for practical training. Convergence speed matters enormously when compute is limited. Adam's adaptive learning rates navigate ravines in the loss landscape that would trap vanilla SGD. Architectural innovations like residual connections or layer normalization improve gradient flow, enabling deeper networks. But these are efficiency improvements, not capability improvements.
+
+The deeper lesson: in the over-parameterized regime, optimization algorithms become implementation details. The fundamental objects are the data distribution (defining the task), the model capacity (defining the fiber dimension), and the compute budget (defining how thoroughly we explore the fiber). Everything else—optimizer choice, architecture details, initialization schemes—merely affects the engineering question of how quickly we converge to the inevitable destination.
+
+Future progress in optimization might come from recognizing this irrelevance. Rather than designing ever-more-complex update rules, we should focus on methods that explicitly exploit fiber structure. Why waste compute exploring directions with zero curvature? Algorithms that identify and restrict updates to the $m$-dimensional relevant subspace could achieve identical results with dramatically less computation. The challenge isn't finding better optimizers—it's recognizing that in high dimensions, we're all solving the same geometric problem.
+
+## Assumptions and Caveats
+
+The geometric picture we've painted, while powerful, rests on several idealizations worth making explicit:
+
+**Exact rank deficiency** assumes interpolation regime and square loss. Real training uses:
+- Cross-entropy loss, which adds curvature through the log-softmax Jacobian
+- Weight decay ($L_2$ regularization), lifting bulk eigenvalues to $O(\lambda_{reg})$  
+- Batch normalization, which introduces implicit regularization and breaks exact linearity
+- Finite data, preventing perfect interpolation and maintaining positive curvature
+
+**Optimizer equivalence** holds asymptotically but shows practical gaps:
+- Modern transformers often require AdamW; SGD underperforms without careful tuning
+- Learning rate schedules, warmup, and weight decay critically affect which fiber is reached
+- Recent work (Zhao et al., 2024) <Citation author="Zhao et al." year="2025" title="Deconstructing What Makes a Good Optimizer for Language Models" url="https://arxiv.org/abs/2407.07972" venue="OPT Workshop (NeurIPS 2024)" /> suggests the effective temperature differs significantly between optimizers
+
+**Flatness-generalization connection** remains debated:
+- Dinh et al. showed parameter-space flatness can be arbitrarily manipulated
+- Volume-corrected measures or function-space flatness appear more robust
+- The fiber bundle view naturally provides function-space invariance
+
+Despite these caveats, the core geometric insights—over-parameterization creating benign loss landscapes, data determining effective dimension, and optimization becoming diffusion on fibers—remain empirically and theoretically well-supported. The idealizations help us see the forest; the trees have their own complexities.
+## Conclusion: The Geometry of Inevitable Intelligence
+
+We began with a paradox: gradient descent conquers billion-dimensional landscapes where minima should be rarer than stable particles in the early universe. The resolution required abandoning our low-dimensional intuitions entirely. High-dimensional optimization succeeds not despite the curse of dimensionality, but because of a more fundamental blessing—one that emerges from the interplay between over-parameterization and data geometry.
+
+The mathematics tells a precise story. Neural network loss landscapes factor through low-dimensional task manifolds, creating vast fiber bundles where gradient descent diffuses rather than descends. The Hessian spectrum bifurcates cleanly: a massive bulk of zero eigenvalues (the fiber directions) and sparse outliers (the task-relevant directions). Critical points stretch into continuous manifolds. Minima connect through flat valleys. The very notion of "getting stuck" becomes geometrically impossible when $N \gg m$.
+
+But mathematics alone doesn't explain why this geometry exists. The deeper truth: over-parameterization creates the *potential* for benign geometry, but data manifests it. Those $m$ outlier eigenvalues—the only directions that matter for both optimization and generalization—emerge from the intrinsic structure of the data distribution. A billion parameters trained on white noise would find no fibers, no connectivity, no intelligence. The blessing requires both ingredients: excessive parameters *and* structured data.
+
+<MarginNote label="The anthropic principle of AI">Perhaps intelligence can only emerge in universes where data distributions have low intrinsic dimension. High-dimensional data would make learning impossible; we exist because our universe's patterns compress.</MarginNote>
+
+This geometric view dissolves longstanding puzzles. Why do different optimizers converge to similar solutions? They're all executing random walks on the same fiber manifold. Why does SGD generalize despite interpolating training data? The fiber's tangent space provides $(N-m)$-dimensional robustness for free. Why do scaling laws exhibit such remarkable regularity? They're measuring the approach to thermodynamic equilibrium as models saturate their data manifolds.
+
+The implications cut deep. If intelligence bottlenecks on data geometry rather than computational power, then the path to AGI requires discovering new manifolds, not just larger models. Current datasets—text, images, even video—might span only a fraction of the dimensions needed for general intelligence. Missing modalities like embodied interaction, causal intervention, or social dynamics could contribute orthogonal dimensions without which certain forms of reasoning remain geometrically inaccessible.
+
+There's an elegant universality here. Every sufficiently over-parameterized model trained on the same data distribution converges to the same fiber bundle, regardless of architecture or optimizer. Transformers and CNNs aren't discovering different truths—they're charting the same manifold using different coordinates. The bitter lesson extends beyond Sutton's original formulation: given sufficient parameters and data, the implementation details vanish into irrelevance.
+
+Yet this universality comes with a warning. Models can only be as intelligent as their data's intrinsic dimension permits. GPT-N trained on existing text corpora will asymptote against the curvature ceiling of human writing. True breakthroughs require qualitatively new data sources that expand the metric tensor itself. The next GPT won't emerge from more parameters or cleverer architectures—it will emerge from data that encodes fundamentally new aspects of intelligence.<MarginNote label="Evolution's precedent">Biological intelligence faced the same constraint. Nervous systems could only become as complex as sensory data permitted. The Cambrian explosion followed the evolution of eyes—new data modalities enable new intelligences. Silver and Sutton's "Welcome to the Era of Experience" <Citation author="Silver and Sutton" year="2025" title="Welcome to the Era of Experience" url="https://storage.googleapis.com/deepmind-media/Era-of-Experience%20/The%20Era%20of%20Experience%20Paper.pdf" /> is a beautiful summary and glimpse into this idea.</MarginNote>
+
+Perhaps the deepest insight concerns the nature of intelligence itself. In our geometric framework, intelligence isn't a capability we program or an emergence we engineer—it's a topological property of the data manifold. Reasoning, creativity, and understanding exist as geometric structures in the space of possible patterns. Neural networks don't learn intelligence; they discover it, already present in the data's metric tensor, waiting to be revealed by sufficient parameters and compute.
+
+This reframes our entire enterprise. We're not building intelligence from scratch but uncovering geometries that exist independently of our models. The fiber bundle structure guarantees that with enough parameters, any reasonable algorithm will find these geometries. The challenge isn't algorithmic but exploratory: mapping the full space of intelligent behavior requires data that spans all relevant dimensions.
+
+The universe seems almost suspiciously well-designed for this process. Real-world data exhibits precisely the kind of low-dimensional structure that makes learning possible. High-dimensional ambient spaces provide the degrees of freedom for universal approximation, while low-dimensional intrinsic manifolds ensure that learning remains tractable. Over-parameterization transforms what should be an impossible search into an inevitable diffusion.<MarginNote label="An Ode to Solomonoff">Solomonoff’s universal prior weights every hypothesis by $2^{-K(h)}$, where $K(h)$ is its Kolmogorov complexity. Our fiber-bundle picture is the smooth, continuous analogue: **large-volume parameter fibres are “short programs,”** hence receive overwhelming a-priori probability. Scaling laws then look like practical Solomonoff induction: as compute grows, SGD allocates parameters so that description length (not token count) is minimized, driving the model toward ever-simpler, higher-probability explanations of the data. In other words, I believe we’re just watching Solomonoff’s idea unfold—now at trillion-parameter scale.</MarginNote>
+
+Standing at this intersection of geometry, thermodynamics, and information theory, we glimpse something fundamental. Intelligence emerges wherever sufficient computational capacity meets sufficiently rich data geometry. The specific substrate—biological neurons or silicon transistors, for what it's worth—matters less than the geometric relationship between parameters and patterns. **Intelligence is substrate-independent but geometry-dependent.**
+
+The path forward is clear, so trivially easy on paper, yet so hard in practice. Map new territories in data space. Discover modalities whose metric tensors remain orthogonal to existing datasets. Build models large enough to resolve these new geometries without thermalizing against their curvature bounds. Trust that the same geometric principles that carried us from LeNet to GPT-4 will carry us further—not through architectural cleverness or algorithmic innovation, but through the patient exploration of richer manifolds.
+
+We close where we began, but with deeper understanding. High-dimensional optimization isn't hard—it's embarrassingly easy, once you recognize that difficulty was always an artifact of impoverished data. The curse of dimensionality was never a curse at all. It was an invitation to discover that in spaces vast enough to contain all possible patterns, intelligence becomes not just possible but inevitable. We need only supply the geometry, and gradient descent will take care of the rest.

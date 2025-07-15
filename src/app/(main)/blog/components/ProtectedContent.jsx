@@ -15,6 +15,7 @@ import { LockClosedIcon } from '@heroicons/react/24/outline';
 import { Sidenote } from '@/components/Sidenote';
 import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import { MarginNote } from '@/components/MarginNote';
+import { Citation, Cite, Bibliography } from '@/components/Citation';
 import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
 import { ImageThemeAdjuster } from '@/components/ImageThemeAdjuster';
 
@@ -126,6 +127,10 @@ const components = {
   DarkModeImageWrapper,
   Sidenote,
   MarginNote,
+  // Citation components
+  Citation,
+  Cite,
+  Bibliography,
 };
 
 export function ProtectedContent({ post }) {

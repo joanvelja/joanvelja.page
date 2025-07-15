@@ -5,10 +5,11 @@ import { useTheme } from 'next-themes';
 import { useState, useEffect } from 'react';
 
 /**
- * ImageThemeAdjuster - A more advanced component for handling light background images in dark mode
+ * ImageThemeAdjuster - A component for handling images across theme changes
  * 
- * This component offers multiple strategies for making light background images
- * more comfortable to view in dark mode environments.
+ * This component offers multiple strategies for making images comfortable to view
+ * in both light and dark mode environments. Use "counter-invert" for images that
+ * are natively designed for dark mode.
  */
 export function ImageThemeAdjuster({
   src,
@@ -18,7 +19,7 @@ export function ImageThemeAdjuster({
   className = "",
   
   // Theme adjustment options
-  strategy = "subtle", // "subtle", "invert", "dim", "frame", "vignette", "blend", "none"
+  strategy = "subtle", // "subtle", "invert", "dim", "frame", "vignette", "blend", "counter-invert", "none"
   invertThreshold = 95, // Percentage brightness threshold for auto-inversion in "auto" mode
   customStyles = {}, // Additional CSS styles
   
@@ -111,6 +112,18 @@ export function ImageThemeAdjuster({
       transition: 'mix-blend-mode 0.3s ease',
     },
     
+    // For images that are natively designed for dark mode
+    // Inverts them in light mode, leaves them untouched in dark mode
+    'counter-invert': isDarkMode ? {
+      // Leave dark mode images as-is since they're designed for dark themes
+      transition: 'filter 0.3s ease',
+    } : {
+      // Clean inversion without color shifts for seamless background matching
+      filter: 'invert(1) brightness(1.02) contrast(0.98)',
+      borderRadius: 'inherit',
+      transition: 'filter 0.3s ease',
+    },
+    
     none: {
       transition: 'all 0.3s ease',
     },
@@ -170,8 +183,9 @@ export function ImageThemeAdjuster({
 }
 
 /*
-Usage example:
+Usage examples:
 
+// For images with light backgrounds (most common)
 <ImageThemeAdjuster
   src="/path/to/image.jpg"
   alt="Description"
@@ -180,5 +194,16 @@ Usage example:
   className="w-full my-4"
   showCaption={true}
   caption="This is an image with a light background"
+/>
+
+// For images that are natively designed for dark mode
+<ImageThemeAdjuster
+  src="/path/to/dark-mode-image.jpg"
+  alt="Description"
+  strategy="counter-invert"
+  aspectRatio="16/9"
+  className="w-full my-4"
+  showCaption={true}
+  caption="This image is designed for dark mode"
 />
 */ 
