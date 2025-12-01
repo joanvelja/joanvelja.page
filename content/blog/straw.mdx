@@ -179,7 +179,7 @@ which typically exceeds $$n$$. But here’s the pushback: from an information-th
 This is why "just make the straw bigger" isn't quite right as a framing. AlphaGo didn't make the straw bigger—it kept the same skinny straw from the environment but added an internal reservoir (search) that converts sparse information into dense training batches. MuZero added a second reservoir (model learning) that further densifies the signal.
 
 <ImageThemeAdjuster
-  src="/images/blog/straw/second_beauty.jpg"
+  src="/images/blog/straw/beautiful.jpg"
   alt="supervision"
   strategy="none"
   aspectRatio="16/9"
@@ -304,6 +304,16 @@ $$(\delta_\ell = J_{\ell\to \mathrm{out}}^\top, g_{\mathrm{out}}),$$
 </div>
 
 where $$g_{\mathrm{out}}$$ is the output-space error (here proportional to the PG term) and $$J_{\ell\to \mathrm{out}}$$ is the Jacobian of the forward map from layer $$\ell$$ to the output. Linear maps *cannot* increase the dimension of a subspace, so the image of a $$k$$-dimensional output subspace is $$\le k$$-dimensional at every earlier layer, so the expected $$Y$$-dependent gradient at any layer remains confined to a small union of directions.
+
+<ImageThemeAdjuster
+  src="/images/blog/straw/lora_final.jpg"
+  alt="supervision"
+  strategy="none"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={false}
+  caption="Ty"
+/>
 
 ---
 
