@@ -57,30 +57,54 @@ Where $$Y$$ is the (fixed, latent) ground-truth answer, and $$R=\mathsf{Check}(\
 ### 3) The hard ceiling: at most one bit of learnable information per episode
 The agent *already knows* its own trajectory $$\tau$$ (it produced it). The only new observation from the environment in an episode is the scalar reward $$R$$. Let us define the *supervision bits per episode* as
 
+<div style={{ textAlign: 'center' }}>
+
 $$\Delta I := I(Y;R \mid \tau, \mathcal{H}),$$
+
+</div>
 
 where $$\mathcal{H}$$ is the full past history (all previous $$(\tau,R)$$’s and any deterministic policy state). 
 
 Lemma 1 (Channel bound per episode). Under A1-A2, for any policy (and any update rule you compute from $$(X,R)$$),
+
+<div style={{ textAlign: 'center' }}>
+
 $$I(Y;R \mid \tau, \mathcal{H}) \le H(R \mid \tau, \mathcal{H}).$$
+
+</div>
 
 In particular, if $$R\in\{0,1\}$$, then $$H(R \mid \tau, \mathcal{H}) \le 1$$ bit, yielding the upper bound on the information gain for each episode.
 
 Corollary (Extension across episodes). Let $$\mathcal H_n := \{(\tau_1,R_1),\dots,(\tau_n,R_n)\}$$ and $$\mathcal H_{i-1} := \{(\tau_1,R_1),\dots,(\tau_{i-1},R_{i-1})\}$$. The chain rule gives
 
+<div style={{ textAlign: 'center' }}>
+
 $$\begin{aligned} I(Y;\mathcal H_n) &= \sum_{i=1}^n I\!\big(Y;(\tau_i,R_i)\,\big|\,\mathcal H_{i-1}\big)\\[2pt] &= \sum_{i=1}^n \Big( \underbrace{I\!\big(Y;\tau_i \,\big|\, \mathcal H_{i-1}\big)}_{\text{trajectory term}} \;+\; \underbrace{I\!\big(Y;R_i \,\big|\, \tau_i,\mathcal H_{i-1}\big)}_{\text{reward (environment) term}} \Big). \end{aligned}$$
 
+</div>
+
 The second equality is just the chain rule *within* each episode:
+
+<div style={{ textAlign: 'center' }}>
 
 $$I\!\big(Y;(\tau_i,R_i)\,\big|\,\mathcal H_{i-1}\big) = I\!\big(Y;\tau_i \,\big|\, \mathcal H_{i-1}\big) \;+\; I\!\big(Y;R_i \,\big|\, \tau_i,\mathcal H_{i-1}\big)$$
 The environment-provided information is the sum of the second terms:
 $$\sum_{i=1}^n I\big(Y;R_i \mid \tau_i,\mathcal H_{i-1}\big)\;\le\; \sum_{i=1}^n H(R_i \mid \tau_i,\mathcal H_{i-1})\;\le\; n.$$
+
+</div>
+
 This yields the desired $$\le 1$$ bit/episode ceiling for outcome supervision. Note how we disregard the trajectory term, which is unexploited by REINFORCE-like PG methods. More about it later…
 
 Corollary (Data-processing to any update). Let $$U_i=f_i(\tau_i,R_i,\mathcal H_{i-1})$$ be any i-th parameter update or gradient estimator. By DPI,
 
+<div style={{ textAlign: 'center' }}>
+
 $$I\big(Y;U_i \mid \tau_i,\mathcal H_{i-1}\big)\;\le\; I\big(Y;R_i \mid \tau_i,\mathcal H_{i-1}\big)\;\le\;1.$$
+
+</div>
+
 For REINFORCE, $$U_i=(R_i-b_i)\,S(\tau_i)$$ is exactly of this form, so the same bound applies. 
+
 So with binary reward, a single episode can transmit at most one bit of information about $$Y$$ into the update.
 
 This matches the blog’s qualitative claim that “learning is driven by the advantage function which provides only $$O(1)$$ bits per episode” in such RL setups.
@@ -105,13 +129,22 @@ If you buy the ~1 bit/episode story for outcome-only reward, then the natural mo
 
 Instead of one scalar at the end, each move $$t$$ gets a policy target $$\pi^{\text{search}}_t$$ (the MCTS visitation distribution) and a *value target* $$z$$ (game outcome). The cross-entropy to $$\pi^{\text{search}}_t$$ communicates on the order of $$H(\pi^{\text{search}}\times t)$$ bits per move, and you have $$T$$ moves—so roughly
 
+<div style={{ textAlign: 'center' }}>
+
 $$n \approx \sum{t=1}^T \times H\big(\pi^{\text{search}}_t\big) + O(1).$$
+
+</div>
 
 Even if $$\pi^{\text{search}}_t$$ is fairly peaky, this dwarfs a single terminal bit.
 
 
 Recall the trajectory term from the information channel decomposition from earlier:
+
+<div style={{ textAlign: 'center' }}>
+
 $$I(Y;\mathcal H_n)=\sum_i I\big(Y;\tau_i\mid\mathcal H_{i-1}\big)+\sum_i I\big(Y;R_i\mid\tau_i,\mathcal H_{i-1}\big),$$
+
+</div>
 
 AlphaGo/Zero explicitly exploits the *trajectory term*. Each visited position is a supervised datapoint with a soft label from search. The extra bits (much, much more than one per episode) are not coming from the environment’s terminal reward channel but instead they’re created by *compute-amplified targets* distilled back into the network. In effect, search converts the hard RL problem into a high-bandwidth supervised one over states.
 
@@ -125,7 +158,12 @@ The catch? This only works when you *can* search—when you have a simulator or 
 4. **Consistency target**: does our model's predicted next state lead to predictions consistent with what actually happened $$K$$ steps later?
 
 A back-of-the-envelope accounting for the amount of bits learnable via this paradigm looks like
+
+<div style={{ textAlign: 'center' }}>
+
 $$m \approx (K+1)\sum_{t=1}^T H\big(\pi^{\text{search}}_t\big)+O(T) \quad\text{(for K unroll steps),}$$
+
+</div>
 
 which typically exceeds $$n$$. But here’s the pushback: from an information-theoretic standpoint, MuZero does not increase the environment’s mutual-information faucet. It just (brilliantly) reuses the same episodes by enforcing multi-step consistency and by training on imagined continuations. Said differently: AlphaGo/Zero and MuZero both widen the gradient bandwidth you can squeeze out of each episode, but the environment is not emitting fundamentally more bits than the trajectory and final outcome already contain.
 
@@ -133,6 +171,16 @@ which typically exceeds $$n$$. But here’s the pushback: from an information-th
 
 
 This is why "just make the straw bigger" isn't quite right as a framing. AlphaGo didn't make the straw bigger—it kept the same skinny straw from the environment but added an internal reservoir (search) that converts sparse information into dense training batches. MuZero added a second reservoir (model learning) that further densifies the signal.
+
+<ImageThemeAdjuster
+  src="/images/blog/straw/second_beauty.jpg"
+  alt="supervision"
+  strategy="none"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={false}
+  caption="Ty"
+/>
 
 The relevant question for reasoning LLMs hence becomes: what's the equivalent of MCTS for language? How do you build an internal amplifier that turns 1 bit from a solution checker into $$O(T)$$ bits of feedback about which reasoning steps were useful? Process rewards are one answer (at what cost though? Getting labels from humans? Using LLMs as judges? No way RL finds jailbreaks for high rewards, right? Right…?). Search over reasoning traces is another (learn to explore until you find correct paths, then distill). But both require solving their own hard problems. 
 
@@ -148,7 +196,11 @@ I’ll give (A) a structural/spectral argument that the *task-relevant* policy-g
 
 For an affine layer $$W_\ell\in\mathbb{R}^{d_{\text{out}}\times d_{\text{in}}}$$, the per-episode REINFORCE gradient has the outer-product form
 
+<div style={{ textAlign: 'center' }}>
+
 $$G_\ell = \sum_{t=1}^T (R-b_t) u_{\ell,t} x_{\ell,t}^\top,$$
+
+</div>
 
 where $$u_{\ell,t}=\nabla_{\text{preact}_\ell}\log\pi(a_t\mid s_t)$$ and $$b_t$$ is any baseline measurable w.r.t. $$\tau_{\neg t}$$ (action-independent). Each summand is rank-1, hence $$\operatorname{rank}(G_\ell)\le \min\{T,d_{\text{out}},d_{\text{in}}\}$$ for that episode. What matters, however, is that only decision steps carry signal in expectation, and at the output layer that signal lives in a tiny subspace—often 1-D—under the checker.
 
@@ -163,14 +215,28 @@ Let $$\mathcal D$$ be the set of decision steps, and $$S_t(Y)\subseteq{1,\dots,V
 
 
 Then for every step $$t$$,
+
+<div style={{ textAlign: 'center' }}>
+
 $$\mathbb E \big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big] =\sum_{k=1}^V p_t[k] \left(\mathbb E[R\mid\tau_{\neg t},A_t{=}k]-\mathbb E[R\mid\tau_{\neg t}]\right)e_k.$$
 
-Consequently, if $$t\notin\mathcal D$$ the RHS is $$0$$ (no signal in expectation). If $$t\in\mathcal D$$, define
- $$\mu_1(t):=\mathbb E[R\mid \tau_{\neg t},A_t\in S_t(Y)]$$, $$\mu_0(t):=\mathbb E[R\mid \tau_{\neg t},A_t\notin S_t(Y)]$$; with Assumptions 2–3,
+</div>
+
+Consequently, if $$t\notin\mathcal D$$ the RHS is $$0$$ (no signal in expectation). If $$t\in\mathcal D$$, define $$\mu_1(t):=\mathbb E[R\mid \tau_{\neg t},A_t\in S_t(Y)]$$, $$\mu_0(t):=\mathbb E[R\mid \tau_{\neg t},A_t\notin S_t(Y)]$$; with Assumptions 2–3,
+
+<div style={{ textAlign: 'center' }}>
+
 $$\boxed{\mathbb E\big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big]=\big(\mu_1(t)-\mu_0(t)\big)\Big((p_t \circ \mathbf 1_{S_t})-q_t p_t\Big),}$$
 
+</div>
+
 which lies in $$\operatorname{span}\{e_s-p_t:\ s\in S_t(Y)\}$$ (dimension $$\le |S_t(Y)|$$). In the singleton case $$S_t(Y)=\{y\}$$,
+
+<div style={{ textAlign: 'center' }}>
+
 $$\boxed{\mathbb E \big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big]=\big(\mu_1(t)-\mu_0(t)\big) p_t[y] (e_y-p_t),}$$
+
+</div>
 
 i.e., a one-dimensional direction at the output.
 
@@ -178,7 +244,12 @@ i.e., a one-dimensional direction at the output.
 **Matrix view (output layer).**
 
 Let $$W_{\text{out}}\in\mathbb R^{V\times d_{\text{model}}}$$ and $$h_t$$ be the hidden state. The per-episode output gradient is
+
+<div style={{ textAlign: 'center' }}>
+
 $$G_{\text{out}}=\sum_{t=1}^T (R-b_t),u_{L,t},h_t^\top.$$
+
+</div>
 
 By (3)–(4), only $$t\in\mathcal D$$ contribute in expectation; each such term is an outer product whose left factor lies in a subspace of dimension $$\le |S_t(Y)|$$ (singleton $$\Rightarrow$$ 1-D). Summing over $$K:=|\mathcal D|$$ decision steps yields, per episode, a sum of at most $$\sum_{t\in\mathcal D}|S_t(Y)|$$ rank-1 matrices. Averaging across a minibatch preserves the signal subspace (union of these few left-factor directions), though the exact matrix rank after averaging need not stay bounded by $$\sum_{t}|S_t|$$.
 
@@ -192,7 +263,12 @@ Let the environment deliver $$B$$ bits over training (binary terminal rewards $$
 
 #### Proposition 1 (Decision-local, low-dimensional RHS at the output).
 Under checker sufficiency and equivariance, for any decision step $$t$$,
+
+<div style={{ textAlign: 'center' }}>
+
 $$\mathbb E\big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big]\in \operatorname{span}\{e_s-p_t:\ s\in S_t(Y)\},$$
+
+</div>
 
 and it is $$0$$ for $$t\notin\mathcal D$$. In the singleton case $$S_t(Y)={y}$$, the span is 1-D. Consequently, the per-episode output-layer gradient is a sum over at most $$K$$ decision steps of outer products whose left factors lie in a subspace of dimension $$\le \sum_{t\in\mathcal D}|S_t(Y)|$$ (singleton $$\Rightarrow \le K)$$.
 
@@ -215,7 +291,11 @@ Then $$\Delta W$$ is $$\varepsilon'$$-close to rank $$r$$ with $$\varepsilon'$$ 
 
 Backprop is linear in the output error: the layer-$$\ell$$ backprop signal satisfies
 
+<div style={{ textAlign: 'center' }}>
+
 $$(\delta_\ell = J_{\ell\to \mathrm{out}}^\top, g_{\mathrm{out}}),$$
+
+</div>
 
 where $$g_{\mathrm{out}}$$ is the output-space error (here proportional to the PG term) and $$J_{\ell\to \mathrm{out}}$$ is the Jacobian of the forward map from layer $$\ell$$ to the output. Linear maps *cannot* increase the dimension of a subspace, so the image of a $$k$$-dimensional output subspace is $$\le k$$-dimensional at every earlier layer, so the expected $$Y$$-dependent gradient at any layer remains confined to a small union of directions.
 
