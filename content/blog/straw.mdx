@@ -1,13 +1,13 @@
 ---
 title: 'Just make the straw bigger'
 description: 'When life gives you one bit per lemon, how many of them will make for a lemonade?'
-image: '/images/blog/straw/straw2.png'
+image: '/images/blog/straw/straw2.jpg'
 date: '2025-12-01'
 tags: ['AI', 'RL', 'Information Theory']
 ---
 
-In *[LoRA without regret]*(https://thinkingmachines.ai/blog/lora/), Schulman et al. informally claim that supervised learning can deliver $$O(\text{\\#tokens})$$ bits of supervision per episode, whereas policy-gradient RL gets only $$O(1)$$ bits per episode because the advantage signal is effectively a single scalar per episode. Karpathy, too, at Dwarkesh’s podcast, compared RL to “*sucking supervision through a straw”*. The informal claim here is that low-bandwidth updates are amenable to low-rank optimization, for whatever reason.
 
+In [*LoRA without regret*](https://thinkingmachines.ai/blog/lora/), Schulman et al. informally claim that supervised learning can deliver $$O(\text{#tokens})$$ bits of supervision per episode, whereas policy-gradient RL gets only $$O(1)$$ bits per episode because the advantage signal is effectively a single scalar per episode. Karpathy, too, at Dwarkesh’s podcast, compared RL to “*sucking supervision through a straw”*. The informal claim here is that low-bandwidth updates are amenable to low-rank optimization, for whatever reason.
 I have heard this take over and over in the past year, especially following the release of o1 and generally RLVR methods, but never really have I read anyone formally bridging the gap between the signal bandwidth and how that relates to low-rank optimization.
 
 In this writeup, I attempt to make this connection explicit. I have divided it into chapters, each containing several subsections.
@@ -121,7 +121,7 @@ The catch? This only works when you *can* search—when you have a simulator or 
 4. **Consistency target**: does our model's predicted next state lead to predictions consistent with what actually happened $$K$$ steps later?
 
 A back-of-the-envelope accounting for the amount of bits learnable via this paradigm looks like
-$$m \approx (K+1)\sum_{t=1}^T H\big(\pi^{\text{search}}_t\big)+O(T) \quad\text{(for $$K$$ unroll steps),}$$
+$$m \approx (K+1)\sum_{t=1}^T H\big(\pi^{\text{search}}_t\big)+O(T) \quad\text{(for K unroll steps),}$$
 
 which typically exceeds $$n$$. But here’s the pushback: from an information-theoretic standpoint, MuZero does not increase the environment’s mutual-information faucet. It just (brilliantly) reuses the same episodes by enforcing multi-step consistency and by training on imagined continuations. Said differently: AlphaGo/Zero and MuZero both widen the gradient bandwidth you can squeeze out of each episode, but the environment is not emitting fundamentally more bits than the trajectory and final outcome already contain.
 
@@ -144,7 +144,7 @@ I’ll give (A) a structural/spectral argument that the *task-relevant* policy-g
 
 For an affine layer $$W_\ell\in\mathbb{R}^{d_{\text{out}}\times d_{\text{in}}}$$, the per-episode REINFORCE gradient has the outer-product form
 
-$$G_\ell = \sum_{t=1}^T (R-b_t) u_{\ell,t} x_{\ell,t}^\top,  \tag{1}$$
+$$G_\ell = \sum_{t=1}^T (R-b_t) u_{\ell,t} x_{\ell,t}^\top,$$
 
 where $$u_{\ell,t}=\nabla_{\text{preact}_\ell}\log\pi(a_t\mid s_t)$$ and $$b_t$$ is any baseline measurable w.r.t. $$\tau_{\neg t}$$ (action-independent). Each summand is rank-1, hence $$\operatorname{rank}(G_\ell)\le \min\{T,d_{\text{out}},d_{\text{in}}\}$$ for that episode. What matters, however, is that only decision steps carry signal in expectation, and at the output layer that signal lives in a tiny subspace—often 1-D—under the checker.
 
@@ -159,14 +159,14 @@ Let $$\mathcal D$$ be the set of decision steps, and $$S_t(Y)\subseteq{1,\dots,V
 
 
 Then for every step $$t$$,
-$$\mathbb E \big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big] =\sum_{k=1}^V p_t[k] \left(\mathbb E[R\mid\tau_{\neg t},A_t{=}k]-\mathbb E[R\mid\tau_{\neg t}]\right)e_k. \tag{2}$$
+$$\mathbb E \big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big] =\sum_{k=1}^V p_t[k] \left(\mathbb E[R\mid\tau_{\neg t},A_t{=}k]-\mathbb E[R\mid\tau_{\neg t}]\right)e_k.$$
 
 Consequently, if $$t\notin\mathcal D$$ the RHS is $$0$$ (no signal in expectation). If $$t\in\mathcal D$$, define
  $$\mu_1(t):=\mathbb E[R\mid \tau_{\neg t},A_t\in S_t(Y)]$$, $$\mu_0(t):=\mathbb E[R\mid \tau_{\neg t},A_t\notin S_t(Y)]$$; with Assumptions 2–3,
-$$\boxed{\mathbb E\big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big]=\big(\mu_1(t)-\mu_0(t)\big)\Big((p_t \circ \mathbf 1_{S_t})-q_t p_t\Big),}\tag{3}$$
+$$\boxed{\mathbb E\big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big]=\big(\mu_1(t)-\mu_0(t)\big)\Big((p_t \circ \mathbf 1_{S_t})-q_t p_t\Big),}$$
 
 which lies in $$\operatorname{span}\{e_s-p_t:\ s\in S_t(Y)\}$$ (dimension $$\le |S_t(Y)|$$). In the singleton case $$S_t(Y)=\{y\}$$,
-$$\boxed{\mathbb E \big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big]=\big(\mu_1(t)-\mu_0(t)\big) p_t[y] (e_y-p_t),}\tag{4}$$
+$$\boxed{\mathbb E \big[(R-b_t) u_{L,t}\bigm|\tau_{\neg t}\big]=\big(\mu_1(t)-\mu_0(t)\big) p_t[y] (e_y-p_t),}$$
 
 i.e., a one-dimensional direction at the output.
 
@@ -174,7 +174,7 @@ i.e., a one-dimensional direction at the output.
 **Matrix view (output layer).**
 
 Let $$W_{\text{out}}\in\mathbb R^{V\times d_{\text{model}}}$$ and $$h_t$$ be the hidden state. The per-episode output gradient is
-$$G_{\text{out}}=\sum_{t=1}^T (R-b_t),u_{L,t},h_t^\top.\tag{5}$$
+$$G_{\text{out}}=\sum_{t=1}^T (R-b_t),u_{L,t},h_t^\top.$$
 
 By (3)–(4), only $$t\in\mathcal D$$ contribute in expectation; each such term is an outer product whose left factor lies in a subspace of dimension $$\le |S_t(Y)|$$ (singleton $$\Rightarrow$$ 1-D). Summing over $$K:=|\mathcal D|$$ decision steps yields, per episode, a sum of at most $$\sum_{t\in\mathcal D}|S_t(Y)|$$ rank-1 matrices. Averaging across a minibatch preserves the signal subspace (union of these few left-factor directions), though the exact matrix rank after averaging need not stay bounded by $$\sum_{t}|S_t|$$.
 
@@ -241,7 +241,7 @@ A quick taxonomy
 | **Binary terminal checker** | $\Delta I \le H(R\mid \tau)\le 1$ bit. | 1 | ~1 direction (the $e_y - p$ tug); wrong tokens are equivariant/indistinguishable. |
 | **Scalar RM (1–5 stars / [0,1])** | $\le \log_2 K$ or SNR-dependent | 1 | Usually still ~1 direction unless the RM scores wrong tokens asymmetrically |
 | **Rubric vector with $K$ criteria (revealed)** | $\le \sum_{k=1}^K H \left(R^{(k)}\mid \tau\right)$; for noisy continuous criteria, $\lesssim \tfrac{1}{2}\sum_{k=1}^K \log_2(1+\mathrm{SNR}_k)$. | $\le K$ | up to $K$ distinct directions per signalling step; explicitly breaks wrong-token equivariance along rubric axes. |
-| **Process rewards (token/step-level)** | $\sim \Theta(#\text{signalling steps})$ × (bits per step) | $\le$ signalling steps × criteria | Many directions; breaks equivariance strongly |
+| **Process rewards (token/step-level)** | $\sim \Theta(\#\text{signalling steps})$ × (bits per step) | $\le$ signalling steps × criteria | Many directions; breaks equivariance strongly |
 | **Actor–Critic with action-dependent advantage** | similar to source reward | $\ge 1$ (often $\gg 1$) | Differentiates among wrong actions ⇒ multiple directions |
 
 
@@ -265,6 +265,7 @@ Equivariance (“any wrong token behaves the same for reward”) implies the out
 ## Closing thoughts
 
 I keep coming back to the decomposition
+
 $$I(Y;\mathcal H_n)=\sum_i I(Y;\tau_i\mid \mathcal H_{i-1})+\sum_i I(Y;R_i\mid \tau_i,\mathcal H_{i-1}),$$
 
 because it reframes a lot of recent RL-for-LLM work as choices about where to spend bits.
