@@ -7,7 +7,7 @@ tags: ['AI', 'RL', 'Information Theory']
 ---
 
 
-In [*LoRA without regret*](https://thinkingmachines.ai/blog/lora/), Schulman et al. informally claim that supervised learning can deliver $$O(\text{#tokens})$$ bits of supervision per episode, whereas policy-gradient RL gets only $$O(1)$$ bits per episode because the advantage signal is effectively a single scalar per episode. Karpathy, too, at Dwarkesh’s podcast, compared RL to “*sucking supervision through a straw”*. The informal claim here is that low-bandwidth updates are amenable to low-rank optimization, for whatever reason.
+In [*LoRA without regret*](https://thinkingmachines.ai/blog/lora/), Schulman et al. informally claim that supervised learning can deliver $$O(\text{\#tokens})$$ bits of supervision per episode, whereas policy-gradient RL gets only $$O(1)$$ bits per episode because the advantage signal is effectively a single scalar per episode. Karpathy, too, at Dwarkesh’s podcast, compared RL to “*sucking supervision through a straw”*. The informal claim here is that low-bandwidth updates are amenable to low-rank optimization, for whatever reason.
 I have heard this take over and over in the past year, especially following the release of o1 and generally RLVR methods, but never really have I read anyone formally bridging the gap between the signal bandwidth and how that relates to low-rank optimization.
 
 In this writeup, I attempt to make this connection explicit. I have divided it into chapters, each containing several subsections.
@@ -39,7 +39,11 @@ The policy $$\pi_\theta$$ samples a trajectory $$\tau = (A_{1:T}, S_{1:T})$$ (in
 
 The environment returns a scalar reward $$R\in\{0,1\}$$ via a checker:
 
+<div style={{ textAlign: 'center' }}>
+
 $$R = \mathsf{Check}(\tau,Y) \in\{0,1\}$$
+
+</div>
 
 Where $$Y$$ is the (fixed, latent) ground-truth answer, and $$R=\mathsf{Check}(\tau,Y)\in\{0,1\}$$ reports success/failure based on whether the generated transcript $$\tau$$ contains a correct instantiation of $$Y$$. Under this reading, $$Y$$ is not a function of $$\tau$$.
 
@@ -277,7 +281,7 @@ Breaking that symmetry is the core act of widening the supervision channel, and 
 <ImageThemeAdjuster
   src="/images/blog/straw/beauty.jpg"
   alt="supervision"
-  strategy="invert"
+  strategy="none"
   aspectRatio="16/9"
   className="w-full my-6"
   showCaption={false}
