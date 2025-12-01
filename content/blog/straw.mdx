@@ -88,14 +88,20 @@ The second equality is just the chain rule *within* each episode:
 <div style={{ textAlign: 'center' }}>
 
 $$I\!\big(Y;(\tau_i,R_i)\,\big|\,\mathcal H_{i-1}\big) = I\!\big(Y;\tau_i \,\big|\, \mathcal H_{i-1}\big) \;+\; I\!\big(Y;R_i \,\big|\, \tau_i,\mathcal H_{i-1}\big)$$
+
+</div>
+
 The environment-provided information is the sum of the second terms:
+
+<div style={{ textAlign: 'center' }}>
+
 $$\sum_{i=1}^n I\big(Y;R_i \mid \tau_i,\mathcal H_{i-1}\big)\;\le\; \sum_{i=1}^n H(R_i \mid \tau_i,\mathcal H_{i-1})\;\le\; n.$$
 
 </div>
 
 This yields the desired $$\le 1$$ bit/episode ceiling for outcome supervision. Note how we disregard the trajectory term, which is unexploited by REINFORCE-like PG methods. More about it later…
 
-Corollary (Data-processing to any update). Let $$U_i=f_i(\tau_i,R_i,\mathcal H_{i-1})$$ be any i-th parameter update or gradient estimator. By DPI,
+**Corollary (Data-processing to any update).** Let $$U_i=f_i(\tau_i,R_i,\mathcal H_{i-1})$$ be any i-th parameter update or gradient estimator. By DPI,
 
 <div style={{ textAlign: 'center' }}>
 
@@ -332,7 +338,11 @@ A quick taxonomy
 **Directional rule of thumb (output layer):**
 Let $$D$$ be the number of decision steps that carry signal and $$K$$ the number of independent feedback dimensions exposed (criteria, heads, or distinct action-dependences). Then the left-factor subspace of the *expected* gradient at the output layer is typically of dimension
 
+<div style={{ textAlign: 'center' }}>
+
 $$S_{\text{out}} \lesssim K \times D,$$
+
+</div>
 
 ### 2) How “asymmetric wrongs” break equivariance
 Equivariance (“any wrong token behaves the same for reward”) implies the output-space expectation $$\mathbb E[(R{-}b)u_{L,t}|\tau_{\neg t}]$$ lies in $$\mathrm{span}\{e_y - p_t\}$$ at a decision step $$t$$. Rubrics/PRMs/RMs **break** this by assigning different expected reward deltas to different wrong tokens (or spans):
@@ -341,16 +351,18 @@ Equivariance (“any wrong token behaves the same for reward”) implies the out
 
 * **PRMs:** Token-/span-level signals distinguish *where* and *how* the trajectory deviated. The left-factor at time $$t$$ becomes a *mixture* of directions tied to those spans; summing across many steps yields $$S_{\text{out}}$$ scaling with the number of rewarded/penalized locations.
 
-
 * **RMs (single scalar):** Even with a single scalar, the mapping from logits to score can be **non-symmetric** in the wrong tokens. If the reward is higher when you choose “almost-right” tokens (e.g., numerically near, semantically close), then the expected direction becomes a **weighted combination** of multiple $$e_k - p$$ vectors instead of just $$e_y - p$$.
-
 
 
 ## Closing thoughts
 
 I keep coming back to the decomposition
 
+<div style={{ textAlign: 'center' }}>
+
 $$I(Y;\mathcal H_n)=\sum_i I(Y;\tau_i\mid \mathcal H_{i-1})+\sum_i I(Y;R_i\mid \tau_i,\mathcal H_{i-1}),$$
+
+</div>
 
 because it reframes a lot of recent RL-for-LLM work as choices about where to spend bits.
 
@@ -368,10 +380,19 @@ Breaking that symmetry is the core act of widening the supervision channel, and 
   caption="Ty"
 />
 
-
 There is also a cleaner way to talk about the value of internal amplification that sidesteps the “but the environment still emits 1 bit” objection. The object we care about is the mutual information between our update and the gradient direction for return, not *just* $$I(Y; R)$$. In the binary-checker setting, the optimal direction is still $$e_y - p$$ at the output, but we typically don’t know where the decision steps are or which wrongs are “closer”. Search, critics, and PRMs increase this mutual information by injecting structure from the prior: compute and auxiliary models make the update less noisy around the right direction even though the raw environmental channel hasn’t changed. The early AlphaGo papers read like variance reduction tricks in this lens: MCTS computes a high-SNR surrogate target for many states; policy learning becomes matching those targets. You can view this as a form of bit-back coding: the 1 environmental bit seeds a lot of internally generated bits that are compressible because they are computed from a strong prior and many correlated rollouts. The environment didn’t speak more, but you used your prior to say a lot more to yourself.
 
 This reframing clarifies the bias–variance trade when you replace verifiable outcomes with fuzzy rubrics. Monte Carlo policy gradients with a checker are unbiased for the true return gradient but have terrible SNR when success is rare; PRMs and rubrics supply dense signals with vastly lower variance but introduce bias because they’re not the true return. The right measure isn’t the MI with $$Y$$ (which a PRM can’t fundamentally increase by DPI if it sees the same $$\tau$$) but rather the risk for estimating $$g*$$: $$MSE = bias^2 + variance$$. There is a regime where adding a biased PRM reduces MSE because variance collapses faster than bias hurts, especially on long chains where MC success probability is exponentially small. There is another regime—distribution shift, misspecified preferences, jailbreaks—where bias dominates and you optimize the wrong thing spectacularly well. This is just the classic overestimation pathology in value learning wearing new clothes: a learned rubric is a value function over language; it will overgeneralize on states it hasn’t seen, and policy optimization will chase those blind spots. The practical antidotes from deep RL carry over: conservative objectives, pessimism under uncertainty, doubly robust estimators that mix outcome-based Monte Carlo with PRM predictions, and targeted data augmentation toward high-advantage, high-uncertainty regions. As a safetyist, maybe preference learning should be framed as a pessimistic risk minimization problem with uncertainty calibration, not as a pure regression to scalar rewards.
+
+<ImageThemeAdjuster
+  src="/images/blog/straw/bitback.jpg"
+  alt="supervision"
+  strategy="none"
+  aspectRatio="16/9"
+  className="w-full my-6"
+  showCaption={false}
+  caption="Ty"
+/>
 
 Exploration is the other half of the story we rarely import from Deep RL into LLMs. In language, we have a perverse inverse: the model is *too* confident in familiar patterns, so exploration looks like *diversifying intermediate reasoning states* rather than final answers. Given how intrinsic this is to pretraining, I find this to be one of the hardest problems, and likely the one whose solution would lead to the biggest gains.
 
