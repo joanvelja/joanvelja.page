@@ -6,6 +6,7 @@ date: '2025-12-01'
 tags: ['AI', 'RL', 'Information Theory']
 ---
 
+*Special thanks go to Tommaso Furlanello, Neev Parikh and @hallerite for reading earlier versions of this post and pushing me to write this.*
 
 In [*LoRA without regret*](https://thinkingmachines.ai/blog/lora/), Schulman et al. informally claim that supervised learning can deliver $$O(\text{\#tokens})$$ bits of supervision per episode, whereas policy-gradient RL gets only $$O(1)$$ bits per episode because the advantage signal is effectively a single scalar per episode. Karpathy, too, at Dwarkesh’s podcast, compared RL to “*sucking supervision through a straw”*. The informal claim here is that low-bandwidth updates are amenable to low-rank optimization, for whatever reason.
 I have heard this take over and over in the past year, especially following the release of o1 and generally RLVR methods, but never really have I read anyone formally bridging the gap between the signal bandwidth and how that relates to low-rank optimization.
