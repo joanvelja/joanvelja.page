@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User, Mail, Briefcase, BookText, Image, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 
 export default function MainLayout({ children }) {
     const [time, setTime] = useState('');
@@ -12,6 +13,8 @@ export default function MainLayout({ children }) {
     const pathname = usePathname();
     const { theme, setTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
+    const { scrollDirection, isAtBottom } = useScrollDirection();
+    const isHidden = scrollDirection === 'down' && !isAtBottom;
 
     useEffect(() => {
         // Set title based on current path
@@ -103,7 +106,7 @@ export default function MainLayout({ children }) {
                     <div className="w-full h-24 md:h-32"></div>
                 </div>
                 <div className="w-full flex flex-col items-center pointer-events-none">
-                    <div className="fixed bottom-8 inset-y-0 flex flex-col justify-end">
+                    <div className={`fixed bottom-8 flex flex-col justify-end transition-transform duration-300 ${isHidden ? 'translate-y-[200%]' : 'translate-y-0'}`}>
                         <div className="z-10 pointer-events-auto">
                             <div className="gap-2 flex flex-row bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md shadow-lg rounded-2xl p-[8px]">
                                 {[

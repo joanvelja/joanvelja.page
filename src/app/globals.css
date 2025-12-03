@@ -236,3 +236,13 @@ pre>code>[data-line][data-highlighted] {
     /* neutral-400 with higher opacity */
   }
 }
+
+/* Math block scrolling for mobile */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+  margin: 1rem 0;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+}

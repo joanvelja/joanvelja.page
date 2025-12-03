@@ -18,8 +18,16 @@ import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
 import { ImageThemeAdjuster } from '@/components/ImageThemeAdjuster';
 import { InteractiveEmbed } from '@/components/InteractiveEmbed';
 
+function getNodeText(node) {
+    if (['string', 'number'].includes(typeof node)) return node;
+    if (node instanceof Array) return node.map(getNodeText).join('');
+    if (typeof node === 'object' && node) return getNodeText(node.props?.children);
+    return '';
+}
+
 function slugify(text) {
-    return text
+    const str = typeof text === 'string' ? text : getNodeText(text);
+    return str
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/(^-|-$)/g, '');
@@ -28,7 +36,7 @@ function slugify(text) {
 // MDX components
 const components = {
     h1: ({ children, ...props }) => {
-        const id = slugify(children?.toString() || '');
+        const id = slugify(children);
         return (
             <HeadingWithAnchor
                 as="h1"
@@ -41,7 +49,7 @@ const components = {
         );
     },
     h2: ({ children, ...props }) => {
-        const id = slugify(children?.toString() || '');
+        const id = slugify(children);
         return (
             <HeadingWithAnchor
                 as="h2"
@@ -54,7 +62,7 @@ const components = {
         );
     },
     h3: ({ children, ...props }) => {
-        const id = slugify(children?.toString() || '');
+        const id = slugify(children);
         return (
             <HeadingWithAnchor
                 as="h3"
@@ -67,7 +75,7 @@ const components = {
         );
     },
     h4: ({ children, ...props }) => {
-        const id = slugify(children?.toString() || '');
+        const id = slugify(children);
         return (
             <HeadingWithAnchor
                 as="h4"
@@ -220,9 +228,8 @@ export async function getAllPosts() {
     return posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-// Get a single post by slug
-// Internal function to fetch and compile post
-const getPostBySlugUncached = async (slug) => {
+// Get raw post data (uncached function)
+const getPostRawDataUncached = async (slug) => {
     const filePath = path.join(process.cwd(), 'content/blog', `${slug}.mdx`);
     const fileContents = fs.readFileSync(filePath, 'utf8');
     const { data, content: rawContent } = matter(fileContents);
@@ -235,12 +242,10 @@ const getPostBySlugUncached = async (slug) => {
 
     // Handle protected posts differently
     if (data.isProtected) {
-        // For protected posts, don't compile MDX yet (it will be compiled after decryption)
-        // Return the encrypted content data
-        content = null; // Content will be decrypted client-side
+        // For protected posts, don't compile MDX yet
+        content = null;
         readingTime = data.estimatedReadingTime || 5;
 
-        // Return necessary data for protected post
         return {
             slug,
             title: data.title,
@@ -250,47 +255,64 @@ const getPostBySlugUncached = async (slug) => {
             image: data.image || null,
             readingTime,
             isProtected: true,
-            // Include encryption metadata needed for decryption, but never the passwordHash directly
             iv: data.iv,
             authTag: data.authTag,
-            // Include encrypted content for client-side decryption
             encryptedContent: data.encryptedContent,
-            // Never include the actual password or hash in the response
         };
     } else {
         // For regular posts, process as normal
         const wordCount = rawContent.split(/\s+/g).length;
         readingTime = Math.ceil(wordCount / wordsPerMinute);
 
-        // Compile MDX content
-        const compiledContent = await compileMDX({
-            source: fileContents,
-            components,
-            options: {
-                ...options,
-                mdxOptions: {
-                    ...options.mdxOptions,
-                },
-            }
-        });
-
         return {
             slug,
-            content: compiledContent.content,
+            rawContent: fileContents, // Return raw content for compilation later
             ...data,
             readingTime,
         };
     }
 };
 
-// Get a single post by slug with persistent caching
-export const getPostBySlug = cache(async (slug) => {
+// Cached version of getPostRawData
+const getPostRawData = cache(async (slug) => {
     return unstable_cache(
-        async () => getPostBySlugUncached(slug),
+        async () => getPostRawDataUncached(slug),
         [`post-${slug}`],
         {
             tags: [`post-${slug}`],
             revalidate: 3600
         }
     )();
-}); 
+});
+
+// Get a single post by slug (fetches cached data then compiles MDX)
+export async function getPostBySlug(slug) {
+    const postData = await getPostRawData(slug);
+
+    // If it's protected or already processed, return as is
+    if (postData.isProtected) {
+        return postData;
+    }
+
+    // Compile MDX content
+    // We do this here because React Elements (returned by compileMDX) cannot be cached by unstable_cache
+    // as they lose their Symbol tags during JSON serialization
+    const compiledContent = await compileMDX({
+        source: postData.rawContent,
+        components,
+        options: {
+            ...options,
+            mdxOptions: {
+                ...options.mdxOptions,
+            },
+        }
+    });
+
+    // Remove rawContent from the result and add the compiled content
+    const { rawContent, ...rest } = postData;
+
+    return {
+        ...rest,
+        content: compiledContent.content,
+    };
+} 

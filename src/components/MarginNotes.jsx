@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useEffect, useRef } from 'react';
+import { createContext, useState, useEffect, useRef, useCallback } from 'react';
 
 export const MarginNotesContext = createContext();
 
@@ -12,7 +12,7 @@ export function MarginNotesProvider({ children }) {
     const contentRef = useRef(null);
 
     // Register a new note
-    const registerNote = (note) => {
+    const registerNote = useCallback((note) => {
         setNotes(prev => {
             // Check if the note already exists
             if (prev.some(n => n.id === note.id)) {
@@ -20,7 +20,7 @@ export function MarginNotesProvider({ children }) {
             }
             return [...prev, note];
         });
-    };
+    }, []);
 
     useEffect(() => {
         // Create an intersection observer to track which notes are visible
@@ -79,12 +79,12 @@ export function MarginNotesProvider({ children }) {
                     shouldUpdate = true;
                 }
             });
-            
+
             if (shouldUpdate) {
                 updateObservedElements();
             }
         });
-        
+
         mutationObserver.observe(document.body, { childList: true, subtree: true });
 
         return () => {
@@ -97,18 +97,18 @@ export function MarginNotesProvider({ children }) {
         <MarginNotesContext.Provider value={{ notes, registerNote }}>
             <div ref={contentRef} className="relative max-w-full">
                 {children}
-            
+
                 {/* Margin notes container - positioned outside the content container */}
                 {notes.length > 0 && (
-                    <div className="absolute top-0 right-0 w-64 h-full hidden xl:block" 
-                         style={{ left: 'calc(50% + 400px)', marginLeft: '2rem' }}>
+                    <div className="absolute top-0 right-0 w-64 h-full hidden xl:block"
+                        style={{ left: 'calc(50% + 400px)', marginLeft: '2rem' }}>
                         <div className="relative w-full h-full">
                             {notes.filter(note => visibleNotes.includes(note.id)).map(note => {
                                 // Calculate position based on the original element's position
                                 const position = notePositions.current.get(note.id) || 0;
                                 const contentTop = contentRef.current?.getBoundingClientRect().top || 0;
                                 const adjustedPosition = position - window.scrollY - contentTop;
-                                
+
                                 return (
                                     <div
                                         key={note.id}
