@@ -11,11 +11,10 @@ import { MarginNote } from '@/components/MarginNote';
 import { MarginNotesProvider } from '@/components/MarginNotes';
 import { CitationProvider, Citation, Bibliography, Cite } from '@/components/Citation';
 import { ProtectedContent } from '../components/ProtectedContent';
-import { LockClosedIcon } from '@heroicons/react/24/outline';
+import { Lock } from 'lucide-react';
 import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
 import { ImageThemeAdjuster } from '@/components/ImageThemeAdjuster';
 import 'katex/dist/katex.min.css';
-import 'prismjs/themes/prism-tomorrow.css';
 
 // Function to convert heading text to URL-friendly slug
 function slugify(text) {
@@ -29,22 +28,22 @@ function slugify(text) {
 export async function generateMetadata({ params }) {
     const { slug } = await params;
     const post = await getPostBySlug(slug);
-    
+
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://joanvelja.page';
     const postUrl = `${baseUrl}/blog/${slug}`;
-    
+
     // Handle the image URL - ensure it's absolute
     let imageUrl = null;
     if (post.image) {
-        imageUrl = post.image.startsWith('http') 
-            ? post.image 
+        imageUrl = post.image.startsWith('http')
+            ? post.image
             : `${baseUrl}${post.image}`;
     }
-    
+
     return {
         title: post.title,
         description: post.excerpt || post.description || 'Read more about this topic on Joan\'s blog.',
-        
+
         // Open Graph tags for general social sharing
         openGraph: {
             title: post.title,
@@ -66,7 +65,7 @@ export async function generateMetadata({ params }) {
                 ]
             })
         },
-        
+
         // Twitter Card tags for X/Twitter sharing
         twitter: {
             card: 'summary_large_image',
@@ -78,12 +77,12 @@ export async function generateMetadata({ params }) {
                 images: [imageUrl]
             })
         },
-        
+
         // Additional meta tags
         alternates: {
             canonical: postUrl,
         },
-        
+
         // Article-specific metadata
         other: {
             'article:author': 'Joan Velja',
@@ -172,7 +171,7 @@ const components = {
         if (!props.src || props.src === '' || (typeof props.src === 'object' && Object.keys(props.src).length === 0)) {
             return null;
         }
-        
+
         // Use our dark mode image wrapper component for better dark mode support
         return (
             <div className="my-4">
@@ -220,79 +219,79 @@ export default async function BlogPost({ params }) {
                         <ReadingProgress />
                         <SectionObserver />
                         <TableOfContents />
-                    
-                    {/* Header */}
-                    <header className="mb-8">
-                        <h1 id="title" className="text-4xl font-bold text-neutral-900 dark:text-white mb-4 font-serif">
-                            {post.title}
-                        </h1>
-                        <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400 font-sans">
-                            <time dateTime={post.date}>
-                                {new Date(post.date).toLocaleDateString('en-US', {
-                                    year: 'numeric',
-                                    month: 'long',
-                                    day: 'numeric'
-                                })}
-                            </time>
-                            <div className="flex items-center gap-4">
-                                {!post.isProtected && (
-                                    <span>{post.readingTime} min read</span>
-                                )}
-                                {post.isProtected && (
-                                    <span className="flex items-center text-amber-600 dark:text-amber-500">
-                                        <LockClosedIcon className="w-4 h-4 mr-1" />
-                                        Protected
-                                    </span>
-                                )}
-                                <ShareButton post={post} />
+
+                        {/* Header */}
+                        <header className="mb-8">
+                            <h1 id="title" className="text-4xl font-bold text-neutral-900 dark:text-white mb-4 font-serif">
+                                {post.title}
+                            </h1>
+                            <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400 font-sans">
+                                <time dateTime={post.date}>
+                                    {new Date(post.date).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: 'long',
+                                        day: 'numeric'
+                                    })}
+                                </time>
+                                <div className="flex items-center gap-4">
+                                    {!post.isProtected && (
+                                        <span>{post.readingTime} min read</span>
+                                    )}
+                                    {post.isProtected && (
+                                        <span className="flex items-center text-amber-600 dark:text-amber-500">
+                                            <Lock className="w-4 h-4 mr-1" />
+                                            Protected
+                                        </span>
+                                    )}
+                                    <ShareButton post={post} />
+                                </div>
                             </div>
-                        </div>
-                    </header>
+                        </header>
 
-                    {/* Cover Image */}
-                    {post.image && (
-                        <div className="relative mb-8">
-                            <DarkModeImageWrapper
-                                src={post.image}
-                                alt={post.title}
-                                className="w-full aspect-[2/1] object-cover"
-                                rounded="rounded-xl"
-                                isCoverImage={true}
-                            />
-                        </div>
-                    )}
-
-                    {/* Content */}
-                    {post.isProtected ? (
-                        <ProtectedContent post={post} />
-                    ) : (
-                        <div className="prose prose-neutral dark:prose-invert max-w-none blog-content">
-                            {post.content}
-                        </div>
-                    )}
-
-                    {/* Bibliography */}
-                    <Bibliography />
-
-                    {/* Tags */}
-                    {post.tags && post.tags.length > 0 && (
-                        <div className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
-                            <h2 className="text-lg font-medium text-neutral-900 dark:text-white mb-3">Tags</h2>
-                            <div className="flex flex-wrap gap-2">
-                                {post.tags.map(tag => (
-                                    <span 
-                                        key={tag}
-                                        className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-full text-sm"
-                                    >
-                                        {tag}
-                                    </span>
-                                ))}
+                        {/* Cover Image */}
+                        {post.image && (
+                            <div className="relative mb-8">
+                                <DarkModeImageWrapper
+                                    src={post.image}
+                                    alt={post.title}
+                                    className="w-full aspect-[2/1] object-cover"
+                                    rounded="rounded-xl"
+                                    isCoverImage={true}
+                                />
                             </div>
-                        </div>
-                    )}
-                </article>
-            </SidenotesProvider>
-        </MarginNotesProvider>
-    </CitationProvider>
+                        )}
+
+                        {/* Content */}
+                        {post.isProtected ? (
+                            <ProtectedContent post={post} />
+                        ) : (
+                            <div className="prose prose-neutral dark:prose-invert max-w-none blog-content">
+                                {post.content}
+                            </div>
+                        )}
+
+                        {/* Bibliography */}
+                        <Bibliography />
+
+                        {/* Tags */}
+                        {post.tags && post.tags.length > 0 && (
+                            <div className="mt-8 pt-6 border-t border-neutral-200 dark:border-neutral-800">
+                                <h2 className="text-lg font-medium text-neutral-900 dark:text-white mb-3">Tags</h2>
+                                <div className="flex flex-wrap gap-2">
+                                    {post.tags.map(tag => (
+                                        <span
+                                            key={tag}
+                                            className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-full text-sm"
+                                        >
+                                            {tag}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </article>
+                </SidenotesProvider>
+            </MarginNotesProvider>
+        </CitationProvider>
     );
 } 

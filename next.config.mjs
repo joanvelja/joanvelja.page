@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  turbopack: {},
+};
 
 import bundleAnalyzer from '@next/bundle-analyzer';
 

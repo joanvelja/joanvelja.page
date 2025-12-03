@@ -4,25 +4,56 @@
 
 :root {
   --transition-duration: 0.3s;
+  --paper: #fdfbf7;
+  --ink: #1a1a1a;
+  --background: var(--paper);
+  --foreground: var(--ink);
 }
 
 /* Global transition for theme change */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   transition: background-color var(--transition-duration) ease,
-              border-color var(--transition-duration) ease,
-              color var(--transition-duration) ease,
-              fill var(--transition-duration) ease,
-              stroke var(--transition-duration) ease;
+    border-color var(--transition-duration) ease,
+    color var(--transition-duration) ease,
+    fill var(--transition-duration) ease,
+    stroke var(--transition-duration) ease;
 }
 
 body {
-  @apply font-mono;
+  @apply font-sans text-ink bg-paper;
   transition: background-color var(--transition-duration) ease;
+  position: relative;
+}
+
+/* Noise Texture */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 @media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #1a1a1a;
+    --ink: #fdfbf7;
+  }
+
   body {
     @apply bg-neutral-900;
+  }
+
+  body::before {
+    opacity: 0.05;
+    filter: invert(1);
   }
 }
 
@@ -43,10 +74,10 @@ body {
 .blog-content li,
 .blog-content blockquote {
   @apply font-serif !important;
-  font-family: var(--font-merriweather) !important;
+  font-family: var(--font-crimson-pro) !important;
   line-height: 1.8rem !important;
   letter-spacing: 0.01em !important;
-  font-size: 1.05rem !important;
+  font-size: 1.125rem !important;
 }
 
 .blog-content h1,
@@ -54,7 +85,7 @@ body {
 .blog-content h3,
 .blog-content h4 {
   @apply font-serif !important;
-  font-family: var(--font-merriweather) !important;
+  font-family: var(--font-crimson-pro) !important;
   letter-spacing: -0.01em !important;
 }
 
@@ -67,7 +98,7 @@ body {
   font-style: italic;
 }
 
-.blog-content ul, 
+.blog-content ul,
 .blog-content ol {
   margin-left: 1rem;
 }
@@ -75,24 +106,22 @@ body {
 /* Dark mode image treatments */
 .dark-mode-image {
   /* Add soft mask to edges */
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0, 0, 0, 1) 85%,
-    rgba(0, 0, 0, 0.9)
-  );
-  
+  mask-image: linear-gradient(to bottom,
+      rgba(0, 0, 0, 1) 85%,
+      rgba(0, 0, 0, 0.9));
+
   /* Slightly reduce brightness and contrast */
   filter: brightness(0.98) contrast(0.98) saturate(0.98);
-  
+
   /* Add subtle shadow effect */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  
+
   /* Smooth transition when switching between modes */
-  transition: filter var(--transition-duration) ease, 
-              box-shadow var(--transition-duration) ease, 
-              mask-image var(--transition-duration) ease,
-              background-color var(--transition-duration) ease,
-              border-color var(--transition-duration) ease;
+  transition: filter var(--transition-duration) ease,
+    box-shadow var(--transition-duration) ease,
+    mask-image var(--transition-duration) ease,
+    background-color var(--transition-duration) ease,
+    border-color var(--transition-duration) ease;
 }
 
 /* Optional vignette effect for images - can be applied with a specific class */
@@ -114,59 +143,96 @@ body {
 }
 
 /* Disable transitions for pre/code blocks where it can cause visual issues */
-pre, code, pre *, code * {
+pre,
+code,
+pre *,
+code * {
   transition: none !important;
 }
 
 /* Code block styles */
 pre {
-    @apply p-4 rounded-lg overflow-x-auto bg-neutral-900 dark:bg-neutral-800;
+  @apply p-4 rounded-lg overflow-x-auto bg-neutral-900 dark:bg-neutral-800;
 }
 
 pre::-webkit-scrollbar {
-    width: 2px;
-    height: 8px;
+  width: 2px;
+  height: 8px;
 }
 
 pre::-webkit-scrollbar-track {
-    background: rgb(229 229 229);
-    border-radius: 9999px;
+  background: rgb(229 229 229);
+  border-radius: 9999px;
 }
 
 pre::-webkit-scrollbar-thumb {
-    background: rgb(163 163 163);
-    border-radius: 9999px;
+  background: rgb(163 163 163);
+  border-radius: 9999px;
 }
 
 .dark pre::-webkit-scrollbar-track {
-    background: rgb(38 38 38);
+  background: rgb(38 38 38);
 }
 
 .dark pre::-webkit-scrollbar-thumb {
-    background: rgb(82 82 82);
+  background: rgb(82 82 82);
 }
 
-pre > code {
-    @apply grid;
-    counter-reset: line;
+pre>code {
+  @apply grid;
+  counter-reset: line;
 }
 
-pre > code > [data-line] {
-    @apply border-l-2 border-l-transparent px-4;
-    counter-increment: line;
+pre>code>[data-line] {
+  @apply border-l-2 border-l-transparent px-4;
+  counter-increment: line;
 }
 
-pre > code > [data-line]::before {
-    @apply text-neutral-500 mr-4;
-    content: counter(line);
+pre>code>[data-line]::before {
+  @apply text-neutral-500 mr-4;
+  content: counter(line);
 }
 
-pre > code > [data-line][data-highlighted] {
-    @apply bg-neutral-800 dark:bg-neutral-700 border-l-blue-500;
+pre>code>[data-line][data-highlighted] {
+  @apply bg-neutral-800 dark:bg-neutral-700 border-l-blue-500;
 }
 
 /* Inline code styles */
-:not(pre) > code {
-    @apply bg-neutral-100 dark:bg-neutral-800 rounded px-1.5 py-0.5 text-sm font-mono;
+:not(pre)>code {
+  @apply bg-neutral-100 dark:bg-neutral-800 rounded px-1.5 py-0.5 text-sm font-mono;
 }
 
+
+/* Global Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+  /* neutral-400 with opacity */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.8);
+  /* neutral-500 with higher opacity */
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.5);
+    /* neutral-600 with opacity */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.8);
+    /* neutral-400 with higher opacity */
+  }
+}

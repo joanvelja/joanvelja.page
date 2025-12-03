@@ -11,11 +11,26 @@ const config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        paper: "var(--paper)",
+        ink: "var(--ink)",
+        crimson: {
+          50: '#fdf2f2',
+          100: '#fde8e8',
+          200: '#fbd5d5',
+          300: '#f8b4b4',
+          400: '#f98080',
+          500: '#f05252',
+          600: '#e02424',
+          700: '#c81e1e',
+          800: '#9b1c1c',
+          900: '#771d1d',
+          950: '#3f0708',
+        },
       },
       fontFamily: {
-        sans: ['var(--font-geist-sans)'],
-        mono: ['var(--font-geist-mono)'],
-        serif: ['var(--font-merriweather)'],
+        sans: ['var(--font-dm-sans)'],
+        mono: ['var(--font-jetbrains-mono)'],
+        serif: ['var(--font-crimson-pro)'],
       },
       fontSize: {
         'display-large': ['3.5rem', { lineHeight: '1.2', letterSpacing: '-0.02em' }],
@@ -57,11 +72,11 @@ const config = {
         DEFAULT: {
           css: {
             'p, ul, ol, li, blockquote': {
-              fontFamily: 'var(--font-merriweather)',
+              fontFamily: 'var(--font-crimson-pro)',
               lineHeight: '1.75rem',
             },
             'h1, h2, h3, h4': {
-              fontFamily: 'var(--font-merriweather)',
+              fontFamily: 'var(--font-crimson-pro)',
             },
           },
         },

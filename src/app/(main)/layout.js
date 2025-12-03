@@ -36,7 +36,7 @@ export default function MainLayout({ children }) {
         };
         updateTime();
         const interval = setInterval(updateTime, 1000);
-        
+
         // Mark as mounted
         setMounted(true);
 
@@ -70,8 +70,10 @@ export default function MainLayout({ children }) {
                         <div className="w-[130px] flex flex-col justify-center">
                             <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">Joan's Website</p>
                         </div>
-                        <h1 className="text-xl font-medium md:block hidden text-neutral-900 dark:text-white font-serif"> {title} </h1>
-                        <div className="w-[130px] flex flex-col items-end">
+                        <div className="flex items-center justify-center">
+                            <h1 className="text-xl font-medium md:block hidden text-neutral-900 dark:text-white font-serif"> {title} </h1>
+                        </div>
+                        <div className="w-[130px] flex flex-col items-end justify-center">
                             <div className="flex items-center gap-6">
                                 <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">
                                     {time}
@@ -104,42 +106,38 @@ export default function MainLayout({ children }) {
                     <div className="fixed bottom-8 inset-y-0 flex flex-col justify-end">
                         <div className="z-10 pointer-events-auto">
                             <div className="gap-2 flex flex-row bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md shadow-lg rounded-2xl p-[8px]">
-                                <div className="flex flex-col items-center group">
-                                    <Link title="About" href="/about" className="nomblhighlight flex flex-col items-center justify-center p-[10px] rounded-xl shadow-sm bg-white/90 dark:bg-neutral-900/90 fill-neutral-600/90 border border-neutral-200/80 dark:border-neutral-700/80
-                                        transition-all ease-in-out hover:shadow-md hover:rotate-12 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:fill-neutral-500
-                                        active:scale-125 active:rotate-0 active:-translate-y-3 active:shadow-xl">
-                                        <User size={28} className="stroke-neutral-700 dark:stroke-neutral-200 transition-all ease-in-out group-hover:stroke-sky-500" />
-                                    </Link>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute translate-y-[42.9px] stroke-neutral-400 dark:stroke-neutral-600"><circle cx="12.1" cy="12.1" r="1"></circle></svg>
-                                </div>
-                                <div className="flex flex-col items-center group">
-                                    <Link title="Contact" href="/contact" className="nomblhighlight flex flex-col items-center justify-center p-[10px] rounded-xl shadow-sm bg-white/90 dark:bg-neutral-900/90 fill-neutral-600/90 border border-neutral-200/80 dark:border-neutral-700/80
-                                        transition-all ease-in-out hover:shadow-md hover:rotate-12 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:fill-neutral-500
-                                        active:scale-125 active:rotate-0 active:-translate-y-3 active:shadow-xl">
-                                        <Mail size={28} className="stroke-neutral-700 dark:stroke-neutral-200 transition-all ease-in-out group-hover:stroke-emerald-500" />
-                                    </Link>
-                                </div>
-                                <div className="flex flex-col items-center group">
-                                    <Link title="Projects" href="/projects" className="nomblhighlight flex flex-col items-center justify-center p-[10px] rounded-xl shadow-sm bg-white/90 dark:bg-neutral-900/90 fill-neutral-600/90 border border-neutral-200/80 dark:border-neutral-700/80
-                                        transition-all ease-in-out hover:shadow-md hover:rotate-12 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:fill-neutral-500
-                                        active:scale-125 active:rotate-0 active:-translate-y-3 active:shadow-xl">
-                                        <Briefcase size={28} className="stroke-neutral-700 dark:stroke-neutral-200 transition-all ease-in-out group-hover:stroke-red-500" />
-                                    </Link>
-                                </div>
-                                <div className="flex flex-col items-center group">
-                                    <Link title="Blog" href="/blog" className="nomblhighlight flex flex-col items-center justify-center p-[10px] rounded-xl shadow-sm bg-white/90 dark:bg-neutral-900/90 fill-neutral-600/90 border border-neutral-200/80 dark:border-neutral-700/80
-                                        transition-all ease-in-out hover:shadow-md hover:rotate-12 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:fill-neutral-500
-                                        active:scale-125 active:rotate-0 active:-translate-y-3 active:shadow-xl">
-                                        <BookText size={28} className="stroke-neutral-700 dark:stroke-neutral-200 transition-all ease-in-out group-hover:stroke-yellow-500" />
-                                    </Link>
-                                </div>
-                                <div className="flex flex-col items-center group">
-                                    <Link title="Photos" href="/photos" className="nomblhighlight flex flex-col items-center justify-center p-[10px] rounded-xl shadow-sm bg-white/90 dark:bg-neutral-900/90 fill-neutral-600/90 border border-neutral-200/80 dark:border-neutral-700/80
-                                        transition-all ease-in-out hover:shadow-md hover:rotate-12 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:fill-neutral-500
-                                        active:scale-125 active:rotate-0 active:-translate-y-3 active:shadow-xl">
-                                        <Image size={28} className="stroke-neutral-700 dark:stroke-neutral-200 transition-all ease-in-out group-hover:stroke-purple-500" />
-                                    </Link>
-                                </div>
+                                {[
+                                    { name: 'About', path: '/about', icon: User, color: 'group-hover:stroke-sky-500' },
+                                    { name: 'Contact', path: '/contact', icon: Mail, color: 'group-hover:stroke-emerald-500' },
+                                    { name: 'Projects', path: '/projects', icon: Briefcase, color: 'group-hover:stroke-red-500' },
+                                    { name: 'Blog', path: '/blog', icon: BookText, color: 'group-hover:stroke-yellow-500' },
+                                    { name: 'Photos', path: '/photos', icon: Image, color: 'group-hover:stroke-purple-500' }
+                                ].map((item) => {
+                                    const isActive = pathname === item.path || (item.path !== '/about' && pathname.startsWith(item.path));
+                                    const Icon = item.icon;
+
+                                    return (
+                                        <div key={item.name} className="flex flex-col items-center group relative">
+                                            <Link
+                                                title={item.name}
+                                                href={item.path}
+                                                className={`nomblhighlight flex flex-col items-center justify-center p-[10px] rounded-xl shadow-sm 
+                                                bg-white/90 dark:bg-neutral-900/90 fill-neutral-600/90 border border-neutral-200/80 dark:border-neutral-700/80
+                                                transition-all ease-in-out duration-300
+                                                hover:shadow-md hover:-translate-y-1 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:fill-neutral-500
+                                                active:scale-95 active:shadow-sm
+                                                ${isActive ? 'bg-neutral-50 dark:bg-neutral-800 border-neutral-300 dark:border-neutral-600' : ''}`}
+                                            >
+                                                <Icon size={28} className={`stroke-neutral-700 dark:stroke-neutral-200 transition-all ease-in-out ${item.color}`} />
+                                            </Link>
+                                            {isActive && (
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute -bottom-6 stroke-neutral-400 dark:stroke-neutral-600 animate-fade-in">
+                                                    <circle cx="12.1" cy="12.1" r="1"></circle>
+                                                </svg>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>

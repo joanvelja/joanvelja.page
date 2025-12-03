@@ -9,7 +9,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
-import { LockClosedIcon } from '@heroicons/react/24/outline';
+import { Lock } from 'lucide-react';
 
 // Import the same components used in the regular MDX rendering
 import { Sidenote } from '@/components/Sidenote';
@@ -104,7 +104,7 @@ const components = {
     if (!props.src || props.src === '' || (typeof props.src === 'object' && Object.keys(props.src).length === 0)) {
       return null;
     }
-    
+
     // Use our dark mode image wrapper component for better dark mode support
     return (
       <div className="my-4">
@@ -142,14 +142,14 @@ export function ProtectedContent({ post }) {
   // Handle successful decryption
   const handleDecrypt = async (decryptedContent) => {
     setIsProcessing(true);
-    
+
     try {
       // Calculate the reading time from the decrypted content
       const wordsPerMinute = 200;
       const wordCount = decryptedContent.split(/\s+/g).length;
       const calculatedReadingTime = Math.ceil(wordCount / wordsPerMinute);
       setReadingTime(calculatedReadingTime);
-      
+
       // Process the decrypted MDX content
       const mdxSource = await serialize(decryptedContent, {
         mdxOptions: {
@@ -170,15 +170,15 @@ export function ProtectedContent({ post }) {
         },
         parseFrontmatter: true,
       });
-      
+
       // Set the processed MDX source
       setMdxSource(mdxSource);
       setIsDecrypted(true);
-      
+
       // Store a flag in session storage to remember this post was decrypted
       // This allows the content to persist during the session but not permanently
       sessionStorage.setItem(`decrypted-${post.slug}`, 'true');
-      
+
     } catch (error) {
       console.error('Error processing decrypted content:', error);
       setIsDecrypted(false);
@@ -186,7 +186,7 @@ export function ProtectedContent({ post }) {
       setIsProcessing(false);
     }
   };
-  
+
   // Check if this post was previously decrypted in this session
   useEffect(() => {
     const wasDecrypted = sessionStorage.getItem(`decrypted-${post.slug}`);
@@ -196,7 +196,7 @@ export function ProtectedContent({ post }) {
       setIsDecrypted(false);
     }
   }, [post.slug]);
-  
+
   // Clear decrypted state when unmounting
   useEffect(() => {
     return () => {
@@ -225,7 +225,7 @@ export function ProtectedContent({ post }) {
       <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md">
         <div className="flex items-start justify-between">
           <div className="flex items-start">
-            <LockClosedIcon className="w-5 h-5 text-blue-600 dark:text-blue-500 mt-0.5 mr-2" />
+            <Lock className="w-5 h-5 text-blue-600 dark:text-blue-500 mt-0.5 mr-2" />
             <p className="text-sm text-blue-700 dark:text-blue-400">
               You are viewing protected content. This content will remain accessible during your current session.
             </p>
@@ -237,7 +237,7 @@ export function ProtectedContent({ post }) {
           )}
         </div>
       </div>
-      
+
       <div className="prose prose-neutral dark:prose-invert max-w-none blog-content">
         <MDXRemote {...mdxSource} components={components} />
       </div>

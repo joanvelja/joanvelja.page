@@ -32,11 +32,6 @@ export const MDXComponents = {
   
   // Enhanced image component with dark mode support
   img: (props) => {
-    // Don't render if src is missing, empty string, or an empty object
-    if (!props.src || props.src === '' || (typeof props.src === 'object' && Object.keys(props.src).length === 0)) {
-      return null;
-    }
-    
     // Use our dark mode image wrapper for standard markdown images
     return (
       <div className="my-8">

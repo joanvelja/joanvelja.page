@@ -8,6 +8,8 @@ import rehypeKatex from 'rehype-katex';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import { compileMDX } from 'next-mdx-remote/rsc';
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
 import { Sidenote } from '@/components/Sidenote';
 import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import { MarginNote } from '@/components/MarginNote';
@@ -101,7 +103,7 @@ const components = {
         if (!props.src || props.src === '' || (typeof props.src === 'object' && Object.keys(props.src).length === 0)) {
             return null;
         }
-        
+
         // Use our dark mode image wrapper component
         return (
             <div className="my-4">
@@ -109,7 +111,7 @@ const components = {
                     src={props.src}
                     alt={props.alt || "Image"}
                     className="w-full"
-                    rounded="rounded-lg" 
+                    rounded="rounded-lg"
                 />
                 {props.alt && props.alt !== "Image" && (
                     <p className="text-xs text-center text-neutral-500 dark:text-neutral-400 mt-1 italic font-serif">
@@ -146,12 +148,15 @@ const options = {
                 theme: 'one-dark-pro',
                 defaultLang: 'plaintext',
                 getHighlighter: async (highlighterOpts) => {
-                    // For shiki@1.x, we use getHighlighter directly
-                    const shiki = await import('shiki');
-                    return shiki.getHighlighter({
-                        ...highlighterOpts, // This usually includes theme passed by rehype-pretty-code
-                        langs: highlighterOpts.langs || ['javascript', 'typescript', 'jsx', 'tsx', 'python', 'html', 'css', 'json', 'yaml', 'markdown', 'bash', 'shell', 'diff']
-                    });
+                    // Use a singleton promise to prevent re-initialization on every request
+                    if (!global.shikiHighlighterPromise) {
+                        const shiki = await import('shiki');
+                        global.shikiHighlighterPromise = shiki.getHighlighter({
+                            ...highlighterOpts,
+                            langs: highlighterOpts.langs || ['javascript', 'typescript', 'jsx', 'tsx', 'python', 'html', 'css', 'json', 'yaml', 'markdown', 'bash', 'shell', 'diff']
+                        });
+                    }
+                    return global.shikiHighlighterPromise;
                 }
             }],
             rehypeSlug,   // Add IDs to headings
@@ -176,7 +181,7 @@ export async function getAllPosts() {
 
                 // Calculate reading time (rough estimate)
                 const wordsPerMinute = 200;
-                
+
                 // For protected posts, use a placeholder reading time or estimate from excerpt
                 let readingTime;
                 if (data.isProtected) {
@@ -216,24 +221,25 @@ export async function getAllPosts() {
 }
 
 // Get a single post by slug
-export async function getPostBySlug(slug) {
+// Internal function to fetch and compile post
+const getPostBySlugUncached = async (slug) => {
     const filePath = path.join(process.cwd(), 'content/blog', `${slug}.mdx`);
     const fileContents = fs.readFileSync(filePath, 'utf8');
     const { data, content: rawContent } = matter(fileContents);
 
     // Calculate reading time (rough estimate)
     const wordsPerMinute = 200;
-    
+
     let readingTime;
     let content;
-    
+
     // Handle protected posts differently
     if (data.isProtected) {
         // For protected posts, don't compile MDX yet (it will be compiled after decryption)
         // Return the encrypted content data
         content = null; // Content will be decrypted client-side
         readingTime = data.estimatedReadingTime || 5;
-        
+
         // Return necessary data for protected post
         return {
             slug,
@@ -275,4 +281,16 @@ export async function getPostBySlug(slug) {
             readingTime,
         };
     }
-} 
+};
+
+// Get a single post by slug with persistent caching
+export const getPostBySlug = cache(async (slug) => {
+    return unstable_cache(
+        async () => getPostBySlugUncached(slug),
+        [`post-${slug}`],
+        {
+            tags: [`post-${slug}`],
+            revalidate: 3600
+        }
+    )();
+}); 

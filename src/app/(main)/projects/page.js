@@ -1,64 +1,65 @@
 'use client';
 
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, ExternalLink, ChevronRight } from 'lucide-react';
+import { projects } from '@/lib/projectsData';
 
 // Tag component for reusability
 const Tag = ({ type }) => {
     const colors = {
-        intern: 'bg-orange-100 text-orange-800',
-        student: 'bg-purple-100 text-purple-800',
-        hackathon: 'bg-pink-100 text-pink-800',
-        freelance: 'bg-blue-100 text-blue-800',
-        web: 'bg-green-100 text-green-800',
-        founder: 'bg-cyan-100 text-cyan-800',
-        ai: 'bg-gray-100 text-gray-800',
-        'Visiting Researcher': 'bg-red-100 text-red-800',
-        Researcher: 'bg-blue-100 text-blue-800'
+        intern: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+        student: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+        hackathon: 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300',
+        freelance: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+        web: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+        founder: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300',
+        ai: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300',
+        'Visiting Researcher': 'bg-crimson-100 text-crimson-800 dark:bg-crimson-900/30 dark:text-crimson-300',
+        Researcher: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300',
+        Masters: 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-300',
+        Bachelors: 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300'
     };
 
     return (
-        <span className={`px-2 py-0.5 rounded-md text-sm font-medium font-sans ${colors[type] || 'bg-gray-100 text-gray-800'}`}>
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium font-sans border border-transparent ${colors[type] || 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300'}`}>
             {type}
         </span>
     );
 };
 
 // WorkListItem component
-const WorkListItem = ({ name, type, location, isSelected, onClick }) => (
+const WorkListItem = ({ name, type, location, period, isSelected, onClick }) => (
     <div
         onClick={onClick}
-        className={`flex items-start justify-between p-4 cursor-pointer transition-all duration-300
-            border-b border-neutral-100 dark:border-neutral-800 last:border-b-0
-            ${isSelected ? 'bg-neutral-50 dark:bg-neutral-800' : 'hover:bg-neutral-50/50 dark:hover:bg-neutral-800/50'}`}
+        className={`group flex items-center justify-between p-5 cursor-pointer transition-all duration-300
+            border border-transparent rounded-xl mb-3
+            ${isSelected
+                ? 'bg-white dark:bg-neutral-800 shadow-md border-neutral-200 dark:border-neutral-700 scale-[1.02]'
+                : 'hover:bg-white dark:hover:bg-neutral-800 hover:shadow-sm hover:border-neutral-200 dark:hover:border-neutral-700 hover:scale-[1.01]'}`}
     >
-        <span className="text-neutral-900 dark:text-white font-medium font-serif">{name}</span>
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex flex-col gap-1">
+            <span className={`font-serif text-lg font-medium transition-colors ${isSelected ? 'text-crimson-600 dark:text-crimson-400' : 'text-neutral-900 dark:text-white group-hover:text-crimson-600 dark:group-hover:text-crimson-400'}`}>
+                {name}
+            </span>
+            <span className="text-neutral-500 dark:text-neutral-400 text-sm font-sans">{location} • {period}</span>
+        </div>
+        <div className="flex flex-col items-end gap-2">
             <Tag type={type} />
-            <span className="text-neutral-500 dark:text-neutral-400 text-xs font-sans">{location}</span>
+            <ChevronRight size={16} className={`text-neutral-400 transition-transform duration-300 ${isSelected ? 'rotate-90 text-crimson-500' : 'group-hover:translate-x-1'}`} />
         </div>
     </div>
 );
 
-// Add this helper function near the top of the file
+// Helper for links
 const renderTextWithLinks = (text) => {
     if (!text) return null;
-    
-    // Match [text](url) pattern
     const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
-    
     return parts.map((part, index) => {
         const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
         if (match) {
             const [_, text, url] = match;
             return (
-                <a
-                    key={index}
-                    href={url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-500 hover:underline"
-                >
+                <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="text-crimson-600 hover:text-crimson-700 dark:text-crimson-400 dark:hover:text-crimson-300 hover:underline">
                     {text}
                 </a>
             );
@@ -72,127 +73,102 @@ const WorkDetailPanel = ({ project, onClose }) => {
     if (!project) return null;
 
     const renderRelatedLink = (link) => {
-        const icons = {
-            arxiv: '📜',
-            github: '🔗',
-            website: '🌐',
-            pdf: '📄'
-        };
-
+        const icons = { arxiv: '📜', github: '🔗', website: '🌐', pdf: '📄' };
         return (
-            <a
-                key={link.url}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline flex items-center gap-2 group"
-            >
-                {icons[link.type]} <span className="group-hover:underline">{link.text}</span>
+            <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-lg text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors group">
+                <span>{icons[link.type]}</span>
+                <span className="group-hover:text-crimson-600 dark:group-hover:text-crimson-400 transition-colors">{link.text}</span>
+                <ExternalLink size={12} className="opacity-50 group-hover:opacity-100" />
             </a>
         );
     };
 
     const renderRelatedWork = (work) => (
-        <div key={work.title} className="border-l-2 border-neutral-200 dark:border-neutral-700 pl-4 py-2">
-            <p className="text-neutral-900 dark:text-white font-medium font-serif">{work.title}</p>
-            
-            {/* Supervisor first - if exists */}
+        <div key={work.title} className="group bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-5 border border-neutral-100 dark:border-neutral-800 hover:border-crimson-100 dark:hover:border-crimson-900/30 transition-colors">
+            <h4 className="text-neutral-900 dark:text-white font-medium font-serif text-lg leading-tight group-hover:text-crimson-700 dark:group-hover:text-crimson-400 transition-colors">
+                {work.title}
+            </h4>
+
             {work.supervisor && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-serif">
-                    Supervised by{' '}
-                    <a 
-                        href={work.supervisor_link} 
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 hover:underline"
-                    >
-                        {work.supervisor}
-                    </a>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 font-sans">
+                    Supervised by <a href={work.supervisor_link} target="_blank" rel="noopener noreferrer" className="text-crimson-600 hover:underline">{work.supervisor}</a>
                 </p>
             )}
-            
-            {/* Description with inline links */}
+
             {work.description && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-serif">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-3 font-serif leading-relaxed">
                     {renderTextWithLinks(work.description)}
                 </p>
             )}
-            
-            {/* Co-authors with superscript dagger */}
+
             {work.coauthors && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-serif">
-                    Authors: {work.coauthors.split('*').join('<sup>†</sup>').split(', ').map((author, i, arr) => (
-                        <span key={author} dangerouslySetInnerHTML={{
-                            __html: author + (i === arr.length - 1 ? '' : ', ')
-                        }} />
+                <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-3 font-sans leading-relaxed">
+                    <span className="font-semibold">Authors:</span> {work.coauthors.split('*').join('†').split(', ').map((author, i, arr) => (
+                        <span key={author} className={author.includes('Joan Velja') ? 'text-neutral-900 dark:text-neutral-200 font-medium' : ''}>
+                            {author}{i === arr.length - 1 ? '' : ', '}
+                        </span>
                     ))}
-                </p>  
+                </p>
             )}
 
             {work.publication_venue && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 font-serif">
-                    Publication Venue: {work.publication_venue}
-                </p>
-            )}
-            
-            {/* Links */}
-            {work.links && (
-                <div className="flex flex-col gap-1 mt-2 font-sans">
-                    {work.links.map(renderRelatedLink)}
+                <div className="mt-3 inline-block px-2 py-1 bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-700 text-xs font-medium text-neutral-600 dark:text-neutral-400 font-sans">
+                    {work.publication_venue}
                 </div>
             )}
-            
-            {/* Equal contribution footnote - only if there are co-authors with asterisks */}
-            {work.coauthors?.includes('*') && (
-                <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2 italic font-serif">
-                    <sup>†</sup> Equal contribution
-                </p>
+
+            {work.links && (
+                <div className="flex flex-wrap gap-2 mt-4 font-sans">
+                    {work.links.map(renderRelatedLink)}
+                </div>
             )}
         </div>
     );
 
     return (
-        <div className={`fixed top-0 right-0 h-screen w-[400px] bg-white dark:bg-neutral-900 shadow-2xl 
-            transform transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] origin-right overflow-hidden
-            ${project ? 'translate-x-0 scale-x-100 opacity-100' : 'translate-x-[50%] scale-x-0 opacity-0'}`}
+        <div className={`fixed top-0 right-0 h-screen w-full md:w-[480px] bg-white dark:bg-neutral-900 shadow-2xl border-l border-neutral-200 dark:border-neutral-800
+            transform transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] z-50
+            ${project ? 'translate-x-0' : 'translate-x-full'}`}
         >
-            <button
-                onClick={onClose}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 
-                    transition-colors duration-300 z-10"
-            >
-                <X className="w-5 h-5 text-neutral-500" />
-            </button>
-            
             <div className="h-full flex flex-col">
-                {/* Fixed Header */}
-                <div className="p-6 pb-2 bg-white dark:bg-neutral-900">
-                    <h2 className="text-2xl font-medium text-neutral-900 dark:text-white mt-8 font-serif">{project.name}</h2>
-                    <p className="text-neutral-600 dark:text-neutral-400 capitalize mt-4 font-serif">{project.type} - {project.location}</p>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 font-sans">{project.period}</p>
+                {/* Header */}
+                <div className="p-6 pb-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-100 dark:border-neutral-800 z-10">
+                    <div className="flex justify-between items-start mb-4">
+                        <Tag type={project.type} />
+                        <button onClick={onClose} className="p-2 -mr-2 -mt-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                            <X className="w-5 h-5 text-neutral-500" />
+                        </button>
+                    </div>
+                    <h2 className="text-2xl md:text-3xl font-medium text-neutral-900 dark:text-white font-serif leading-tight">
+                        {project.name}
+                    </h2>
+                    <p className="text-neutral-500 dark:text-neutral-400 mt-2 font-sans text-sm flex items-center gap-2">
+                        {project.location} • {project.period}
+                    </p>
                 </div>
 
-                {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto p-6 pt-2
-                    [&::-webkit-scrollbar]:w-2 
-                    [&::-webkit-scrollbar-track]:bg-neutral-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-800
-                    [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-600
-                    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
-                    <div className="font-sans">
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                    <div className="font-sans flex flex-wrap gap-2">
                         {project.links?.map(renderRelatedLink)}
                     </div>
-                    
-                    <div className="space-y-4 mt-4">
-                        <h3 className="text-lg font-medium text-neutral-900 dark:text-white font-serif">About</h3>
-                        <p className="text-neutral-700 dark:text-neutral-300 leading-relaxed font-serif">{project.description}</p>
-                        
+
+                    <div className="space-y-6">
+                        <div>
+                            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-3 font-sans">Overview</h3>
+                            <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed font-serif text-lg">
+                                {project.description}
+                            </p>
+                        </div>
+
                         {project.relatedWorks?.length > 0 && (
-                            <>
-                                <h4 className="text-lg font-medium text-neutral-900 dark:text-white mt-6 font-serif">Publications & Projects</h4>
+                            <div>
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-4 font-sans">Key Research & Projects</h3>
                                 <div className="space-y-4">
                                     {project.relatedWorks.map(renderRelatedWork)}
                                 </div>
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>
@@ -205,133 +181,15 @@ const WorkDetailPanel = ({ project, onClose }) => {
 export default function ProjectsPage() {
     const [selectedProject, setSelectedProject] = useState(null);
 
-    const projects = {
-        present: [
-            {
-                name: 'University of Oxford',
-                type: 'Visiting Researcher',
-                description: 'Working on Prover-Verifier Games, supervised by Prof. Alessandro Abate.',
-                location: 'Oxford, UK',
-                period: 'Jan 2025 - Present',
-                links: [
-                    // {
-                    //     type: 'github',
-                    //     url: 'https://github.com/joanvelja/prover-verifier-games',
-                    //     text: 'GitHub Codebase'
-                    // }
-                ],
-                // relatedWorks: [
-                //     {
-                //         title: 'Prover-Verifier Games in Neural Networks',
-                //         description: 'Research paper exploring verification games in neural architectures',
-                //         links: [
-                //             {
-                //                 type: 'arxiv',
-                //                 url: 'https://arxiv.org/abs/example',
-                //                 text: 'Read on arXiv'
-                //             },
-                //             {
-                //                 type: 'pdf',
-                //                 url: '/papers/example.pdf',
-                //                 text: 'Download PDF'
-                //             }
-                //         ]
-                //     }
-                // ]
-            },
-            {
-                name: 'University of Amsterdam',
-                type: 'Masters',
-                description: 'Masters in Artificial Intelligence',
-                location: 'Amsterdam, Netherlands',
-                period: 'Sept 2023 - 2025',
-                relatedWorks: [
-                    {
-                        title: 'Dynamic Vocabulary Pruning in Early-Exit LLMs',
-                        description: 'Studied the gains in efficiency from pruning the vocabulary matrix of LLMs under early-exit [(Schuster et al. 2022)](https://arxiv.org/abs/2207.07061) settings.',
-                        supervisor: 'Metod Jazbec',
-                        supervisor_link: 'https://metodj.github.io/',
-                        coauthors: 'Jort Vincenti*, Karim Abdel Sadek*, Joan Velja*, Matteo Nulli*, Metod Jazbec',
-                        links: [
-                            {
-                                type: 'arxiv',
-                                url: 'https://arxiv.org/abs/2410.18952',
-                                text: 'Read on arXiv'
-                            }
-                        ]
-                    }
-                ]
-            }
-        ],
-        past: [
-            {
-                name: 'LASR Labs (London Initiative for Safe AI)',
-                type: 'Researcher', 
-                description: 'Wrote a cool paper on steganographic collusion between Language Models!', location: 'London, UK', 
-                // period:'Jul 2024 - Oct 2024',
-                relatedWorks: [
-                    {
-                        title: 'Hidden in Plain Text: Emergence & Mitigation of Steganographic Collusion in LLMs',
-                        description: 'Wrote a cool paper on steganographic collusion between Language Models! Cited by Deepmind [(MONA, Farquhar et al. 2025)](https://arxiv.org/abs/2501.13011), and mentioned by Anthropic as a influential safety paper in 2024 ([here](https://x.com/saprmarks/status/1873551162919506068) and [here](https://www.lesswrong.com/posts/nAsMfmxDv6Qp7cfHh/fabien-s-shortform?commentId=gGDAXomb2ihucF4Ls)). Finally, Open Philanthropy is funding further research on the topic, as seen [here](https://arc.net/l/quote/xxtlyguv).',
-                        coauthors: 'Yohan Mathew*, Ollie Matthews*, Robert McCarthy*, Joan Velja*, Christian Schroeder de Witt, Dylan Cope, Nandi Schoots',
-                        publication_venue: 'NeurIPS - SoLaR Workshop 2024',
-                        links: [
-                            {
-                                type: 'arxiv',
-                                url: 'https://arxiv.org/abs/2410.03768',
-                                text: 'Read on arXiv'
-                            },
-                            {
-                                type: 'github',
-                                url: 'https://github.com/olliematthews/lasr-steganography/tree/master',
-                                text: 'GitHub Codebase'
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                name: 'University of Technology Sydney',
-                type: 'Bachelors',
-                description: 'Bachelors in Artificial Intelligence - Exchange Program',
-                location: 'Sydney, Australia',
-                period: 'Feb 2023 - Jul 2023',
-            },
-            { 
-                name: 'Università Bocconi',
-                type: 'Bachelors',
-                description: 'Bachelors in Economics and Computer Science', 
-                location: 'Milan, Italy', 
-                period:'Sept 2020 - Jul 2023',
-                relatedWorks: [
-                    {
-                        title: ' An unorthodox shift in the variance-bias tradeoff in Neural Networks: the double descent phenomenon and the ease of training in the overparametrized regime.',
-                        description: 'I was supervised by Prof. Enrico Maria Malatesta, and our work on Singular Learning Theory culminated into my Thesis, which I defended with distinction.',
-                        coauthors: 'Joan Velja, Enrico Maria Malatesta',
-                        links: [
-                            {
-                                type: 'pdf',
-                                url: 'pdf/BSc_Thesis.pdf',
-                                text: 'See my BSc Thesis PDF'
-                            }
-                        ]
-                    }
-                ]
-            }
-        ]
-    };
-
     return (
         <main className="flex flex-col items-center justify-start w-full h-[calc(100vh-120px)] animate-fade-in">
-            <section className="w-full max-w-[540px] h-full flex flex-col px-4">
-                <div className="flex-1 overflow-y-auto space-y-8 py-8 [&::-webkit-scrollbar]:w-2 
-                    [&::-webkit-scrollbar-track]:bg-neutral-100 dark:[&::-webkit-scrollbar-track]:bg-neutral-800
-                    [&::-webkit-scrollbar-thumb]:bg-neutral-300 dark:[&::-webkit-scrollbar-thumb]:bg-neutral-600
-                    [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
+            <section className="w-full max-w-2xl h-full flex flex-col px-4 md:px-0">
+                <div className="flex-1 overflow-y-auto py-8 px-2 space-y-10 scrollbar-hide">
+
                     {/* Present Section */}
-                    <div>
-                        <h3 className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2 px-4 font-sans">Present</h3>
-                        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 divide-y divide-neutral-100 dark:divide-neutral-800">
+                    <div className="animate-slide-up" style={{ animationDelay: '100ms' }}>
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-4 px-2 font-sans">Current</h3>
+                        <div className="space-y-2">
                             {projects.present.map((project) => (
                                 <WorkListItem
                                     key={project.name}
@@ -344,9 +202,9 @@ export default function ProjectsPage() {
                     </div>
 
                     {/* Past Section */}
-                    <div>
-                        <h3 className="text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-2 px-4 font-sans">Past</h3>
-                        <div className="bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 divide-y divide-neutral-100 dark:divide-neutral-800">
+                    <div className="animate-slide-up" style={{ animationDelay: '200ms' }}>
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-4 px-2 font-sans">Previous</h3>
+                        <div className="space-y-2">
                             {projects.past.map((project) => (
                                 <WorkListItem
                                     key={project.name}
@@ -359,6 +217,14 @@ export default function ProjectsPage() {
                     </div>
                 </div>
             </section>
+
+            {/* Detail Panel Overlay */}
+            {selectedProject && (
+                <div
+                    className="fixed inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-500"
+                    onClick={() => setSelectedProject(null)}
+                />
+            )}
 
             {/* Detail Panel */}
             <WorkDetailPanel
