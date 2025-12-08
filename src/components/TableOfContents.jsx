@@ -7,7 +7,7 @@ export function TableOfContents() {
     const [headings, setHeadings] = useState([]);
     const [activeId, setActiveId] = useState('');
     const [isOpen, setIsOpen] = useState(true);
-    
+
     // Extract headings from the document
     useEffect(() => {
         const extractHeadings = () => {
@@ -19,27 +19,27 @@ export function TableOfContents() {
             }));
             setHeadings(headingData);
         };
-        
+
         extractHeadings();
-        
+
         // Re-extract if the DOM changes (useful for dynamic content)
         const observer = new MutationObserver(extractHeadings);
         observer.observe(document.body, { childList: true, subtree: true });
-        
+
         return () => observer.disconnect();
     }, []);
-    
+
     // Track active heading based on scroll position
     useEffect(() => {
         const handleScroll = () => {
             const headingElements = Array.from(document.querySelectorAll('h1[id], h2[id], h3[id], h4[id]'));
-            
+
             // Find the heading closest to the top of the viewport
             const headingPositions = headingElements.map(heading => {
                 const rect = heading.getBoundingClientRect();
                 return { id: heading.id, top: rect.top };
             });
-            
+
             // Bias towards headings near the top, but not too far above
             const activeHeading = headingPositions.reduce((closest, current) => {
                 if (current.top <= 150 && current.top > closest.top) {
@@ -47,16 +47,16 @@ export function TableOfContents() {
                 }
                 return closest;
             }, { id: '', top: -Infinity });
-            
+
             setActiveId(activeHeading.id);
         };
-        
+
         window.addEventListener('scroll', handleScroll, { passive: true });
         handleScroll(); // Call on initial render
-        
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
-    
+
     // Handle clicking a TOC item
     const handleClick = useCallback((e, id) => {
         e.preventDefault();
@@ -69,13 +69,13 @@ export function TableOfContents() {
             setActiveId(id);
         }
     }, []);
-    
+
     if (headings.length === 0) return null;
-    
+
     return (
         <div className={`
             fixed left-4 top-32 z-40
-            transition-all duration-300 ease-in-out
+            transition-transform duration-300 ease-in-out
             xl:block hidden
             ${isOpen ? 'translate-x-0' : '-translate-x-[calc(100%-24px)]'}
         `}>
@@ -93,14 +93,14 @@ export function TableOfContents() {
                         </h2>
                         <div className="inline-block h-[1px] w-10 bg-neutral-300 dark:bg-neutral-700 mt-3"></div>
                     </div>
-                    
+
                     <ul className="space-y-2.5">
                         {headings.map(heading => (
-                            <li 
+                            <li
                                 key={heading.id}
-                                style={{ 
+                                style={{
                                     paddingLeft: `${(heading.level - 1) * 0.75}rem`,
-                                }} 
+                                }}
                                 className="text-[0.95rem] font-serif"
                             >
                                 <a
@@ -109,8 +109,8 @@ export function TableOfContents() {
                                     className={`
                                         block py-1.5 px-2 rounded transition-colors
                                         hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50
-                                        ${activeId === heading.id ? 
-                                            'text-blue-600/90 dark:text-blue-400/90 font-medium' : 
+                                        ${activeId === heading.id ?
+                                            'text-blue-600/90 dark:text-blue-400/90 font-medium' :
                                             'text-neutral-700/90 dark:text-neutral-300/90'}
                                         leading-snug tracking-[0.01em]
                                     `}
@@ -121,7 +121,7 @@ export function TableOfContents() {
                         ))}
                     </ul>
                 </nav>
-                
+
                 <button
                     onClick={() => setIsOpen(!isOpen)}
                     className="flex items-center justify-center h-10 w-6 self-start mt-2
@@ -133,7 +133,7 @@ export function TableOfContents() {
                     {isOpen ? <ChevronLeft className="text-neutral-600 dark:text-neutral-400" size={14} /> : <ChevronRight className="text-neutral-600 dark:text-neutral-400" size={14} />}
                 </button>
             </div>
-            
+
             {/* Mobile/Inline TOC for smaller screens */}
             <div className="xl:hidden block mt-6 mb-8 mx-auto max-w-[800px] px-4">
                 <details className="group">
@@ -153,11 +153,11 @@ export function TableOfContents() {
                                  border border-neutral-200/40 dark:border-neutral-700/40 rounded-md">
                         <ul className="space-y-2">
                             {headings.map(heading => (
-                                <li 
+                                <li
                                     key={heading.id}
-                                    style={{ 
+                                    style={{
                                         paddingLeft: `${(heading.level - 1) * 0.75}rem`,
-                                    }} 
+                                    }}
                                     className="text-[0.95rem] font-serif"
                                 >
                                     <a
@@ -165,8 +165,8 @@ export function TableOfContents() {
                                         className={`
                                             block py-1.5 px-1 rounded transition-colors
                                             hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50
-                                            ${activeId === heading.id ? 
-                                                'text-blue-600/90 dark:text-blue-400/90 font-medium' : 
+                                            ${activeId === heading.id ?
+                                                'text-blue-600/90 dark:text-blue-400/90 font-medium' :
                                                 'text-neutral-700/90 dark:text-neutral-300/90'}
                                             leading-snug tracking-[0.01em]
                                         `}

@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # AGENTS.md — Next.js + React house rules
 
 This repo is optimized for fast, reproducible web development with Next.js. Defaults are opinionated: **npm**, **ESLint**, **Jest**, **Tailwind CSS**, component-driven architecture, and strict separation of concerns.
@@ -173,4 +177,4 @@ This includes:
 - Casts to any to get around type issues
 - Any other style that is inconsistent with the file
 
-Report at the end with only a 1-3 sentence summary of what you changed
+Report at the end with only a 1-3 sentence summary of what you changed.

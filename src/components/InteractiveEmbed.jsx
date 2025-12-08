@@ -51,7 +51,7 @@ export function InteractiveEmbed({
             {title}
           </h3>
         )}
-        <div 
+        <div
           className={`
             relative overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700
             bg-neutral-50 dark:bg-neutral-800
@@ -78,11 +78,11 @@ export function InteractiveEmbed({
           {title}
         </h3>
       )}
-      
-      <div 
+
+      <div
         className={`
           relative overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700
-          bg-white dark:bg-neutral-900 shadow-sm transition-all duration-300 ease-in-out
+          bg-white dark:bg-neutral-900 shadow-sm transition-shadow duration-300
           ${aspectRatio ? `aspect-[${aspectRatio}]` : ''}
           ${isDarkMode ? 'shadow-neutral-900/20' : 'shadow-neutral-300/20'}
         `}
@@ -108,7 +108,7 @@ export function InteractiveEmbed({
               <div className="text-neutral-600 dark:text-neutral-400 font-serif text-sm">
                 Failed to load interactive content
               </div>
-              <button 
+              <button
                 onClick={() => {
                   setHasError(false);
                   setIsLoading(true);
