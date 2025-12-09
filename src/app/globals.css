@@ -224,7 +224,7 @@ pre>code>[data-line][data-highlighted] {
   background: rgba(156, 163, 175, 0.8);
 }
 
-/* Math block scrolling for mobile */
+/* Math block styling - scrollable containers */
 .katex-display {
   overflow-x: auto;
   overflow-y: hidden;
@@ -232,4 +232,80 @@ pre>code>[data-line][data-highlighted] {
   margin: 1rem 0;
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
+}
+
+/* Inline math - flows with text */
+.math-inline .katex,
+.katex:not(.katex-display .katex) {
+  display: inline;
+}
+
+/* Display math - centered with scrollable container */
+.math-display,
+.katex-display {
+  display: block;
+  text-align: center;
+}
+
+.math-display>.katex-display,
+.katex-display>.katex {
+  display: inline-block;
+  text-align: left;
+}
+
+/* Scrollable table containers */
+.blog-content table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  margin: 1rem 0;
+}
+
+.blog-content table::-webkit-scrollbar {
+  height: 6px;
+}
+
+.blog-content table::-webkit-scrollbar-track {
+  background: rgb(229 229 229);
+  border-radius: 3px;
+}
+
+.blog-content table::-webkit-scrollbar-thumb {
+  background: rgb(163 163 163);
+  border-radius: 3px;
+}
+
+.dark .blog-content table::-webkit-scrollbar-track {
+  background: rgb(38 38 38);
+}
+
+.dark .blog-content table::-webkit-scrollbar-thumb {
+  background: rgb(82 82 82);
+}
+
+/* Math scrollbar styling */
+.katex-display::-webkit-scrollbar {
+  height: 4px;
+}
+
+.katex-display::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.katex-display::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.3);
+  border-radius: 2px;
+}
+
+.katex-display::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.5);
+}
+
+.dark .katex-display::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.4);
+}
+
+.dark .katex-display::-webkit-scrollbar-thumb:hover {
+  background: rgba(75, 85, 99, 0.6);
 }
