@@ -195,9 +195,18 @@ pre>code>[data-line][data-highlighted] {
 
 
 /* Global Scrollbar Styles */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -205,23 +214,21 @@ pre>code>[data-line][data-highlighted] {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(156, 163, 175, 0.5);
-  /* neutral-400 with opacity */
+  background: rgba(156, 163, 175, 0.3);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(107, 114, 128, 0.8);
-  /* neutral-500 with higher opacity */
+  background: rgba(107, 114, 128, 0.5);
 }
 
 /* Dark mode scrollbar adjustments */
 .dark ::-webkit-scrollbar-thumb {
-  background: rgba(75, 85, 99, 0.5);
+  background: rgba(75, 85, 99, 0.25);
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(156, 163, 175, 0.8);
+  background: rgba(107, 114, 128, 0.4);
 }
 
 /* Math block styling - scrollable containers */

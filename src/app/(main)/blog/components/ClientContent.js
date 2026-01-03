@@ -11,11 +11,11 @@ export function ClientContent({ initialPosts, allTags }) {
 
     // Filter posts based on selected tag and search query
     const filteredPosts = initialPosts.filter(post => {
-        const matchesTag = selectedTag ? post.tags.includes(selectedTag) : true;
+        const matchesTag = selectedTag ? post.tags?.includes(selectedTag) : true;
         const matchesSearch = searchQuery
-            ? post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              post.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              post.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+            ? post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            post.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (post.tags || []).some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
             : true;
         return matchesTag && matchesSearch;
     });

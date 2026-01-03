@@ -31,7 +31,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${crimsonPro.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
-      <body>
+      <body suppressHydrationWarning>
         <ThemeProvider>
           {children}
         </ThemeProvider>
