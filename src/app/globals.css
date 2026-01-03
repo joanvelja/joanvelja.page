@@ -4,7 +4,7 @@
 
 :root {
   --transition-duration: 0.3s;
-  --paper: #fdfbf7;
+  --paper: #f8f5f0;
   --ink: #1a1a1a;
   --background: var(--paper);
   --foreground: var(--ink);

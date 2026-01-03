@@ -9,22 +9,28 @@ export const metadata = {
     description: 'Learn more about Joan Velja and his work.'
 };
 
-// Helper for bold text and links
+// Helper for bold, italic text and links
 const renderTextWithLinks = (text) => {
     if (!text) return null;
 
-    // First split by bold pattern **text**
-    const parts = text.split(/(\*\*[^*]+\*\*)/g);
+    // Split by bold (**text**) and italic (*text*) patterns
+    // Bold first (greedy), then italic (non-greedy to avoid matching bold)
+    const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
 
     return parts.map((part, index) => {
         // Check if this part is bold
-        const boldMatch = part.match(/\*\*([^*]+)\*\*/);
+        const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
         if (boldMatch) {
             return <strong key={index} className="font-semibold text-neutral-900 dark:text-white">{boldMatch[1]}</strong>;
         }
 
-        // If not bold, check for links [text](url)
-        // We need to split again because a non-bold part might contain multiple links or text
+        // Check if this part is italic
+        const italicMatch = part.match(/^\*([^*]+)\*$/);
+        if (italicMatch) {
+            return <em key={index} className="italic">{italicMatch[1]}</em>;
+        }
+
+        // If not bold/italic, check for links [text](url)
         const linkParts = part.split(/(\[[^\]]+\]\([^)]+\))/g);
 
         return linkParts.map((subPart, subIndex) => {
@@ -65,60 +71,39 @@ export default async function AboutPage() {
 
     return (
         <main className="flex flex-col items-center justify-start w-full animate-fade-in max-w-2xl mx-auto">
-            {/* Profile Section */}
-            <section className="w-full px-4 py-12 flex flex-col items-center">
-                {/* Profile Image */}
-                <div className="flex justify-center w-full mb-10">
-                    <div className="relative group">
-                        {/* Removed the "inelegant" background blur div */}
-                        <div className="relative flex items-center justify-center">
-                            <Image
-                                alt="Profile picture"
-                                src="/pfp/joan.png"
-                                width={180}
-                                height={180}
-                                priority
-                                className="rounded-full shadow-lg transition duration-500 group-hover:scale-[1.02] filter grayscale-[0.3] group-hover:grayscale-0"
-                            />
+            {/* Hero Section - Side by Side */}
+            <section className="w-full px-4 py-12">
+                <div className="flex flex-col md:flex-row md:items-start gap-6 md:gap-8 animate-slide-up">
+                    {/* Profile Image - Left */}
+                    <div className="flex-shrink-0">
+                        <Image
+                            alt="Joan Velja"
+                            src="/pfp/joan.png"
+                            width={302}
+                            height={403}
+                            priority
+                            className="shadow-md object-cover"
+                            style={{ aspectRatio: '4/5' }}
+                        />
+                    </div>
+
+                    {/* Content - Right */}
+                    <div className="space-y-4">
+                        <h1 className="text-2xl md:text-3xl font-serif font-medium text-neutral-900 dark:text-neutral-100 tracking-tight">
+                            Hi, I'm Joan.
+                        </h1>
+                        <div className="prose dark:prose-invert max-w-none">
+                            <p className="text-lg leading-relaxed font-serif text-neutral-700 dark:text-neutral-300">
+                                {renderTextWithLinks(`I'm a PhD student at the **University of Oxford**, supervised by [Alessandro Abate](https://www.cs.ox.ac.uk/people/alessandro.abate/). My research focuses on AI alignment and safety—in particular, understanding how we can ensure supervision of increasingly powerful AI systems, in what is called the *scalable* (or amplified) *oversight problem*. I'm particularly interested in the role of priors and generalization in this endeavour. I also co-supervise research on red-teaming untrusted monitoring at **LASR Labs**.`)}
+                            </p>
                         </div>
                     </div>
                 </div>
 
-                {/* Greeting */}
-                <div className="space-y-4 animate-slide-up text-center mb-12" style={{ animationDelay: '100ms' }}>
-                    <h1 className="text-3xl md:text-4xl font-serif font-medium text-neutral-900 dark:text-neutral-100 tracking-tight">
-                        Hi, I'm Joan.
-                    </h1>
-                    <p className="text-lg text-neutral-700 dark:text-neutral-400 font-sans max-w-md mx-auto">
-                        PhD Candidate in AI Alignment & Safety
-                    </p>
-                </div>
+                <hr className="border-neutral-200 dark:border-neutral-800 w-1/4 mx-auto my-10" />
 
                 {/* Content Sections */}
-                <div className="space-y-10 text-neutral-900 dark:text-neutral-200 w-full animate-slide-up" style={{ animationDelay: '200ms' }}>
-
-                    {/* Intro */}
-                    <div className="prose dark:prose-invert max-w-none">
-                        <p className="text-lg leading-relaxed font-serif text-neutral-800 dark:text-neutral-300">
-                            {renderTextWithLinks(`
-                            If you stumbled upon this page, you might have a lot in common with me. I muse on the alignment problem, particularly trying to understand the role of priors in this endeavour. What are the true priors AIs have? How do we know they are true? What are the implications of these priors?
-                            `)}
-                        </p>
-                    </div>
-
-                    <hr className="border-neutral-200 dark:border-neutral-800 w-1/3 mx-auto" />
-
-                    {/* Current Work */}
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-serif font-medium text-neutral-900 dark:text-white">Current Focus</h2>
-                        <p className="text-lg leading-relaxed font-serif text-neutral-800 dark:text-neutral-300">
-                            {renderTextWithLinks(`
-                            I am a D.Phil student — which is just fancy British for PhD — at the **University of Oxford**, supervised by [Alessandro Abate](https://www.cs.ox.ac.uk/people/alessandro.abate/). Currently, I am also co-supervising research on Red-teaming Untrusted Monitoring at **LASR Labs**.
-                            
-                            My research interests span AI Alignment and Safety, Reinforcement Learning, and Generalization. I'm driven by the question of how we can ensure increasingly powerful AI systems remain aligned with human values.
-                            `)}
-                        </p>
-                    </div>
+                <div className="space-y-10 text-neutral-900 dark:text-neutral-200 w-full animate-slide-up" style={{ animationDelay: '100ms' }}>
 
                     {/* Selected Research */}
                     {featuredWorks.length > 0 && (
