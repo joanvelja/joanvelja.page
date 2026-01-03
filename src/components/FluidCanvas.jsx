@@ -1,0 +1,94 @@
+'use client';
+
+import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useFluidSimulation } from '@/hooks/useFluidSimulation';
+
+const TILE_COLOR_MAP = {
+    light: {
+        sky: { hot: [0.055, 0.647, 0.914], cold: [0.118, 0.227, 0.373], equilibrium: [0.96, 0.96, 0.96] },
+        emerald: { hot: [0.063, 0.725, 0.506], cold: [0.024, 0.306, 0.231], equilibrium: [0.96, 0.96, 0.96] },
+        red: { hot: [0.937, 0.267, 0.267], cold: [0.498, 0.114, 0.114], equilibrium: [0.96, 0.96, 0.96] },
+        yellow: { hot: [0.918, 0.702, 0.031], cold: [0.443, 0.247, 0.071], equilibrium: [0.96, 0.96, 0.96] },
+        purple: { hot: [0.659, 0.333, 0.969], cold: [0.231, 0.027, 0.392], equilibrium: [0.96, 0.96, 0.96] },
+    },
+    dark: {
+        sky: { hot: [0.220, 0.741, 0.973], cold: [0.047, 0.290, 0.431], equilibrium: [0.15, 0.15, 0.15] },
+        emerald: { hot: [0.204, 0.827, 0.600], cold: [0.024, 0.373, 0.275], equilibrium: [0.15, 0.15, 0.15] },
+        red: { hot: [0.973, 0.443, 0.443], cold: [0.600, 0.106, 0.106], equilibrium: [0.15, 0.15, 0.15] },
+        yellow: { hot: [0.980, 0.800, 0.082], cold: [0.522, 0.302, 0.055], equilibrium: [0.15, 0.15, 0.15] },
+        purple: { hot: [0.753, 0.518, 0.988], cold: [0.345, 0.110, 0.529], equilibrium: [0.15, 0.15, 0.15] },
+    }
+};
+
+const INK_COLORS = {
+    light: { ink: [0.15, 0.15, 0.15], paper: [0.96, 0.96, 0.96] },
+    dark: { ink: [0.85, 0.85, 0.85], paper: [0.15, 0.15, 0.15] },
+};
+
+const PRISMATIC_COLORS = {
+    light: { base: [0.96, 0.96, 0.96] },
+    dark: { base: [0.15, 0.15, 0.15] },
+};
+
+function getColors(mode, theme, tileColor) {
+    const themeKey = theme === 'dark' ? 'dark' : 'light';
+    if (mode === 'thermodynamic') {
+        return TILE_COLOR_MAP[themeKey][tileColor] || TILE_COLOR_MAP[themeKey].sky;
+    } else if (mode === 'ink') {
+        return INK_COLORS[themeKey];
+    } else {
+        return PRISMATIC_COLORS[themeKey];
+    }
+}
+
+export function FluidCanvas({
+    isActive,
+    intensity,
+    tileColor = 'sky',
+    theme = 'light',
+    mode = 'thermodynamic',
+    className = ''
+}) {
+    const canvasRef = useRef(null);
+    const { start, stop, updateIntensity } = useFluidSimulation(canvasRef, {});
+    const runningRef = useRef(false);
+
+    const colors = useMemo(() => getColors(mode, theme, tileColor), [mode, theme, tileColor]);
+
+    useEffect(() => {
+        updateIntensity(intensity);
+    }, [intensity, updateIntensity]);
+
+    useEffect(() => {
+        if (isActive && !runningRef.current) {
+            runningRef.current = true;
+            updateIntensity(intensity || 0.5);
+            start(mode, colors);
+        }
+
+        if (!isActive && intensity <= 0.01 && runningRef.current) {
+            runningRef.current = false;
+            stop();
+        }
+    }, [isActive, intensity, start, stop, updateIntensity, mode, colors]);
+
+    useEffect(() => {
+        return () => {
+            stop();
+            runningRef.current = false;
+        };
+    }, [stop]);
+
+    return (
+        <canvas
+            ref={canvasRef}
+            width={64}
+            height={64}
+            className={`absolute inset-0 w-full h-full pointer-events-none rounded-xl ${className}`}
+            style={{
+                opacity: Math.max(intensity, 0),
+                mixBlendMode: mode === 'prismatic' ? 'soft-light' : 'normal'
+            }}
+        />
+    );
+}

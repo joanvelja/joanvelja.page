@@ -1,48 +1,84 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { throttle } from '@/lib/utils';
 
 export function TableOfContents() {
     const [headings, setHeadings] = useState([]);
     const [activeId, setActiveId] = useState('');
     const [isOpen, setIsOpen] = useState(true);
 
+    // Cache heading elements and their positions
+    const headingElementsRef = useRef([]);
+    const headingPositionsRef = useRef([]);
+
     // Extract headings from the document
     useEffect(() => {
         const extractHeadings = () => {
-            const elements = Array.from(document.querySelectorAll('h1[id], h2[id], h3[id], h4[id]'));
+            const articleContainer = document.querySelector('article') || document.querySelector('main') || document.body;
+            const elements = Array.from(articleContainer.querySelectorAll('h1[id], h2[id], h3[id], h4[id]'));
+            headingElementsRef.current = elements;
+
             const headingData = elements.map(element => ({
                 id: element.id,
                 text: element.textContent,
                 level: parseInt(element.tagName.substring(1)),
             }));
             setHeadings(headingData);
+
+            // Also update cached positions
+            updateHeadingPositions();
+        };
+
+        const updateHeadingPositions = () => {
+            headingPositionsRef.current = headingElementsRef.current.map(heading => ({
+                id: heading.id,
+                offsetTop: heading.offsetTop,
+            }));
         };
 
         extractHeadings();
 
-        // Re-extract if the DOM changes (useful for dynamic content)
-        const observer = new MutationObserver(extractHeadings);
-        observer.observe(document.body, { childList: true, subtree: true });
+        // Re-extract if the DOM changes (scoped to article/main container)
+        const articleContainer = document.querySelector('article') || document.querySelector('main');
+        if (articleContainer) {
+            const observer = new MutationObserver(extractHeadings);
+            observer.observe(articleContainer, { childList: true, subtree: true });
+            return () => observer.disconnect();
+        }
+    }, []);
 
-        return () => observer.disconnect();
+    // Recalculate heading positions on resize
+    useEffect(() => {
+        const updateHeadingPositions = () => {
+            headingPositionsRef.current = headingElementsRef.current.map(heading => ({
+                id: heading.id,
+                offsetTop: heading.offsetTop,
+            }));
+        };
+
+        const throttledResize = throttle(updateHeadingPositions, 100);
+        window.addEventListener('resize', throttledResize);
+
+        return () => window.removeEventListener('resize', throttledResize);
     }, []);
 
     // Track active heading based on scroll position
     useEffect(() => {
         const handleScroll = () => {
-            const headingElements = Array.from(document.querySelectorAll('h1[id], h2[id], h3[id], h4[id]'));
+            const scrollY = window.scrollY;
+            const viewportOffset = 150;
 
-            // Find the heading closest to the top of the viewport
-            const headingPositions = headingElements.map(heading => {
+            // Use cached heading elements and get their current positions
+            const headingPositions = headingElementsRef.current.map(heading => {
                 const rect = heading.getBoundingClientRect();
                 return { id: heading.id, top: rect.top };
             });
 
             // Bias towards headings near the top, but not too far above
             const activeHeading = headingPositions.reduce((closest, current) => {
-                if (current.top <= 150 && current.top > closest.top) {
+                if (current.top <= viewportOffset && current.top > closest.top) {
                     return current;
                 }
                 return closest;
@@ -51,10 +87,12 @@ export function TableOfContents() {
             setActiveId(activeHeading.id);
         };
 
-        window.addEventListener('scroll', handleScroll, { passive: true });
+        const throttledHandleScroll = throttle(handleScroll, 100);
+
+        window.addEventListener('scroll', throttledHandleScroll, { passive: true });
         handleScroll(); // Call on initial render
 
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', throttledHandleScroll);
     }, []);
 
     // Handle clicking a TOC item

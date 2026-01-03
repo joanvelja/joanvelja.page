@@ -1,34 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { throttle } from '@/lib/utils';
 
 export function useScrollDirection() {
     const [scrollDirection, setScrollDirection] = useState(null);
     const [isAtTop, setIsAtTop] = useState(true);
     const [isAtBottom, setIsAtBottom] = useState(false);
+    const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0);
 
     useEffect(() => {
-        let lastScrollY = window.scrollY;
-
         const updateScrollDirection = () => {
             const scrollY = window.scrollY;
-            const direction = scrollY > lastScrollY ? 'down' : 'up';
+            const direction = scrollY > lastScrollY.current ? 'down' : 'up';
 
-            if (direction !== scrollDirection && (scrollY - lastScrollY > 10 || scrollY - lastScrollY < -10)) {
+            if (Math.abs(scrollY - lastScrollY.current) > 10) {
                 setScrollDirection(direction);
             }
 
             setIsAtTop(scrollY < 10);
             setIsAtBottom(window.innerHeight + scrollY >= document.body.offsetHeight - 10);
 
-            lastScrollY = scrollY > 0 ? scrollY : 0;
+            lastScrollY.current = scrollY > 0 ? scrollY : 0;
         };
 
-        window.addEventListener('scroll', updateScrollDirection);
+        const throttledUpdateScrollDirection = throttle(updateScrollDirection, 100);
+
+        window.addEventListener('scroll', throttledUpdateScrollDirection, { passive: true });
         return () => {
-            window.removeEventListener('scroll', updateScrollDirection);
+            window.removeEventListener('scroll', throttledUpdateScrollDirection);
         };
-    }, [scrollDirection]);
+    }, []);
 
     return { scrollDirection, isAtTop, isAtBottom };
 }

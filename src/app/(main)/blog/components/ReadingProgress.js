@@ -6,13 +6,19 @@ export function ReadingProgress() {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
+        let ticking = false;
         const updateProgress = () => {
-            const scrolled = window.scrollY;
-            const total = document.documentElement.scrollHeight - window.innerHeight;
-            setProgress((scrolled / total) * 100);
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.scrollY;
+                    const total = document.documentElement.scrollHeight - window.innerHeight;
+                    setProgress((scrolled / total) * 100);
+                    ticking = false;
+                });
+                ticking = true;
+            }
         };
-
-        window.addEventListener('scroll', updateProgress);
+        window.addEventListener('scroll', updateProgress, { passive: true });
         return () => window.removeEventListener('scroll', updateProgress);
     }, []);
 
