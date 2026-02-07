@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useCallback, useMemo } from 'react';
+import { useRef, useEffect, useCallback, useMemo, forwardRef } from 'react';
 import { useFluidSimulation } from '@/hooks/useFluidSimulation';
 
 const TILE_COLOR_MAP = {
@@ -20,57 +20,54 @@ const TILE_COLOR_MAP = {
     }
 };
 
-const INK_COLORS = {
-    light: { ink: [0.15, 0.15, 0.15], paper: [0.96, 0.96, 0.96] },
-    dark: { ink: [0.85, 0.85, 0.85], paper: [0.15, 0.15, 0.15] },
-};
-
-const PRISMATIC_COLORS = {
-    light: { base: [0.96, 0.96, 0.96] },
-    dark: { base: [0.15, 0.15, 0.15] },
-};
-
 function getColors(mode, theme, tileColor) {
     const themeKey = theme === 'dark' ? 'dark' : 'light';
     if (mode === 'thermodynamic') {
         return TILE_COLOR_MAP[themeKey][tileColor] || TILE_COLOR_MAP[themeKey].sky;
-    } else if (mode === 'ink') {
-        return INK_COLORS[themeKey];
-    } else {
-        return PRISMATIC_COLORS[themeKey];
     }
+    return TILE_COLOR_MAP[themeKey].sky;
 }
 
-export function FluidCanvas({
-    isActive,
-    intensity,
+export const FluidCanvas = forwardRef(function FluidCanvas({
+    intensityRef,
+    onUpdateIntensity,
     tileColor = 'sky',
     theme = 'light',
     mode = 'thermodynamic',
     className = ''
-}) {
+}, ref) {
     const canvasRef = useRef(null);
-    const { start, stop, updateIntensity } = useFluidSimulation(canvasRef, {});
+    const { start, stop, updateIntensity } = useFluidSimulation(canvasRef);
     const runningRef = useRef(false);
 
     const colors = useMemo(() => getColors(mode, theme, tileColor), [mode, theme, tileColor]);
 
     useEffect(() => {
-        updateIntensity(intensity);
-    }, [intensity, updateIntensity]);
+        if (ref) {
+            if (typeof ref === 'function') {
+                ref(canvasRef.current);
+            } else {
+                ref.current = canvasRef.current;
+            }
+        }
+    }, [ref]);
 
     useEffect(() => {
-        if (isActive && !runningRef.current) {
-            runningRef.current = true;
-            updateIntensity(intensity || 0.5);
-            start(mode, colors);
-        }
+        if (onUpdateIntensity) {
+            onUpdateIntensity((value) => {
+                updateIntensity(value);
 
-        if (!isActive && intensity <= 0.01 && runningRef.current) {
-            runningRef.current = false;
-            stop();
+                if (value > 0.01 && !runningRef.current) {
+                    runningRef.current = true;
+                    start(mode, colors);
+                }
+                if (value <= 0.01 && runningRef.current) {
+                    runningRef.current = false;
+                    stop();
+                }
+            });
         }
-    }, [isActive, intensity, start, stop, updateIntensity, mode, colors]);
+    }, [onUpdateIntensity, updateIntensity, start, stop, mode, colors]);
 
     useEffect(() => {
         return () => {
@@ -86,9 +83,9 @@ export function FluidCanvas({
             height={64}
             className={`absolute inset-0 w-full h-full pointer-events-none rounded-xl ${className}`}
             style={{
-                opacity: Math.max(intensity, 0),
+                opacity: 0,
                 mixBlendMode: mode === 'prismatic' ? 'soft-light' : 'normal'
             }}
         />
     );
-}
+});

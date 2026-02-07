@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useRef } from 'react';
+import { createContext, useState, useRef, useCallback, useMemo } from 'react';
 
 export const SidenotesContext = createContext();
 
@@ -8,7 +8,7 @@ export function SidenotesProvider({ children }) {
     const [notes, setNotes] = useState([]);
     const notesMap = useRef(new Map());
 
-    const addNote = (content) => {
+    const addNote = useCallback((content) => {
         const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
 
         if (notesMap.current.has(contentStr)) {
@@ -26,10 +26,12 @@ export function SidenotesProvider({ children }) {
         });
 
         return number;
-    };
+    }, []);
+
+    const value = useMemo(() => ({ notes, addNote }), [notes, addNote]);
 
     return (
-        <SidenotesContext.Provider value={{ notes, addNote }}>
+        <SidenotesContext.Provider value={value}>
             {children}
             {notes.length > 0 && (
                 <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800">

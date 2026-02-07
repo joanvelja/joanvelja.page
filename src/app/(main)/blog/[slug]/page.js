@@ -2,7 +2,6 @@ import { getPostBySlug, getAllPosts } from '@/lib/mdx';
 import { ShareButton } from '../components/ShareButton';
 import { ReadingProgress } from '../components/ReadingProgress';
 import { SidenotesProvider } from '@/components/Sidenotes';
-import { SectionObserver } from '@/components/SectionObserver';
 import { TableOfContents } from '@/components/TableOfContents';
 import { MarginNotesProvider } from '@/components/MarginNotes';
 import { CitationProvider, Bibliography } from '@/components/Citation';
@@ -71,7 +70,6 @@ export default async function BlogPost({ params }) {
                 <SidenotesProvider>
                     <article className="w-full max-w-[800px] mx-auto px-4 py-8">
                         <ReadingProgress />
-                        <SectionObserver />
                         <TableOfContents />
 
                         <header className="mb-8">

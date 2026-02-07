@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useCallback, useMemo } from 'react';
 import { useHoverTooltip } from '@/hooks/useHoverTooltip';
 
 const CitationContext = React.createContext();
@@ -9,7 +9,7 @@ export function CitationProvider({ children }) {
     const [citations, setCitations] = useState([]);
     const citationMap = useRef(new Map());
 
-    const addCitation = (citation) => {
+    const addCitation = useCallback((citation) => {
         const key = citation.key || `${citation.author}-${citation.year}`;
 
         if (citationMap.current.has(key)) {
@@ -27,10 +27,12 @@ export function CitationProvider({ children }) {
         });
 
         return number;
-    };
+    }, []);
+
+    const value = useMemo(() => ({ citations, addCitation }), [citations, addCitation]);
 
     return (
-        <CitationContext.Provider value={{ citations, addCitation }}>
+        <CitationContext.Provider value={value}>
             {children}
         </CitationContext.Provider>
     );

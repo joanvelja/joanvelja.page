@@ -8,7 +8,12 @@ import { unstable_cache } from 'next/cache';
 import { mdxComponents } from './mdx-components';
 import { mdxOptions } from './mdx-plugins';
 
-// Get all blog posts
+function estimateReadingTime(content, isProtected, estimatedReadingTime) {
+    if (isProtected) return estimatedReadingTime || 5;
+    const wordCount = content.split(/\s+/).length;
+    return Math.ceil(wordCount / 200);
+}
+
 export async function getAllPosts() {
     const postsDirectory = path.join(process.cwd(), 'content/blog');
     const filenames = await fs.readdir(postsDirectory);
@@ -21,16 +26,7 @@ export async function getAllPosts() {
                 const fileContents = await fs.readFile(filePath, 'utf8');
                 const { data, content } = matter(fileContents);
                 const slug = filename.replace(/\.mdx$/, '');
-
-                const wordsPerMinute = 200;
-                let readingTime;
-
-                if (data.isProtected) {
-                    readingTime = data.estimatedReadingTime || 5;
-                } else {
-                    const wordCount = content.split(/\s+/g).length;
-                    readingTime = Math.ceil(wordCount / wordsPerMinute);
-                }
+                const readingTime = estimateReadingTime(content, data.isProtected, data.estimatedReadingTime);
 
                 if (data.isProtected) {
                     return {
@@ -56,13 +52,10 @@ export async function getAllPosts() {
     return posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-// Get raw post data (uncached function)
 const getPostRawDataUncached = async (slug) => {
     const filePath = path.join(process.cwd(), 'content/blog', `${slug}.mdx`);
     const fileContents = await fs.readFile(filePath, 'utf8');
     const { data, content: rawContent } = matter(fileContents);
-
-    const wordsPerMinute = 200;
 
     if (data.isProtected) {
         return {
@@ -72,7 +65,7 @@ const getPostRawDataUncached = async (slug) => {
             excerpt: data.excerpt || 'This post is password protected.',
             tags: data.tags || [],
             image: data.image || null,
-            readingTime: data.estimatedReadingTime || 5,
+            readingTime: estimateReadingTime(rawContent, true, data.estimatedReadingTime),
             isProtected: true,
             iv: data.iv,
             authTag: data.authTag,
@@ -80,17 +73,14 @@ const getPostRawDataUncached = async (slug) => {
         };
     }
 
-    const wordCount = rawContent.split(/\s+/g).length;
-
     return {
         slug,
         rawContent: fileContents,
         ...data,
-        readingTime: Math.ceil(wordCount / wordsPerMinute),
+        readingTime: estimateReadingTime(rawContent, false),
     };
 };
 
-// Cached version of getPostRawData
 const getPostRawData = cache(async (slug) => {
     return unstable_cache(
         async () => getPostRawDataUncached(slug),
@@ -99,7 +89,6 @@ const getPostRawData = cache(async (slug) => {
     )();
 });
 
-// Get a single post by slug
 export async function getPostBySlug(slug) {
     const postData = await getPostRawData(slug);
 

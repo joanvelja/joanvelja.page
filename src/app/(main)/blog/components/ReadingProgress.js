@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 export function ReadingProgress() {
-    const [progress, setProgress] = useState(0);
+    const barRef = useRef(null);
 
     useEffect(() => {
         let ticking = false;
@@ -12,7 +12,9 @@ export function ReadingProgress() {
                 window.requestAnimationFrame(() => {
                     const scrolled = window.scrollY;
                     const total = document.documentElement.scrollHeight - window.innerHeight;
-                    setProgress((scrolled / total) * 100);
+                    if (barRef.current) {
+                        barRef.current.style.width = `${(scrolled / total) * 100}%`;
+                    }
                     ticking = false;
                 });
                 ticking = true;
@@ -24,10 +26,11 @@ export function ReadingProgress() {
 
     return (
         <div className="fixed top-0 left-0 w-full h-1 bg-neutral-100 dark:bg-neutral-800">
-            <div 
+            <div
+                ref={barRef}
                 className="h-full bg-neutral-900 dark:bg-white transition-all duration-150"
-                style={{ width: `${progress}%` }}
+                style={{ width: '0%' }}
             />
         </div>
     );
-} 
+}

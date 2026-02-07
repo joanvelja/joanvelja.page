@@ -1,36 +1,35 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { throttle } from '@/lib/utils';
+import { useEffect, useRef } from 'react';
 
-export function useScrollDirection() {
-    const [scrollDirection, setScrollDirection] = useState(null);
-    const [isAtTop, setIsAtTop] = useState(true);
-    const [isAtBottom, setIsAtBottom] = useState(false);
-    const lastScrollY = useRef(typeof window !== 'undefined' ? window.scrollY : 0);
+export function useScrollDirection(dockRef, headerRef) {
+    const lastScrollY = useRef(0);
+    const directionRef = useRef(null);
 
     useEffect(() => {
-        const updateScrollDirection = () => {
+        const onScroll = () => {
             const scrollY = window.scrollY;
-            const direction = scrollY > lastScrollY.current ? 'down' : 'up';
+            const isAtTop = scrollY < 10;
+            const isAtBottom =
+                window.innerHeight + scrollY >= document.documentElement.scrollHeight - 10;
 
             if (Math.abs(scrollY - lastScrollY.current) > 10) {
-                setScrollDirection(direction);
+                directionRef.current = scrollY > lastScrollY.current ? 'down' : 'up';
             }
 
-            setIsAtTop(scrollY < 10);
-            setIsAtBottom(window.innerHeight + scrollY >= document.body.offsetHeight - 10);
-
             lastScrollY.current = scrollY > 0 ? scrollY : 0;
+
+            const hidden = directionRef.current === 'down' && !isAtBottom;
+
+            if (dockRef.current) {
+                dockRef.current.setAttribute('data-hidden', hidden);
+            }
+            if (headerRef.current) {
+                headerRef.current.setAttribute('data-scrolled', !isAtTop);
+            }
         };
 
-        const throttledUpdateScrollDirection = throttle(updateScrollDirection, 100);
-
-        window.addEventListener('scroll', throttledUpdateScrollDirection, { passive: true });
-        return () => {
-            window.removeEventListener('scroll', throttledUpdateScrollDirection);
-        };
-    }, []);
-
-    return { scrollDirection, isAtTop, isAtBottom };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        return () => window.removeEventListener('scroll', onScroll);
+    }, [dockRef, headerRef]);
 }

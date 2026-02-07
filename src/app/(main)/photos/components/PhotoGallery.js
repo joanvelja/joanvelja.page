@@ -23,8 +23,7 @@ function decodeThumbhash(base64) {
   }
 }
 
-function PhotoGridItem({ photo, index, isFullSpan, isCentered }) {
-  const { openLightbox } = useLightbox();
+function PhotoGridItem({ photo, index, isFullSpan, isCentered, openLightbox }) {
   const { register } = useThumbnailRegistryContext();
   const { ref: lazyRef, isVisible, hasLoaded, onLoad } = useImageLazyLoad();
   const elementRef = useRef(null);
@@ -46,12 +45,9 @@ function PhotoGridItem({ photo, index, isFullSpan, isCentered }) {
 
   const handleClick = useCallback(() => {
     setOverlayVisible(false);
-    // Restore overlay after animation
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        openLightbox(index, undefined);
-        setTimeout(() => setOverlayVisible(true), 500);
-      });
+      openLightbox(index, undefined);
+      setTimeout(() => setOverlayVisible(true), 400);
     });
   }, [index, openLightbox]);
 
@@ -109,7 +105,7 @@ function PhotoGridItem({ photo, index, isFullSpan, isCentered }) {
 }
 
 function PhotoGrid({ photos }) {
-  const { setPhotos } = useLightbox();
+  const { setPhotos, openLightbox } = useLightbox();
 
   useEffect(() => {
     setPhotos(photos);
@@ -146,6 +142,7 @@ function PhotoGrid({ photos }) {
           index={index}
           isFullSpan={shouldSpanFull(photo)}
           isCentered={shouldCenter(photo, index)}
+          openLightbox={openLightbox}
         />
       ))}
     </div>

@@ -12,6 +12,7 @@ export function TableOfContents() {
     // Cache heading elements and their positions
     const headingElementsRef = useRef([]);
     const headingPositionsRef = useRef([]);
+    const activeIdRef = useRef('');
 
     // Extract headings from the document
     useEffect(() => {
@@ -84,7 +85,14 @@ export function TableOfContents() {
                 return closest;
             }, { id: '', top: -Infinity });
 
-            setActiveId(activeHeading.id);
+            if (activeHeading.id && activeHeading.id !== activeIdRef.current) {
+                activeIdRef.current = activeHeading.id;
+                setActiveId(activeHeading.id);
+                window.history.replaceState(null, null, `#${activeHeading.id}`);
+            } else if (!activeHeading.id && activeIdRef.current) {
+                activeIdRef.current = '';
+                setActiveId('');
+            }
         };
 
         const throttledHandleScroll = throttle(handleScroll, 100);

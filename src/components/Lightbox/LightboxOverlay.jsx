@@ -34,7 +34,8 @@ class LightboxErrorBoundary extends Component {
 }
 
 export function LightboxOverlay() {
-  const { isOpen, currentIndex, photos, closeLightbox, navigate } = useLightbox();
+  const { isOpen, currentIndex, getPhotos, closeLightbox, navigate } = useLightbox();
+  const photos = getPhotos();
   const { getElement } = useThumbnailRegistryContext();
   const [settled, setSettled] = useState(false);
   const [imageError, setImageError] = useState(false);

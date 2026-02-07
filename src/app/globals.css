@@ -368,3 +368,24 @@ body.lightbox-open {
 @media (hover: none) {
   .lightbox-nav-arrow { display: none; }
 }
+
+/* Dock: disable backdrop-blur when hidden (saves GPU) */
+[data-hidden="true"] {
+  backdrop-filter: none;
+}
+
+/* Reduced motion: respect user preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Content visibility for below-fold blog content */
+.blog-content pre,
+.blog-content .katex-display,
+.blog-content table {
+  content-visibility: auto;
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { useThumbnailRegistry } from '@/hooks/useThumbnailRegistry';
 
 const ThumbnailRegistryContext = createContext(null);
@@ -15,6 +15,8 @@ export function LightboxProvider({ children }) {
   const currentIndexRef = useRef(currentIndex);
   currentIndexRef.current = currentIndex;
   const photosRef = useRef([]);
+
+  const getPhotos = useCallback(() => photosRef.current, []);
 
   const openLightbox = useCallback((index, photos) => {
     if (photos) photosRef.current = photos;
@@ -76,15 +78,15 @@ export function LightboxProvider({ children }) {
     }
   }, []);
 
-  const stateValue = {
+  const stateValue = useMemo(() => ({
     isOpen,
     currentIndex,
-    photos: photosRef.current,
+    getPhotos,
     openLightbox,
     closeLightbox,
     navigate,
     setPhotos,
-  };
+  }), [isOpen, currentIndex, getPhotos, openLightbox, closeLightbox, navigate, setPhotos]);
 
   return (
     <ThumbnailRegistryContext.Provider value={registry}>
