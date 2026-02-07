@@ -1,4 +1,4 @@
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { compileMDX } from 'next-mdx-remote/rsc';
@@ -11,14 +11,14 @@ import { mdxOptions } from './mdx-plugins';
 // Get all blog posts
 export async function getAllPosts() {
     const postsDirectory = path.join(process.cwd(), 'content/blog');
-    const filenames = fs.readdirSync(postsDirectory);
+    const filenames = await fs.readdir(postsDirectory);
 
     const posts = await Promise.all(
         filenames
             .filter(filename => filename.endsWith('.mdx'))
             .map(async filename => {
                 const filePath = path.join(postsDirectory, filename);
-                const fileContents = fs.readFileSync(filePath, 'utf8');
+                const fileContents = await fs.readFile(filePath, 'utf8');
                 const { data, content } = matter(fileContents);
                 const slug = filename.replace(/\.mdx$/, '');
 
@@ -59,7 +59,7 @@ export async function getAllPosts() {
 // Get raw post data (uncached function)
 const getPostRawDataUncached = async (slug) => {
     const filePath = path.join(process.cwd(), 'content/blog', `${slug}.mdx`);
-    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const fileContents = await fs.readFile(filePath, 'utf8');
     const { data, content: rawContent } = matter(fileContents);
 
     const wordsPerMinute = 200;
@@ -116,7 +116,7 @@ export async function getPostBySlug(slug) {
         },
     });
 
-    const { rawContent, ...rest } = postData;
+    const { rawContent: _rawContent, ...rest } = postData;
 
     return {
         ...rest,

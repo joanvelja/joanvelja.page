@@ -1,13 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 const config = {
-  content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-  ],
-  darkMode: 'class',
   theme: {
     extend: {
+      zIndex: {
+        dropdown: '40',
+        tooltip: '50',
+        modal: '60',
+      },
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
@@ -83,12 +82,6 @@ const config = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-    require('tailwind-scrollbar'),
-  ],
 };
 
 export default config;
-
-module

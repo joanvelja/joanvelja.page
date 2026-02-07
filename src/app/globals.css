@@ -1,6 +1,8 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../../tailwind.config.mjs";
+@plugin "@tailwindcss/typography";
+@plugin "tailwind-scrollbar";
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   --transition-duration: 0.3s;
@@ -63,9 +65,9 @@ body {
 .blog-content ol,
 .blog-content li,
 .blog-content blockquote {
-  @apply font-serif !important;
+  @apply !font-serif;
   font-family: var(--font-crimson-pro) !important;
-  line-height: 1.8rem !important;
+  line-height: 1.45 !important;
   letter-spacing: 0.01em !important;
   font-size: 1.125rem !important;
 }
@@ -74,7 +76,7 @@ body {
 .blog-content h2,
 .blog-content h3,
 .blog-content h4 {
-  @apply font-serif !important;
+  @apply !font-serif;
   font-family: var(--font-crimson-pro) !important;
   letter-spacing: -0.01em !important;
 }
@@ -91,6 +93,26 @@ body {
 .blog-content ul,
 .blog-content ol {
   margin-left: 1rem;
+}
+
+/* Distill-style link underlines */
+.blog-content a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.blog-content a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* Citation/sidenote marker color */
+.citation-marker {
+  color: hsla(206, 90%, 20%, 0.7);
+}
+
+.dark .citation-marker {
+  color: hsla(206, 80%, 65%, 0.9);
 }
 
 /* Dark mode image treatments */
@@ -251,6 +273,9 @@ pre>code>[data-line][data-highlighted] {
 .katex-display {
   display: block;
   text-align: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .math-display>.katex-display,
@@ -314,4 +339,32 @@ pre>code>[data-line][data-highlighted] {
 
 .dark .katex-display::-webkit-scrollbar-thumb:hover {
   background: rgba(75, 85, 99, 0.6);
+}
+
+/* Lightbox */
+.lightbox-focusable:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+body.lightbox-open {
+  overflow: hidden;
+}
+
+.photo-grid-item {
+  transition: transform 0.2s ease-out;
+}
+
+.photo-grid-item:hover {
+  transform: scale(1.02);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .lightbox-nav-arrow { opacity: 0; transition: opacity 0.2s; }
+  .lightbox-nav-zone:hover .lightbox-nav-arrow { opacity: 1; }
+}
+
+@media (hover: none) {
+  .lightbox-nav-arrow { display: none; }
 }

@@ -1,27 +1,23 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useState, useRef } from 'react';
 
 export const SidenotesContext = createContext();
 
 export function SidenotesProvider({ children }) {
     const [notes, setNotes] = useState([]);
     const notesMap = useRef(new Map());
-    
+
     const addNote = (content) => {
-        // Create a content hash to identify unique notes
         const contentStr = typeof content === 'string' ? content : JSON.stringify(content);
-        
-        // If we've seen this note before, return its number
+
         if (notesMap.current.has(contentStr)) {
             return notesMap.current.get(contentStr);
         }
 
-        // Otherwise, create a new note
         const number = notesMap.current.size + 1;
         notesMap.current.set(contentStr, number);
-        
-        // Only add to notes array if it's new
+
         setNotes(prev => {
             if (prev.some(note => note.number === number)) {
                 return prev;
@@ -36,20 +32,35 @@ export function SidenotesProvider({ children }) {
         <SidenotesContext.Provider value={{ notes, addNote }}>
             {children}
             {notes.length > 0 && (
-                <div className="mt-16 pt-8 pb-8 mb-8 border-t border-neutral-200 dark:border-neutral-800">
-                    <h2 className="text-2xl font-bold mb-4 text-neutral-900 dark:text-white font-serif">Notes</h2>
-                    <div className="space-y-4">
+                <div className="mt-16 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+                    <h2 className="text-xl font-semibold mb-6 text-neutral-900 dark:text-white font-serif tracking-tight">
+                        Notes
+                    </h2>
+                    <ol className="space-y-3 list-none p-0 m-0">
                         {notes.map(({ number, content }) => (
-                            <div key={number} id={`note-${number}`} className="flex gap-2 text-sm text-neutral-700 dark:text-neutral-300 font-serif">
-                                <a href={`#ref-${number}`} className="text-white-500 hover:underline font-sans">
+                            <li
+                                key={number}
+                                id={`sidenote-${number}`}
+                                className="flex gap-3 text-sm text-neutral-700 dark:text-neutral-300 font-serif leading-relaxed scroll-mt-24"
+                            >
+                                <span className="flex-shrink-0 font-sans text-xs font-medium w-6 text-right citation-marker">
                                     {number}
-                                </a>
-                                <div>{content}</div>
-                            </div>
+                                </span>
+                                <div className="flex-1">
+                                    {content}
+                                    <a
+                                        href={`#sidenote-ref-${number}`}
+                                        className="ml-2 text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 text-xs"
+                                        title="Back to text"
+                                    >
+                                        ↩
+                                    </a>
+                                </div>
+                            </li>
                         ))}
-                    </div>
+                    </ol>
                 </div>
             )}
         </SidenotesContext.Provider>
     );
-} 
+}

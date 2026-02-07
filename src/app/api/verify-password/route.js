@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { verifyPassword } from '@/lib/encryption';
-import fs from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 
@@ -86,7 +86,9 @@ export async function POST(request) {
     const filePath = path.join(process.cwd(), 'content/blog', `${slug}.mdx`);
     
     // Check if file exists
-    if (!fs.existsSync(filePath)) {
+    try {
+      await fs.access(filePath);
+    } catch {
       return NextResponse.json(
         { error: 'Post not found' },
         { status: 404 }
@@ -94,7 +96,7 @@ export async function POST(request) {
     }
     
     // Read file and extract frontmatter
-    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const fileContents = await fs.readFile(filePath, 'utf8');
     const { data } = matter(fileContents);
     
     // Check if post is password protected

@@ -1,14 +1,22 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { User, Mail, Briefcase, BookText, Image, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { NavTile } from '@/components/NavTile';
+import { Clock } from '@/components/Clock';
+
+const pathToTitle = {
+    '/about': 'About',
+    '/contact': 'Contact',
+    '/projects': 'Projects & Works',
+    '/blog': 'Blog',
+    '/photos': 'Photos'
+};
 
 export default function MainLayout({ children }) {
-    const [time, setTime] = useState('');
     const [title, setTitle] = useState('');
     const pathname = usePathname();
     const { theme, setTheme } = useTheme();
@@ -17,33 +25,8 @@ export default function MainLayout({ children }) {
     const isHidden = scrollDirection === 'down' && !isAtBottom;
 
     useEffect(() => {
-        // Set title based on current path
-        const pathToTitle = {
-            '/about': 'About',
-            '/contact': 'Contact',
-            '/projects': 'Projects & Works',
-            '/blog': 'Blog',
-            '/photos': 'Photos'
-        };
         setTitle(pathToTitle[pathname] || '');
-
-        // Update time every second
-        const updateTime = () => {
-            const now = new Date();
-            setTime(now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }));
-        };
-        updateTime();
-        const interval = setInterval(updateTime, 1000);
-
-        // Mark as mounted
         setMounted(true);
-
-        return () => clearInterval(interval);
     }, [pathname]);
 
     // Use next-themes toggle
@@ -78,9 +61,7 @@ export default function MainLayout({ children }) {
                         </div>
                         <div className="w-[130px] flex flex-col items-end justify-center">
                             <div className="flex items-center gap-6">
-                                <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">
-                                    {time}
-                                </p>
+                                <Clock />
                                 <button
                                     onClick={toggleTheme}
                                     className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"

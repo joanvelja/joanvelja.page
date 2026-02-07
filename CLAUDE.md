@@ -1,6 +1,17 @@
-# AGENTS.md — Next.js + React house rules
+# CLAUDE.md — joanvelja.page
 
-This repo is optimized for fast, reproducible web development with Next.js. Defaults are opinionated: **bun**, **ESLint**, **Jest**, **Tailwind CSS**, component-driven architecture, and strict separation of concerns.
+This file provides guidance to Claude Code (claude.ai/code) when working with this repository.
+
+---
+
+## Commands
+
+```bash
+bun dev         # Development server with Turbopack
+bun run build   # Production build
+bun test        # Jest tests
+bun run lint    # ESLint
+```
 
 ---
 
@@ -59,21 +70,21 @@ Only take an action after all the above reasoning is completed. Once you've take
 
 ---
 
-## Tooling & workflow
+## Tooling & Workflow
+
 - Use **bun** for everything.
 - Env & deps:
   - Add deps: `bun add <pkg>` (save to `dependencies`) or `bun add -d <pkg>` (for `devDependencies`).
   - Run: `bun run <script>` (e.g., `bun dev`, `bun test`).
   - One-off tools: `bunx <tool>` (e.g., `bunx eslint .`).
-- When the agent needs to install or run anything, prefer the `bun` commands above.
 - Keep `bun.lock` committed for deterministic installs.
 
-> Notes:
-> - `bun.lock` is the source of truth for dependency versions.
+> `bun.lock` is the source of truth for dependency versions.
 
 ---
 
-## Coding conventions
+## Coding Conventions
+
 - **React 19+ / Next.js 15+**: Functional components, Hooks, Server Components by default (add `'use client'` only when necessary).
 - **Styling**: **Tailwind CSS** for all styling. Avoid CSS modules or inline styles unless dynamic. Use `cn()` utility for class merging.
 - **Linting/Formatting**: Follow `eslint` config. Run `bun run lint` to verify.
@@ -87,14 +98,6 @@ Only take an action after all the above reasoning is completed. Once you've take
 
 ---
 
-## Project hygiene
-- Always ensure `node_modules` is up to date (`bun install`).
-- Pre-commit hooks are configured with Husky.
-- Before opening a PR/committing:
-  `bun run lint && bun test` (if tests are set up).
-
----
-
 ## Implementation Guidelines
 
 ### 1) Architecture & Abstractions (Composition + Hooks)
@@ -104,27 +107,7 @@ Only take an action after all the above reasoning is completed. Once you've take
   * **UI Components**: Pure presentation. Receive data, render UI, trigger callbacks.
   * **Custom Hooks**: Encapsulate logic, state, and side effects. Return data and handlers.
   * **Utils/Lib**: Pure functions, helpers, API calls.
-* **Client vs. Server**: default to Server Components for data fetching/rendering. Use Client Components (`'use client'`) only for interactivity (state, effects, event listeners).
-
-```jsx
-// components/UserProfile.jsx
-'use client';
-import { useUser } from '@/hooks/useUser';
-
-export function UserProfile({ userId }) {
-  const { user, isLoading, error } = useUser(userId); // Logic hidden in hook
-
-  if (isLoading) return <Spinner />;
-  if (error) return <ErrorMsg error={error} />;
-
-  return (
-    <div className="p-4 border rounded-lg">
-      <h2 className="text-xl font-bold">{user.name}</h2>
-      <p className="text-gray-600">{user.email}</p>
-    </div>
-  );
-}
-```
+* **Client vs. Server**: Default to Server Components for data fetching/rendering. Use Client Components (`'use client'`) only for interactivity (state, effects, event listeners).
 
 ### 2) Configuration & Constants
 
@@ -132,22 +115,11 @@ export function UserProfile({ userId }) {
 * **Constants**: Store static data/config in `src/lib/constants.js` or similar.
 * **Theming**: Use `tailwind.config.mjs` for design tokens (colors, fonts, spacing).
 
-### 3) Testing strategy
+### 3) Testing Strategy
 
 * **Unit tests**: `jest` + `react-testing-library`. Test behaviors, not implementation details.
 * **Snapshot tests**: Use sparingly for complex UI structures.
 * **Integration tests**: Test critical flows (e.g., form submission, navigation).
-
-```jsx
-// __tests__/UserProfile.test.jsx
-import { render, screen } from '@testing-library/react';
-import { UserProfile } from '@/components/UserProfile';
-
-test('renders user name', async () => {
-  render(<UserProfile userId="123" />);
-  expect(await screen.findByText('John Doe')).toBeInTheDocument();
-});
-```
 
 ### 4) Documentation & Accessibility
 
@@ -159,11 +131,13 @@ test('renders user name', async () => {
 * **Props Interface**: Define clear prop types (using JSDoc or PropTypes if not TS).
 * **Polymorphic Components**: Allow components to render as different elements (e.g., `as="a"` or `as="button"`) where appropriate.
 
-### 6) Tools at your disposal
+### 6) Tools at Your Disposal
 
-For every uncertainty, note that you have `web_fetch(query)` at your disposal to run web searches. This is particularly encouraged for dependencies, and how new versions of packages like `next`, `react`, and `tailwindcss` implement features as they update. It is of paramount importance that we stay on top of our game here: these are libraries in constant evolution and we do not want to fall behind in terms of (new) functionalities.
+For every uncertainty, note that you have `web_fetch(query)` at your disposal to run web searches. This is particularly encouraged for dependencies, and how new versions of packages like `next`, `react`, and `tailwindcss` implement features as they update. Stay on top of library evolution.
 
-# Remove AI code slop
+---
+
+## AI Code Slop Removal
 
 Check the diff against main, and remove all AI generated slop introduced in this branch.
 
@@ -173,4 +147,117 @@ This includes:
 - Casts to any to get around type issues
 - Any other style that is inconsistent with the file
 
-Report at the end with only a 1-3 sentence summary of what you changed
+Report at the end with only a 1-3 sentence summary of what you changed.
+
+---
+
+## Project-Specific Architecture
+
+### App Router Structure
+
+The site uses Next.js App Router with route groups:
+
+```
+src/app/
+├── (main)/           # Main site layout wrapper
+│   ├── about/
+│   ├── blog/
+│   │   ├── [slug]/   # Dynamic blog post routes
+│   │   └── components/
+│   ├── contact/
+│   ├── photos/
+│   └── projects/
+├── api/              # API routes
+├── layout.js         # Root layout
+└── page.js           # Home page
+```
+
+### MDX Content Pipeline
+
+Blog posts live in `content/blog/*.mdx` with frontmatter:
+
+```yaml
+---
+title: Post Title
+description: Brief description
+image: /images/blog/cover.png
+date: '2025-01-15'
+tags:
+  - Tag1
+  - Tag2
+isProtected: false  # Optional: password-protected posts
+---
+```
+
+Processing: `gray-matter` for frontmatter → `next-mdx-remote/rsc` for compilation → custom components via `src/lib/mdx-components.js`.
+
+### Server vs Client Components
+
+- **Server by default**: Pages, layouts, data fetching
+- **Client (`'use client'`)**: Interactive components (Sidenote, Citation, MarginNote, TableOfContents, FluidCanvas)
+
+### Key Custom Features
+
+- **Citations**: Academic-style numbered references with tooltips and auto-generated bibliography
+- **Sidenotes**: Hover-reveal footnotes with popup positioning
+- **MarginNotes**: Side-margin annotations for supplementary content
+- **ImageThemeAdjuster**: Dark mode image handling with invert/adaptive strategies
+- **FluidCanvas**: WebGL fluid simulation background
+- **Password Protection**: Encrypted content with client-side decryption
+
+---
+
+## MDX Content Guidelines
+
+### Available Components
+
+Use these directly in MDX files:
+
+```jsx
+// Citations - academic references
+<Citation
+  author="Author Name"
+  year="2024"
+  title="Paper Title"
+  url="https://..."
+  venue="Conference/Journal"
+/>
+
+// Auto-generated bibliography at end
+<Bibliography />
+
+// Sidenotes - hover-reveal footnotes
+<Sidenote>Additional context that appears on hover</Sidenote>
+
+// Margin notes - labeled side annotations
+<MarginNote label="Note">Content appears in margin on wide screens</MarginNote>
+
+// Image with dark mode handling
+<ImageThemeAdjuster
+  src="/images/blog/image.png"
+  alt="Description"
+  strategy="invert"  // or "adaptive", "none"
+  aspectRatio="16/9"
+  showCaption={true}
+  caption="Source attribution"
+/>
+
+// Interactive embeds
+<InteractiveEmbed src="https://..." height={400} />
+```
+
+### Math Support
+
+LaTeX via `$$...$$` for display math or `$...$` for inline.
+
+### Code Blocks
+
+Standard markdown fenced code blocks with syntax highlighting.
+
+---
+
+## Project Hygiene
+
+- Always ensure `node_modules` is up to date (`bun install`).
+- Pre-commit hooks are configured with Husky.
+- Before opening a PR/committing: `bun run lint && bun test`

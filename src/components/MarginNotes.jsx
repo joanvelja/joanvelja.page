@@ -10,6 +10,7 @@ export function MarginNotesProvider({ children }) {
     const notePositions = useRef(new Map());
     const observerRef = useRef(null);
     const contentRef = useRef(null);
+    const updateTimeout = useRef(null);
 
     // Register a new note
     const registerNote = useCallback((note) => {
@@ -31,18 +32,14 @@ export function MarginNotesProvider({ children }) {
                     if (!id) return;
 
                     if (entry.isIntersecting) {
-                        // Add note to visible notes
                         setVisibleNotes(prev => {
                             if (prev.includes(id)) return prev;
                             return [...prev, id];
                         });
 
-                        // Calculate and store the note's position
-                        const rect = entry.target.getBoundingClientRect();
-                        const position = rect.top + window.scrollY;
+                        const position = entry.boundingClientRect.top + window.scrollY;
                         notePositions.current.set(id, position);
                     } else {
-                        // Remove note from visible notes
                         setVisibleNotes(prev => prev.filter(noteId => noteId !== id));
                     }
                 });
@@ -71,7 +68,6 @@ export function MarginNotesProvider({ children }) {
         // Initial observation
         updateObservedElements();
 
-        // Set up a mutation observer to catch dynamically added notes
         const mutationObserver = new MutationObserver(mutations => {
             let shouldUpdate = false;
             mutations.forEach(mutation => {
@@ -81,15 +77,19 @@ export function MarginNotesProvider({ children }) {
             });
 
             if (shouldUpdate) {
-                updateObservedElements();
+                clearTimeout(updateTimeout.current);
+                updateTimeout.current = setTimeout(updateObservedElements, 50);
             }
         });
 
-        mutationObserver.observe(document.body, { childList: true, subtree: true });
+        if (contentRef.current) {
+            mutationObserver.observe(contentRef.current, { childList: true, subtree: true });
+        }
 
         return () => {
             observerRef.current?.disconnect();
             mutationObserver?.disconnect();
+            clearTimeout(updateTimeout.current);
         };
     }, []);
 

@@ -19,7 +19,8 @@ let shikiHighlighterPromise = null;
 async function getShikiHighlighter(highlighterOpts) {
     if (!shikiHighlighterPromise) {
         const shiki = await import('shiki');
-        shikiHighlighterPromise = shiki.getHighlighter({
+        const createFn = shiki.createHighlighter || shiki.getHighlighter;
+        shikiHighlighterPromise = createFn({
             ...highlighterOpts,
             langs: highlighterOpts.langs || [
                 'javascript', 'typescript', 'jsx', 'tsx', 'python',

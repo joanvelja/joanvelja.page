@@ -1,0 +1,730 @@
+[
+  {
+    "id": "oxford-apr-2025",
+    "src": "/images/photos/Oxford, Apr 2025.JPG",
+    "thumbhash": "0fcVHYR3iIiPd4iGeEeIeHdycBYI",
+    "title": "Oxford",
+    "date": "2025-04-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 200,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/71"
+    }
+  },
+  {
+    "id": "keble-road-mar-2025",
+    "src": "/images/photos/Keble Road, Mar 2025.JPG",
+    "thumbhash": "n9YNTIqPgmmXeIeIh3hgiAeHZw==",
+    "title": "Keble Road",
+    "date": "2025-03-01T08:00:00.000Z",
+    "width": 3840,
+    "height": 2160,
+    "aspectRatio": "3840/2160",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/2770"
+    }
+  },
+  {
+    "id": "montréal-mar-2025",
+    "src": "/images/photos/Montréal, Mar 2025.JPG",
+    "thumbhash": "oOcNHYZ/VYd3d4d4d4h4dwB1CGJ3",
+    "title": "Montréal",
+    "date": "2025-03-01T08:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 64,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/604"
+    }
+  },
+  {
+    "id": "udem-mar-2025",
+    "src": "/images/photos/UdeM, Mar 2025.JPG",
+    "thumbhash": "RwgGDYAETHl1iIiCa3eJewNmEYAX",
+    "title": "UdeM",
+    "date": "2025-03-01T08:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 1250,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/30"
+    }
+  },
+  {
+    "id": "universitè-de-montréal-mar-2025",
+    "src": "/images/photos/Universitè de Montréal, Mar 2025.JPG",
+    "thumbhash": "AggCBYAxXbZfpnWlSWlriGNvKPR2",
+    "title": "Universitè De Montréal",
+    "date": "2025-03-01T08:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 9mm f/2.8",
+      "iso": 1000,
+      "aperture": "f/2.8",
+      "shutterSpeed": "1/40"
+    }
+  },
+  {
+    "id": "night-run-in-oost-jan-2025",
+    "src": "/images/photos/Night run in Oost, Jan 2025.JPG",
+    "thumbhash": "yQcGLYRmh3iEhneAineHiZiAiwnI",
+    "title": "Night Run In Oost",
+    "date": "2025-01-01T08:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 2000,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/17"
+    }
+  },
+  {
+    "id": "strangers-in-amsterdam-nov-2024",
+    "src": "/images/photos/Strangers in Amsterdam, Nov 2024.JPG",
+    "thumbhash": "F+cJRYh/hYmGh3eWh6iGlkCHBoRo",
+    "title": "Strangers In Amsterdam",
+    "date": "2024-11-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/4608"
+    }
+  },
+  {
+    "id": "america-oct-2024",
+    "src": "/images/photos/America, Oct 2024.JPG",
+    "thumbhash": "6aUJDYCAeId4eIiJd4iIh6B5BpZX",
+    "title": "America",
+    "date": "2024-10-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 9mm f/2.8",
+      "iso": 25,
+      "aperture": "f/2.8",
+      "shutterSpeed": "1/570"
+    }
+  },
+  {
+    "id": "conservatory-of-flowers-oct-2024",
+    "src": "/images/photos/Conservatory of Flowers, Oct 2024.JPG",
+    "thumbhash": "WpYFhYoosR+ViJVpW3ZoaZB4B4mY",
+    "title": "Conservatory Of Flowers",
+    "date": "2024-10-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/4310"
+    }
+  },
+  {
+    "id": "lombard-street-oct-2024",
+    "src": "/images/photos/Lombard Street, Oct 2024.JPG",
+    "thumbhash": "nOcJFYL8l4ZTqohodniIhwKaB4JY",
+    "title": "Lombard Street",
+    "date": "2024-10-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 64,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/2833"
+    }
+  },
+  {
+    "id": "lower-pacific-heights-oct-2024",
+    "src": "/images/photos/Lower Pacific Heights, Oct 2024.JPG",
+    "thumbhash": "2+cJHYS/ZHaJmWhXmFiZZzCICqWY",
+    "title": "Lower Pacific Heights",
+    "date": "2024-10-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/2833"
+    }
+  },
+  {
+    "id": "presidio-oct-2024",
+    "src": "/images/photos/Presidio, Oct 2024.JPG",
+    "thumbhash": "4ecRRYhfZJl3iHh5iHh3iECHCGWI",
+    "title": "Presidio",
+    "date": "2024-10-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/2506"
+    }
+  },
+  {
+    "id": "someday...-oct-2024",
+    "src": "/images/photos/Someday..., Oct 2024.JPG",
+    "thumbhash": "J6YJHYR5eHhwd3d1eKd3h4iPgvgo",
+    "title": "Someday...",
+    "date": "2024-10-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 9mm f/2.8",
+      "iso": 25,
+      "aperture": "f/2.8",
+      "shutterSpeed": "1/1727"
+    }
+  },
+  {
+    "id": "southwark-sep-2024",
+    "src": "/images/photos/Southwark, Sep 2024.JPG",
+    "thumbhash": "W/gJDYKgqVe+e4iNuaeIeLEGC4yz",
+    "title": "Southwark",
+    "date": "2024-09-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/1488"
+    }
+  },
+  {
+    "id": "belgravia-aug-2024",
+    "src": "/images/photos/Belgravia, Aug 2024.JPG",
+    "thumbhash": "lPcVFYKPhniHiHh1mXh3dxCYCpKp",
+    "title": "Belgravia",
+    "date": "2024-08-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/2506"
+    }
+  },
+  {
+    "id": "good-steg!-aug-2024",
+    "src": "/images/photos/Good Steg!, Aug 2024.JPG",
+    "thumbhash": "XggODIKvepmUp1l3iGcLXJXQVQ==",
+    "title": "Good Steg!",
+    "date": "2024-08-01T07:00:00.000Z",
+    "width": 3664,
+    "height": 2062,
+    "aspectRatio": "3664/2062",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro front camera 2.69mm f/1.9",
+      "iso": 64,
+      "aperture": "f/1.9",
+      "shutterSpeed": "1/54"
+    }
+  },
+  {
+    "id": "grumpy-in-london-aug-2024",
+    "src": "/images/photos/Grumpy in London, Aug 2024.png",
+    "thumbhash": "YOcNLQZ4Vn+ZWWhXh3h3d2hwhAZX",
+    "title": "Grumpy In London",
+    "date": "2024-08-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "belgrave-square-jul-2024",
+    "src": "/images/photos/Belgrave Square, Jul 2024.JPG",
+    "thumbhash": "HRgODYY/goarmZeZiWhndwFkAnFY",
+    "title": "Belgrave Square",
+    "date": "2024-07-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 160,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/100"
+    }
+  },
+  {
+    "id": "jakubský-obvod-jul-2024",
+    "src": "/images/photos/Jakubský Obvod, Jul 2024.JPG",
+    "thumbhash": "HggKHYRvt4avdHlbZXiHdlOAOAWI",
+    "title": "Jakubský Obvod",
+    "date": "2024-07-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/1980"
+    }
+  },
+  {
+    "id": "bank-jun-2024",
+    "src": "/images/photos/Bank, Jun 2024.JPG",
+    "thumbhash": "5NYNRYj2Y2qXaYiId2iXd2BmCmem",
+    "title": "Bank",
+    "date": "2024-06-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 80,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/4950"
+    }
+  },
+  {
+    "id": "rijnbuurt-apr-2024",
+    "src": "/images/photos/Rijnbuurt, Apr 2024.JPG",
+    "thumbhash": "nfgJHYT5mGx7R3aEiod3d5CWefhV",
+    "title": "Rijnbuurt",
+    "date": "2024-04-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 64,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/604"
+    }
+  },
+  {
+    "id": "willemspark-mar-2024",
+    "src": "/images/photos/Willemspark, Mar 2024.JPG",
+    "thumbhash": "XRgGDYLY4rCIlkl6iIaIhvmD9z9Y",
+    "title": "Willemspark",
+    "date": "2024-03-01T08:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 15 Pro",
+      "lens": "iPhone 15 Pro back triple camera 6.765mm f/1.78",
+      "iso": 64,
+      "aperture": "f/1.78",
+      "shutterSpeed": "1/774"
+    }
+  },
+  {
+    "id": "milano-sep-2023",
+    "src": "/images/photos/Milano, Sep 2023.JPG",
+    "thumbhash": "XQgKDYKcwNeHaaZ4l3eIiAxLM2Bl",
+    "title": "Milano",
+    "date": "2023-09-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 11 Pro",
+      "lens": "iPhone 11 Pro back triple camera 4.25mm f/1.8",
+      "iso": 100,
+      "aperture": "f/1.8",
+      "shutterSpeed": "1/121"
+    }
+  },
+  {
+    "id": "amsterdam-west-aug-2023",
+    "src": "/images/photos/Amsterdam West, Aug 2023.JPG",
+    "thumbhash": "UPgFDYLPZ4ipmnhyaraqhWs0AIaX",
+    "title": "Amsterdam West",
+    "date": "2023-08-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 11 Pro",
+      "lens": "iPhone 11 Pro back triple camera 4.25mm f/1.8",
+      "iso": 32,
+      "aperture": "f/1.8",
+      "shutterSpeed": "1/166"
+    }
+  },
+  {
+    "id": "meledugno-aug-2023",
+    "src": "/images/photos/Meledugno, Aug 2023.JPG",
+    "thumbhash": "YrcJHYb+W2Npd4h7aIhnehBOmvWj",
+    "title": "Meledugno",
+    "date": "2023-08-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 11 Pro",
+      "lens": "iPhone 11 Pro back triple camera 4.25mm f/1.8",
+      "iso": 32,
+      "aperture": "f/1.8",
+      "shutterSpeed": "1/3125"
+    }
+  },
+  {
+    "id": "sant'ulderico-aug-2023",
+    "src": "/images/photos/Sant'Ulderico, Aug 2023.JPG",
+    "thumbhash": "XhgKHYbAdlZFp3evl1d2iQeHOXBI",
+    "title": "Sant'Ulderico",
+    "date": "2023-08-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": {
+      "camera": "Apple iPhone 11 Pro",
+      "lens": "iPhone 11 Pro back triple camera 4.25mm f/1.8",
+      "iso": 32,
+      "aperture": "f/1.8",
+      "shutterSpeed": "1/439"
+    }
+  },
+  {
+    "id": "seceda-jul-2023",
+    "src": "/images/photos/Seceda, Jul 2023.jpg",
+    "thumbhash": "n9cJLYJ3dYhvmHm5aEaYiImAlwd4",
+    "title": "Seceda",
+    "date": "2023-07-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": null
+  },
+  {
+    "id": "north-governorate-jun-2023",
+    "src": "/images/photos/North Governorate, Jun 2023.jpg",
+    "thumbhash": "HcYJNQRpt2Cop3pmlpiHZwd1e1C3",
+    "title": "North Governorate",
+    "date": "2023-06-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "oranienburger-straße-jun-2023",
+    "src": "/images/photos/Oranienburger Straße, Jun 2023.jpg",
+    "thumbhash": "ifcJJQKHiIB4l3c3aItpiEdgiwPG",
+    "title": "Oranienburger Straße",
+    "date": "2023-06-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "manly-apr-2023",
+    "src": "/images/photos/Manly, Apr 2023.jpg",
+    "thumbhash": "XwgGDQKiQ09luW47WFiFjJdffPY6",
+    "title": "Manly",
+    "date": "2023-04-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "nusa-penida-apr-2023",
+    "src": "/images/photos/Nusa Penida, Apr 2023.jpg",
+    "thumbhash": "38YJNQRli6pZ93WYimRXaFlgtwKF",
+    "title": "Nusa Penida",
+    "date": "2023-04-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "songran-a-apr-2023",
+    "src": "/images/photos/Songran A, Apr 2023.jpg",
+    "thumbhash": "3/cVNYR4iIePd4d2eFiIh3aQVAdJ",
+    "title": "Songran A",
+    "date": "2023-04-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": null
+  },
+  {
+    "id": "sydney-apr-2023",
+    "src": "/images/photos/Sydney, Apr 2023.jpg",
+    "thumbhash": "nKUJLQKmiI+HB3eYh4qISHeAWQeZ",
+    "title": "Sydney",
+    "date": "2023-04-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "ubud-apr-2023",
+    "src": "/images/photos/Ubud, Apr 2023.jpg",
+    "thumbhash": "IAgSPASZ+Im3eIc3aHeJkJcImQ==",
+    "title": "Ubud",
+    "date": "2023-04-01T07:00:00.000Z",
+    "width": 3848,
+    "height": 6922,
+    "aspectRatio": "3848/6922",
+    "exif": null
+  },
+  {
+    "id": "wynyard-apr-2023",
+    "src": "/images/photos/Wynyard, Apr 2023.jpg",
+    "thumbhash": "VBgGFQQad3+IBpaJaFVJhUmApAQ4",
+    "title": "Wynyard",
+    "date": "2023-04-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "palm-beach-mar-2023",
+    "src": "/images/photos/Palm Beach, Mar 2023.jpg",
+    "thumbhash": "nQcKXA6QB3U5Z3W4mHebb7X5Vg==",
+    "title": "Palm Beach",
+    "date": "2023-03-01T08:00:00.000Z",
+    "width": 1125,
+    "height": 1950,
+    "aspectRatio": "1125/1950",
+    "exif": null
+  },
+  {
+    "id": "uts-building-7-mar-2023",
+    "src": "/images/photos/UTS Building 7, Mar 2023.jpg",
+    "thumbhash": "FAgGFQKGdnWJCHbXeFaZWJFgeQWV",
+    "title": "UTS Building 7",
+    "date": "2023-03-01T08:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "wynyard-mar-2023",
+    "src": "/images/photos/Wynyard, Mar 2023.jpg",
+    "thumbhash": "HPgFFQJ0h39Wt3dXp4t3d4i/fcf7",
+    "title": "Wynyard",
+    "date": "2023-03-01T08:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "bondi-walk-feb-2023",
+    "src": "/images/photos/Bondi Walk, Feb 2023.jpg",
+    "thumbhash": "XucFJQJR+UmliLnGeKplh2aAOgS6",
+    "title": "Bondi Walk",
+    "date": "2023-02-01T08:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "katoomba-feb-2023",
+    "src": "/images/photos/Katoomba, Feb 2023.jpg",
+    "thumbhash": "n8YJPYR2iXePl3hzlyh4inaAaAeH",
+    "title": "Katoomba",
+    "date": "2023-02-01T08:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": null
+  },
+  {
+    "id": "manly-feb-2023",
+    "src": "/images/photos/Manly, Feb 2023.jpg",
+    "thumbhash": "IdcNHQJkep+ISHaIeIaIl3VQSQez",
+    "title": "Manly",
+    "date": "2023-02-01T08:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "queenscliff-feb-2023",
+    "src": "/images/photos/Queenscliff, Feb 2023.jpg",
+    "thumbhash": "3gcKHQTzgxpYaFqZmXhmeX+E90d4",
+    "title": "Queenscliff",
+    "date": "2023-02-01T08:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "uts-building-7-feb-2023",
+    "src": "/images/photos/UTS Building 7, Feb 2023.jpg",
+    "thumbhash": "XucJFQKUlXt1CDY4d1OZiI3A9gpu",
+    "title": "UTS Building 7",
+    "date": "2023-02-01T08:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "dubai-desert-dec-2022",
+    "src": "/images/photos/Dubai Desert, Dec 2022.JPG",
+    "thumbhash": "4wcKRQyqd5+HeGcYl3fIaIiAhwiI",
+    "title": "Dubai Desert",
+    "date": "2022-12-01T08:00:00.000Z",
+    "width": 1536,
+    "height": 2049,
+    "aspectRatio": "1536/2049",
+    "exif": {
+      "camera": "Apple iPhone 12",
+      "lens": "iPhone 12 back dual wide camera 4.2mm f/1.6",
+      "iso": 32,
+      "aperture": "f/1.6",
+      "shutterSpeed": "1/3125"
+    }
+  },
+  {
+    "id": "dubai-marina-dec-2022",
+    "src": "/images/photos/Dubai Marina, Dec 2022.jpg",
+    "thumbhash": "3+YJHQSFlp+G53eImmdHh7CVSQlY",
+    "title": "Dubai Marina",
+    "date": "2022-12-01T08:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "duomo-oct-2022",
+    "src": "/images/photos/Duomo, Oct 2022.jpg",
+    "thumbhash": "G+cFRQihbrc3CXaHp4iWiHmAlQdY",
+    "title": "Duomo",
+    "date": "2022-10-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "rue-de-rivoli-oct-2022",
+    "src": "/images/photos/Rue de Rivoli, Oct 2022.jpg",
+    "thumbhash": "WwgGFQIZRmlqBbYXp5Z5eLVQeQqm",
+    "title": "Rue De Rivoli",
+    "date": "2022-10-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "sacre-coeur-oct-2022",
+    "src": "/images/photos/Sacre Coeur, Oct 2022.jpg",
+    "thumbhash": "BQgKDQBJdod3CLaJh4xmaDqDsHQH",
+    "title": "Sacre Coeur",
+    "date": "2022-10-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "cima-carega-2-jul-2022",
+    "src": "/images/photos/Cima Carega 2, Jul 2022.jpg",
+    "thumbhash": "n+cJNQSIiV54lmkIh2V5lnhwqAZ2",
+    "title": "Cima Carega 2",
+    "date": "2022-07-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "cima-carega-jul-2022",
+    "src": "/images/photos/Cima Carega, Jul 2022.jpg",
+    "thumbhash": "HtcFPYaRpFicdXmnyQh1U2mAlwZ4",
+    "title": "Cima Carega",
+    "date": "2022-07-01T07:00:00.000Z",
+    "width": 4032,
+    "height": 3024,
+    "aspectRatio": "4032/3024",
+    "exif": null
+  },
+  {
+    "id": "piazza-duomo-may-2022",
+    "src": "/images/photos/Piazza Duomo, May 2022.jpg",
+    "thumbhash": "6CcODQaliI92aHhniIaHdn1wxgdm",
+    "title": "Piazza Duomo",
+    "date": "2022-05-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "montenapoleone-apr-2022",
+    "src": "/images/photos/Montenapoleone, Apr 2022.jpg",
+    "thumbhash": "XhgKDQSytI+GyIWnuIyWaQx8onMH",
+    "title": "Montenapoleone",
+    "date": "2022-04-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  }
+]

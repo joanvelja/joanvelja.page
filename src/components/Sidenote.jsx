@@ -1,48 +1,52 @@
 'use client';
 
-import { useState, useEffect, useContext, useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { SidenotesContext } from './Sidenotes';
+import { useHoverTooltip } from '@/hooks/useHoverTooltip';
 
-export function Sidenote({ children, type = 'popup' }) {
-    const [isHovered, setIsHovered] = useState(false);
-    const [noteNumber, setNoteNumber] = useState(null);
+export function Sidenote({ children }) {
     const { addNote } = useContext(SidenotesContext);
-    const contentRef = useRef(children);
+    const { show: showTooltip, handlers } = useHoverTooltip();
+    const noteNumberRef = useRef(null);
 
-    useEffect(() => {
-        if (contentRef.current && !noteNumber) {
-            const number = addNote(contentRef.current);
-            setNoteNumber(number);
-        }
-    }, [addNote, noteNumber]);
-
-    if (!noteNumber) return null;
+    if (noteNumberRef.current === null) {
+        noteNumberRef.current = addNote(children);
+    }
+    const noteNumber = noteNumberRef.current;
 
     return (
         <span
-            className="relative inline group"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            className="relative inline"
+            {...handlers}
         >
             <a
-                href={`#note-${noteNumber}`}
-                id={`ref-${noteNumber}`}
-                className="cursor-help text-blue-500 hover:underline decoration-dotted underline-offset-4"
+                href={`#sidenote-${noteNumber}`}
+                id={`sidenote-ref-${noteNumber}`}
+                className="cursor-help no-underline relative top-[-2px]"
             >
-                <sup className="font-sans font-semibold ml-0.5">{noteNumber}</sup>
+                <sup className="font-sans font-medium text-[75%] leading-none citation-marker">
+                    {noteNumber}
+                </sup>
             </a>
 
             <span
                 className={`
-                    absolute z-50 p-4 rounded-lg bg-white dark:bg-neutral-800 
-                    shadow-xl border border-neutral-200 dark:border-neutral-700
-                    text-sm text-neutral-700 dark:text-neutral-300 font-serif
-                    transition-[opacity,transform] duration-200 pointer-events-none
-                    ${type === 'popup' ? 'w-64 -translate-x-1/2 left-1/2 bottom-full mb-2' : 'w-48 -right-52 top-0'}
-                    ${isHovered ? 'opacity-100 transform translate-y-0' : 'opacity-0 transform translate-y-2'}
+                    absolute z-tooltip w-72 p-4 block
+                    bg-white/95 dark:bg-neutral-900/95
+                    border border-neutral-200 dark:border-neutral-700
+                    rounded shadow-lg
+                    -translate-x-1/2 left-1/2 bottom-full mb-3
+                    ${showTooltip ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}
                 `}
+                {...handlers}
             >
-                {children}
+                <span className="block text-sm text-neutral-700 dark:text-neutral-300 font-serif leading-relaxed">
+                    {children}
+                </span>
+                {/* Arrow */}
+                <span className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 block
+                    border-l-[6px] border-r-[6px] border-t-[6px]
+                    border-transparent border-t-white/95 dark:border-t-neutral-900/95" />
             </span>
         </span>
     );

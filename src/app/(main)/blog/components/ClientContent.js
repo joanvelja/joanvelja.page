@@ -1,24 +1,38 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { ArticleCard } from './ArticleCard';
 import { TagPill } from './TagPill';
 
+function useDebouncedValue(value, delay = 300) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedValue(value), delay);
+        return () => clearTimeout(timer);
+    }, [value, delay]);
+
+    return debouncedValue;
+}
+
 export function ClientContent({ initialPosts, allTags }) {
     const [selectedTag, setSelectedTag] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const debouncedSearch = useDebouncedValue(searchQuery, 300);
 
-    // Filter posts based on selected tag and search query
-    const filteredPosts = initialPosts.filter(post => {
-        const matchesTag = selectedTag ? post.tags?.includes(selectedTag) : true;
-        const matchesSearch = searchQuery
-            ? post.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            post.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (post.tags || []).some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-            : true;
-        return matchesTag && matchesSearch;
-    });
+    const filteredPosts = useMemo(() => {
+        const query = debouncedSearch.toLowerCase();
+        return initialPosts.filter(post => {
+            const matchesTag = selectedTag ? post.tags?.includes(selectedTag) : true;
+            const matchesSearch = query
+                ? post.title?.toLowerCase().includes(query) ||
+                  post.description?.toLowerCase().includes(query) ||
+                  (post.tags || []).some(tag => tag.toLowerCase().includes(query))
+                : true;
+            return matchesTag && matchesSearch;
+        });
+    }, [initialPosts, selectedTag, debouncedSearch]);
 
     return (
         <>

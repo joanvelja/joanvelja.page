@@ -3,6 +3,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 
 const SIM_RESOLUTION = 64;
+const TEXEL_SIZE = Object.freeze([1.0 / SIM_RESOLUTION, 1.0 / SIM_RESOLUTION]);
 
 const baseVertex = `
 attribute vec2 a_position;
@@ -203,6 +204,7 @@ export function useFluidSimulation(canvasRef) {
     const intensityRef = useRef(0);
     const quadRef = useRef(null);
     const initializedRef = useRef(false);
+    const contextLostRef = useRef(false);
 
     const init = useCallback(() => {
         const canvas = canvasRef.current;
@@ -217,6 +219,17 @@ export function useFluidSimulation(canvasRef) {
             console.error('WebGL not supported');
             return false;
         }
+
+        canvas.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault();
+            contextLostRef.current = true;
+            cancelAnimationFrame(animationRef.current);
+        });
+
+        canvas.addEventListener('webglcontextrestored', () => {
+            contextLostRef.current = false;
+            initializedRef.current = false;
+        });
 
         glRef.current = gl;
         initializedRef.current = true;
@@ -260,7 +273,7 @@ export function useFluidSimulation(canvasRef) {
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
     }, []);
 
-    const useProgram = useCallback((program) => {
+    const bindProgram = useCallback((program) => {
         const gl = glRef.current;
         gl.useProgram(program);
         const posLoc = gl.getAttribLocation(program, 'a_position');
@@ -296,28 +309,26 @@ export function useFluidSimulation(canvasRef) {
         const fbos = fbosRef.current;
         if (!gl || !progs.advection) return;
 
-        const texelSize = [1.0 / SIM_RESOLUTION, 1.0 / SIM_RESOLUTION];
-
         gl.viewport(0, 0, SIM_RESOLUTION, SIM_RESOLUTION);
 
-        let setUniform = useProgram(progs.advection);
+        let setUniform = bindProgram(progs.advection);
         bindTexture(0, fbos.velocity.read.texture, 'u_velocity', progs.advection);
         bindTexture(1, fbos.velocity.read.texture, 'u_source', progs.advection);
-        setUniform('u_texelSize', texelSize);
+        setUniform('u_texelSize', TEXEL_SIZE);
         setUniform('u_dt', dt);
         setUniform('u_dissipation', 0.98);
         blit(fbos.velocity.write.framebuffer);
         fbos.velocity.swap();
 
-        setUniform = useProgram(progs.advection);
+        setUniform = bindProgram(progs.advection);
         bindTexture(0, fbos.velocity.read.texture, 'u_velocity', progs.advection);
         bindTexture(1, fbos.density.read.texture, 'u_source', progs.advection);
-        setUniform('u_texelSize', texelSize);
+        setUniform('u_texelSize', TEXEL_SIZE);
         setUniform('u_dt', dt);
         setUniform('u_dissipation', 0.97);
         blit(fbos.density.write.framebuffer);
         fbos.density.swap();
-    }, [useProgram, bindTexture, blit]);
+    }, [bindProgram, bindTexture, blit]);
 
     const injectForce = useCallback((x, y, fx, fy, radius = 0.02) => {
         const gl = glRef.current;
@@ -327,14 +338,14 @@ export function useFluidSimulation(canvasRef) {
 
         gl.viewport(0, 0, SIM_RESOLUTION, SIM_RESOLUTION);
 
-        const setUniform = useProgram(progs.addForce);
+        const setUniform = bindProgram(progs.addForce);
         bindTexture(0, fbos.velocity.read.texture, 'u_velocity', progs.addForce);
         setUniform('u_point', [x, y]);
         setUniform('u_force', [fx, fy]);
         setUniform('u_radius', radius);
         blit(fbos.velocity.write.framebuffer);
         fbos.velocity.swap();
-    }, [useProgram, bindTexture, blit]);
+    }, [bindProgram, bindTexture, blit]);
 
     const injectDensity = useCallback((x, y, r, g, b, radius = 0.03) => {
         const gl = glRef.current;
@@ -344,14 +355,14 @@ export function useFluidSimulation(canvasRef) {
 
         gl.viewport(0, 0, SIM_RESOLUTION, SIM_RESOLUTION);
 
-        const setUniform = useProgram(progs.addDensity);
+        const setUniform = bindProgram(progs.addDensity);
         bindTexture(0, fbos.density.read.texture, 'u_density', progs.addDensity);
         setUniform('u_point', [x, y]);
         setUniform('u_color', [r, g, b]);
         setUniform('u_radius', radius);
         blit(fbos.density.write.framebuffer);
         fbos.density.swap();
-    }, [useProgram, bindTexture, blit]);
+    }, [bindProgram, bindTexture, blit]);
 
     const render = useCallback((colors) => {
         const gl = glRef.current;
@@ -365,7 +376,7 @@ export function useFluidSimulation(canvasRef) {
 
         const intensity = intensityRef.current;
 
-        const setUniform = useProgram(progs.display);
+        const setUniform = bindProgram(progs.display);
         bindTexture(0, fbos.density.read.texture, 'u_texture', progs.display);
         setUniform('u_intensity', intensity);
         setUniform('u_time', timeRef.current);
@@ -377,7 +388,7 @@ export function useFluidSimulation(canvasRef) {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         blit(null);
         gl.disable(gl.BLEND);
-    }, [useProgram, bindTexture, blit]);
+    }, [bindProgram, bindTexture, blit]);
 
     const start = useCallback((mode, colors) => {
         if (!init()) return;
@@ -385,13 +396,15 @@ export function useFluidSimulation(canvasRef) {
         if (animationRef.current) return;
 
         const animate = () => {
-            // Performance optimization: Skip frame when tab is hidden
             if (document.hidden) {
                 animationRef.current = requestAnimationFrame(animate);
                 return;
             }
 
-            // Performance optimization: Skip heavy computation when intensity is very low
+            if (contextLostRef.current) {
+                return;
+            }
+
             const intensity = intensityRef.current;
             if (intensity < 0.01) {
                 animationRef.current = requestAnimationFrame(animate);
@@ -430,24 +443,32 @@ export function useFluidSimulation(canvasRef) {
         intensityRef.current = value;
     }, []);
 
-    useEffect(() => {
-        return () => stop();
-    }, [stop]);
+    const cleanup = useCallback(() => {
+        const gl = glRef.current;
+        if (!gl || contextLostRef.current) return;
 
-    // Visibility change listener for potential pause/resume logic
-    useEffect(() => {
-        const handleVisibilityChange = () => {
-            if (document.hidden) {
-                // Tab is hidden - animation loop will skip frames automatically
-                // Could add additional pause logic here if needed
-            } else {
-                // Tab is visible again - animation resumes automatically
-                // Could add resume logic here if needed
+        Object.values(programsRef.current).forEach(p => {
+            if (p) gl.deleteProgram(p);
+        });
+
+        Object.values(fbosRef.current).forEach(fbo => {
+            if (fbo) {
+                gl.deleteFramebuffer(fbo.read.framebuffer);
+                gl.deleteFramebuffer(fbo.write.framebuffer);
+                gl.deleteTexture(fbo.read.texture);
+                gl.deleteTexture(fbo.write.texture);
             }
-        };
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+        });
+
+        if (quadRef.current) gl.deleteBuffer(quadRef.current);
     }, []);
 
-    return { start, stop, updateIntensity, init };
+    useEffect(() => {
+        return () => {
+            stop();
+            cleanup();
+        };
+    }, [stop, cleanup]);
+
+    return { start, stop, updateIntensity, init, cleanup };
 }

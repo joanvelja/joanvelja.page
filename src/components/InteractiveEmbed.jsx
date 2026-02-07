@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useTheme } from 'next-themes';
 
 /**
  * InteractiveEmbed - A component for embedding interactive HTML content
@@ -23,7 +22,6 @@ export function InteractiveEmbed({
   caption = "",
   aspectRatio, // e.g., "16/9", "4/3", "1/1"
 }) {
-  const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -69,8 +67,6 @@ export function InteractiveEmbed({
     );
   }
 
-  const isDarkMode = resolvedTheme === 'dark';
-
   return (
     <div className={`my-8 ${className}`}>
       {showTitle && (
@@ -82,9 +78,8 @@ export function InteractiveEmbed({
       <div
         className={`
           relative overflow-hidden rounded-lg border border-neutral-200 dark:border-neutral-700
-          bg-white dark:bg-neutral-900 shadow-sm transition-shadow duration-300
+          bg-white dark:bg-neutral-900 shadow-sm shadow-neutral-300/20 dark:shadow-neutral-900/20 transition-shadow duration-300
           ${aspectRatio ? `aspect-[${aspectRatio}]` : ''}
-          ${isDarkMode ? 'shadow-neutral-900/20' : 'shadow-neutral-300/20'}
         `}
         style={!aspectRatio ? { height } : {}}
       >
