@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, ExternalLink, ChevronRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { projects } from '@/lib/projectsData';
 
 // Tag component for reusability
@@ -68,75 +69,94 @@ const renderTextWithLinks = (text) => {
     });
 };
 
+const LINK_ICONS = { arxiv: '📜', github: '🔗', website: '🌐', pdf: '📄' };
+
+const renderRelatedLink = (link) => (
+    <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer"
+        className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-lg text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors group">
+        <span>{LINK_ICONS[link.type]}</span>
+        <span className="group-hover:text-crimson-600 dark:group-hover:text-crimson-400 transition-colors">{link.text}</span>
+        <ExternalLink size={12} className="opacity-50 group-hover:opacity-100" />
+    </a>
+);
+
+const renderRelatedWork = (work) => (
+    <div key={work.title} className="group bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-5 border border-neutral-100 dark:border-neutral-800 hover:border-crimson-100 dark:hover:border-crimson-900/30 transition-colors">
+        <h4 className="text-neutral-900 dark:text-white font-medium font-serif text-lg leading-tight group-hover:text-crimson-700 dark:group-hover:text-crimson-400 transition-colors">
+            {work.title}
+        </h4>
+
+        {work.supervisor && (
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 font-sans">
+                Supervised by <a href={work.supervisor_link} target="_blank" rel="noopener noreferrer" className="text-crimson-600 hover:underline">{work.supervisor}</a>
+            </p>
+        )}
+
+        {work.description && (
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-3 font-serif leading-relaxed">
+                {renderTextWithLinks(work.description)}
+            </p>
+        )}
+
+        {work.coauthors && (
+            <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-3 font-sans leading-relaxed">
+                <span className="font-semibold">Authors:</span> {work.coauthors.split('*').join('†').split(', ').map((author, i, arr) => (
+                    <span key={author} className={author.includes('Joan Velja') ? 'text-neutral-900 dark:text-neutral-200 font-medium' : ''}>
+                        {author}{i === arr.length - 1 ? '' : ', '}
+                    </span>
+                ))}
+            </p>
+        )}
+
+        {work.publication_venue && (
+            <div className="mt-3 inline-block px-2 py-1 bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-700 text-xs font-medium text-neutral-600 dark:text-neutral-400 font-sans">
+                {work.publication_venue}
+            </div>
+        )}
+
+        {work.links && (
+            <div className="flex flex-wrap gap-2 mt-4 font-sans">
+                {work.links.map(renderRelatedLink)}
+            </div>
+        )}
+    </div>
+);
+
 // WorkDetailPanel component
 const WorkDetailPanel = ({ project, onClose }) => {
-    if (!project) return null;
-
-    const renderRelatedLink = (link) => {
-        const icons = { arxiv: '📜', github: '🔗', website: '🌐', pdf: '📄' };
-        return (
-            <a key={link.url} href={link.url} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-100 dark:bg-neutral-800 rounded-lg text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors group">
-                <span>{icons[link.type]}</span>
-                <span className="group-hover:text-crimson-600 dark:group-hover:text-crimson-400 transition-colors">{link.text}</span>
-                <ExternalLink size={12} className="opacity-50 group-hover:opacity-100" />
-            </a>
+    const handleKeyDown = (e) => {
+        if (e.key !== 'Tab') return;
+        const focusable = e.currentTarget.querySelectorAll(
+            'a[href], button, [tabindex]:not([tabindex="-1"])'
         );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
     };
 
-    const renderRelatedWork = (work) => (
-        <div key={work.title} className="group bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-5 border border-neutral-100 dark:border-neutral-800 hover:border-crimson-100 dark:hover:border-crimson-900/30 transition-colors">
-            <h4 className="text-neutral-900 dark:text-white font-medium font-serif text-lg leading-tight group-hover:text-crimson-700 dark:group-hover:text-crimson-400 transition-colors">
-                {work.title}
-            </h4>
-
-            {work.supervisor && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 font-sans">
-                    Supervised by <a href={work.supervisor_link} target="_blank" rel="noopener noreferrer" className="text-crimson-600 hover:underline">{work.supervisor}</a>
-                </p>
-            )}
-
-            {work.description && (
-                <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-3 font-serif leading-relaxed">
-                    {renderTextWithLinks(work.description)}
-                </p>
-            )}
-
-            {work.coauthors && (
-                <p className="text-xs text-neutral-500 dark:text-neutral-500 mt-3 font-sans leading-relaxed">
-                    <span className="font-semibold">Authors:</span> {work.coauthors.split('*').join('†').split(', ').map((author, i, arr) => (
-                        <span key={author} className={author.includes('Joan Velja') ? 'text-neutral-900 dark:text-neutral-200 font-medium' : ''}>
-                            {author}{i === arr.length - 1 ? '' : ', '}
-                        </span>
-                    ))}
-                </p>
-            )}
-
-            {work.publication_venue && (
-                <div className="mt-3 inline-block px-2 py-1 bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-700 text-xs font-medium text-neutral-600 dark:text-neutral-400 font-sans">
-                    {work.publication_venue}
-                </div>
-            )}
-
-            {work.links && (
-                <div className="flex flex-wrap gap-2 mt-4 font-sans">
-                    {work.links.map(renderRelatedLink)}
-                </div>
-            )}
-        </div>
-    );
-
     return (
-        <div className={`fixed top-0 right-0 h-screen w-full md:w-[480px] bg-white dark:bg-neutral-900 shadow-2xl border-l border-neutral-200 dark:border-neutral-800
-            transform transition-all duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] z-50
-            ${project ? 'translate-x-0' : 'translate-x-full'}`}
+        <motion.div
+            role="dialog"
+            aria-modal="true"
+            onKeyDown={handleKeyDown}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            className="fixed top-0 right-0 h-screen w-full md:w-[480px] bg-white dark:bg-neutral-900 shadow-2xl border-l border-neutral-200 dark:border-neutral-800 z-50"
         >
             <div className="h-full flex flex-col">
-                {/* Header */}
                 <div className="p-6 pb-4 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-100 dark:border-neutral-800 z-10">
                     <div className="flex justify-between items-start mb-4">
                         <Tag type={project.type} />
-                        <button onClick={onClose} className="p-2 -mr-2 -mt-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                        <button autoFocus onClick={onClose} aria-label="Close panel" className="p-2 -mr-2 -mt-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
                             <X className="w-5 h-5 text-neutral-500" />
                         </button>
                     </div>
@@ -148,7 +168,6 @@ const WorkDetailPanel = ({ project, onClose }) => {
                     </p>
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 overflow-y-auto p-6 space-y-8">
                     <div className="font-sans flex flex-wrap gap-2">
                         {project.links?.map(renderRelatedLink)}
@@ -173,13 +192,26 @@ const WorkDetailPanel = ({ project, onClose }) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
 // Main page component
 export default function ProjectsPage() {
     const [selectedProject, setSelectedProject] = useState(null);
+
+    const close = useCallback(() => setSelectedProject(null), []);
+
+    useEffect(() => {
+        if (!selectedProject) return;
+        document.body.style.overflow = 'hidden';
+        const handleKeyDown = (e) => { if (e.key === 'Escape') close(); };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.body.style.overflow = '';
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [selectedProject, close]);
 
     return (
         <main className="flex flex-col items-center justify-start w-full h-[calc(100vh-120px)] animate-fade-in">
@@ -218,19 +250,26 @@ export default function ProjectsPage() {
                 </div>
             </section>
 
-            {/* Detail Panel Overlay */}
-            {selectedProject && (
-                <div
-                    className="fixed inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm z-40 transition-opacity duration-500"
-                    onClick={() => setSelectedProject(null)}
-                />
-            )}
-
-            {/* Detail Panel */}
-            <WorkDetailPanel
-                project={selectedProject}
-                onClose={() => setSelectedProject(null)}
-            />
+            <AnimatePresence>
+                {selectedProject && (
+                    <>
+                        <motion.div
+                            key="backdrop"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="fixed inset-0 bg-black/20 dark:bg-black/50 backdrop-blur-sm z-40"
+                            onClick={close}
+                        />
+                        <WorkDetailPanel
+                            key="panel"
+                            project={selectedProject}
+                            onClose={close}
+                        />
+                    </>
+                )}
+            </AnimatePresence>
         </main>
     );
-} 
+}

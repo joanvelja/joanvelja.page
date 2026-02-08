@@ -1,5 +1,82 @@
 [
   {
+    "id": "angel-island-jan-2026",
+    "src": "/images/photos/Angel Island, Jan 2026.jpg",
+    "thumbhash": "Z+cNDYB4eIdveIeFd1iHh7WQRAxr",
+    "title": "Angel Island",
+    "date": "2026-01-01T08:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": null
+  },
+  {
+    "id": "musei-vaticani-sep-2025",
+    "src": "/images/photos/Musei Vaticani, Sep 2025.jpg",
+    "thumbhash": "mBgCFQKESYQHaFK4aIlldllvgNcH",
+    "title": "Musei Vaticani",
+    "date": "2025-09-01T07:00:00.000Z",
+    "width": 6048,
+    "height": 8064,
+    "aspectRatio": "6048/8064",
+    "exif": null
+  },
+  {
+    "id": "quartieri-spagnoli-sep-2025",
+    "src": "/images/photos/Quartieri Spagnoli, Sep 2025.jpg",
+    "thumbhash": "mRgKFQL4uVuWd1N6mIxGt6BcDpq5",
+    "title": "Quartieri Spagnoli",
+    "date": "2025-09-01T07:00:00.000Z",
+    "width": 3024,
+    "height": 4032,
+    "aspectRatio": "3024/4032",
+    "exif": null
+  },
+  {
+    "id": "roma-sep-2025",
+    "src": "/images/photos/Roma, Sep 2025.jpg",
+    "thumbhash": "o+cNJQR4h594aGWHh3h4Z2NgBgVX",
+    "title": "Roma",
+    "date": "2025-09-01T07:00:00.000Z",
+    "width": 4284,
+    "height": 5712,
+    "aspectRatio": "4284/5712",
+    "exif": null
+  },
+  {
+    "id": "barcelona-aug-2025",
+    "src": "/images/photos/Barcelona, Aug 2025.jpg",
+    "thumbhash": "oucJJQS3p25292VId3taeHZgRQU3",
+    "title": "Barcelona",
+    "date": "2025-08-01T07:00:00.000Z",
+    "width": 4284,
+    "height": 5712,
+    "aspectRatio": "4284/5712",
+    "exif": null
+  },
+  {
+    "id": "bunkers-aug-2025",
+    "src": "/images/photos/Bunkers, Aug 2025.jpg",
+    "thumbhash": "HvgNHYR4eHdveIiHd2eIeIhglAlG",
+    "title": "Bunkers",
+    "date": "2025-08-01T07:00:00.000Z",
+    "width": 5712,
+    "height": 4284,
+    "aspectRatio": "5712/4284",
+    "exif": null
+  },
+  {
+    "id": "sagrada-familia-aug-2025",
+    "src": "/images/photos/Sagrada Familia, Aug 2025.jpg",
+    "thumbhash": "pucJJQTTho+np0pmhoeIaDhwlQNY",
+    "title": "Sagrada Familia",
+    "date": "2025-08-01T07:00:00.000Z",
+    "width": 4284,
+    "height": 5712,
+    "aspectRatio": "4284/5712",
+    "exif": null
+  },
+  {
     "id": "oxford-apr-2025",
     "src": "/images/photos/Oxford, Apr 2025.JPG",
     "thumbhash": "0fcVHYR3iIiPd4iGeEeIeHdycBYI",
