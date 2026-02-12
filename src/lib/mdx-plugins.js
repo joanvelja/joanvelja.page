@@ -9,6 +9,7 @@ import remarkToc from 'remark-toc';
 import rehypeKatex from 'rehype-katex';
 import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
+import rehypePunctilio from 'punctilio/rehype';
 
 /**
  * Singleton Shiki highlighter for code syntax highlighting
@@ -60,6 +61,7 @@ export const rehypePlugins = [
         getHighlighter: getShikiHighlighter,
     }],
     rehypeSlug,   // Add IDs to headings
+    rehypePunctilio,
 ];
 
 /**
@@ -73,6 +75,7 @@ export const rehypePluginsClient = [
         defaultLang: 'plaintext',
     }],
     rehypeSlug,
+    rehypePunctilio,
 ];
 
 /**
