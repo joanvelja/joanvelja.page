@@ -1,7 +1,14 @@
-import { Crimson_Pro, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { EB_Garamond, Crimson_Pro, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/providers/ThemeProvider";
+
+const ebGaramond = EB_Garamond({
+  variable: "--font-eb-garamond",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
 
 const crimsonPro = Crimson_Pro({
   variable: "--font-crimson-pro",
@@ -30,7 +37,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${crimsonPro.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${ebGaramond.variable} ${crimsonPro.variable} ${dmSans.variable} ${jetbrainsMono.variable} antialiased`} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ThemeProvider>
           {children}

@@ -3,6 +3,7 @@ export const projects = {
         {
             name: 'University of Oxford',
             type: 'PhD',
+            shortDescription: 'AI alignment and elicitation research, supervised by Prof. Alessandro Abate',
             description: 'D.Phil. student (fancy British for PhD), working on AI Alignment and Elicitation. Supervised by Prof. Alessandro Abate (OxCAV Group).',
             location: 'Oxford, UK',
             period: 'Sept 2025 - Present',
@@ -11,6 +12,7 @@ export const projects = {
         {
             name: 'LASR Labs',
             type: 'Researcher',
+            shortDescription: 'Co-supervising red-teaming research on untrusted monitoring',
             description: 'Project co-supervisor on Red-teaming Untrusted Monitoring. Developing control evaluations for untrusted monitoring by relaxing human red-team coordination assumptions. Co-supervising with Charlie Griffin (UK AISI).',
             location: 'London, UK',
             period: 'Aug 2025 - Present',
@@ -21,6 +23,7 @@ export const projects = {
         {
             name: 'University of Oxford',
             type: 'Visiting Researcher',
+            shortDescription: 'Prover-Verifier Games research with Prof. Alessandro Abate',
             description: 'Working on Prover-Verifier Games, supervised by Prof. Alessandro Abate.',
             location: 'Oxford, UK',
             period: 'Jan 2025 - Jul 2025',
@@ -29,6 +32,7 @@ export const projects = {
         {
             name: 'University of Amsterdam',
             type: 'Masters',
+            shortDescription: 'MSc in Artificial Intelligence',
             description: 'Masters in Artificial Intelligence',
             location: 'Amsterdam, Netherlands',
             period: 'Sept 2023 - 2025',
@@ -52,6 +56,7 @@ export const projects = {
         {
             name: 'LASR Labs (London Initiative for Safe AI)',
             type: 'Researcher',
+            shortDescription: 'Steganographic collusion research, published at NeurIPS SoLaR 2024',
             description: 'Wrote a cool paper on steganographic collusion between Language Models!',
             location: 'London, UK',
             relatedWorks: [
@@ -79,6 +84,7 @@ export const projects = {
         {
             name: 'University of Technology Sydney',
             type: 'Bachelors',
+            shortDescription: 'BSc exchange semester in Artificial Intelligence',
             description: 'Bachelors in Artificial Intelligence - Exchange Program',
             location: 'Sydney, Australia',
             period: 'Feb 2023 - Jul 2023',
@@ -86,6 +92,7 @@ export const projects = {
         {
             name: 'Università Bocconi',
             type: 'Bachelors',
+            shortDescription: 'BSc in Economics and Computer Science',
             description: 'Bachelors in Economics and Computer Science',
             location: 'Milan, Italy',
             period: 'Sept 2020 - Jul 2023',

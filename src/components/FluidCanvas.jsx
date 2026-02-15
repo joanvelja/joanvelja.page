@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useCallback, useMemo, forwardRef } from 'react';
+import { useRef, useEffect, useMemo, forwardRef } from 'react';
 import { useFluidSimulation } from '@/hooks/useFluidSimulation';
 
 const TILE_COLOR_MAP = {
@@ -20,27 +20,21 @@ const TILE_COLOR_MAP = {
     }
 };
 
-function getColors(mode, theme, tileColor) {
-    const themeKey = theme === 'dark' ? 'dark' : 'light';
-    if (mode === 'thermodynamic') {
-        return TILE_COLOR_MAP[themeKey][tileColor] || TILE_COLOR_MAP[themeKey].sky;
-    }
-    return TILE_COLOR_MAP[themeKey].sky;
-}
-
 export const FluidCanvas = forwardRef(function FluidCanvas({
     intensityRef,
     onUpdateIntensity,
     tileColor = 'sky',
     theme = 'light',
-    mode = 'thermodynamic',
     className = ''
 }, ref) {
     const canvasRef = useRef(null);
-    const { start, stop, updateIntensity } = useFluidSimulation(canvasRef);
-    const runningRef = useRef(false);
+    const { start, stop, updateIntensity, updateColors } = useFluidSimulation(canvasRef);
 
-    const colors = useMemo(() => getColors(mode, theme, tileColor), [mode, theme, tileColor]);
+    const themeKey = theme === 'dark' ? 'dark' : 'light';
+    const colors = useMemo(
+        () => TILE_COLOR_MAP[themeKey][tileColor] || TILE_COLOR_MAP[themeKey].sky,
+        [themeKey, tileColor]
+    );
 
     useEffect(() => {
         if (ref) {
@@ -54,25 +48,24 @@ export const FluidCanvas = forwardRef(function FluidCanvas({
 
     useEffect(() => {
         if (onUpdateIntensity) {
-            onUpdateIntensity((value) => {
+            onUpdateIntensity((value, action) => {
                 updateIntensity(value);
-
-                if (value > 0.01 && !runningRef.current) {
-                    runningRef.current = true;
-                    start(mode, colors);
-                }
-                if (value <= 0.01 && runningRef.current) {
-                    runningRef.current = false;
+                if (action === 'enter') {
+                    start(colors, { fresh: true });
+                } else if (value <= 0.01) {
                     stop();
                 }
             });
         }
-    }, [onUpdateIntensity, updateIntensity, start, stop, mode, colors]);
+    }, [onUpdateIntensity, updateIntensity, start, stop, colors]);
+
+    useEffect(() => {
+        updateColors(colors);
+    }, [colors, updateColors]);
 
     useEffect(() => {
         return () => {
             stop();
-            runningRef.current = false;
         };
     }, [stop]);
 
@@ -82,10 +75,7 @@ export const FluidCanvas = forwardRef(function FluidCanvas({
             width={64}
             height={64}
             className={`absolute inset-0 w-full h-full pointer-events-none rounded-xl ${className}`}
-            style={{
-                opacity: 0,
-                mixBlendMode: mode === 'prismatic' ? 'soft-light' : 'normal'
-            }}
+            style={{ opacity: 0 }}
         />
     );
 });

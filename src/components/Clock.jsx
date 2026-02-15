@@ -1,27 +1,27 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
+import { useEffect, useRef, memo } from 'react';
+
+function formatTime() {
+    return new Date().toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    });
+}
 
 export const Clock = memo(function Clock() {
-    const [time, setTime] = useState('');
+    const spanRef = useRef(null);
 
     useEffect(() => {
-        const updateTime = () => {
-            const now = new Date();
-            setTime(now.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            }));
-        };
-
-        updateTime();
-        const interval = setInterval(updateTime, 1000);
+        const interval = setInterval(() => {
+            if (spanRef.current) {
+                spanRef.current.textContent = formatTime();
+            }
+        }, 1000);
         return () => clearInterval(interval);
     }, []);
 
-    if (!time) return null;
-
-    return <span className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">{time}</span>;
+    return <span ref={spanRef} className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">{formatTime()}</span>;
 });
