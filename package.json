@@ -26,7 +26,7 @@
     "katex": "^0.16.28",
     "lucide-react": "^0.563.0",
     "next": "^16.1.6",
-    "next-mdx-remote": "^5.0.0",
+    "next-mdx-remote": "^6.0.0",
     "next-themes": "^0.4.6",
     "probe-image-size": "^7.2.3",
     "punctilio": "^1.9.1",

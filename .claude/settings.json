@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/security-audit.sh",
+            "timeout": 15000
+          }
+        ]
+      }
+    ]
+  }
+}
