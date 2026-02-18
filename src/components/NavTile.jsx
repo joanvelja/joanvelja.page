@@ -118,8 +118,7 @@ export const NavTile = memo(function NavTile({
                 {!skipFluid && (
                     <FluidCanvas
                         ref={canvasElRef}
-                        intensityRef={intensityRef}
-                        onUpdateIntensity={(fn) => { fluidCanvasRef.current = fn; }}
+                        updateRef={fluidCanvasRef}
                         tileColor={tileColor}
                         theme={theme}
                     />

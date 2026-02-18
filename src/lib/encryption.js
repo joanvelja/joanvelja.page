@@ -15,7 +15,7 @@ const AUTH_TAG_BYTES = 16;
  * @param {Buffer} salt - Optional salt, will generate if not provided
  * @returns {Object} Object containing hash and salt
  */
-export function hashPassword(password, providedSalt = null) {
+function hashPassword(password, providedSalt = null) {
   const salt = providedSalt || crypto.randomBytes(SALT_BYTES);
   
   const hash = crypto.pbkdf2Sync(
@@ -57,7 +57,7 @@ export function verifyPassword(password, storedHash, storedSalt) {
  * @param {string} salt - Salt for key derivation (base64)
  * @returns {Object} Encrypted content data
  */
-export function encryptContent(content, password, salt) {
+function encryptContent(content, password, salt) {
   // Convert salt from base64
   const saltBuffer = Buffer.from(salt, 'base64');
   

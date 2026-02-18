@@ -35,7 +35,7 @@ async function getShikiHighlighter(highlighterOpts) {
 /**
  * Remark plugins for markdown processing
  */
-export const remarkPlugins = [
+const remarkPlugins = [
     remarkGfm,    // GitHub Flavored Markdown (tables, strikethrough, etc.)
     remarkMath,   // Math equations ($$...$$ and $...$)
     remarkToc,    // Table of contents generation
@@ -44,7 +44,7 @@ export const remarkPlugins = [
 /**
  * Remark plugins without TOC (for protected content client-side rendering)
  */
-export const remarkPluginsNoToc = [
+const remarkPluginsNoToc = [
     remarkGfm,
     remarkMath,
 ];
@@ -52,7 +52,7 @@ export const remarkPluginsNoToc = [
 /**
  * Rehype plugins for HTML transformation (server-side with Shiki caching)
  */
-export const rehypePlugins = [
+const rehypePlugins = [
     rehypeKatex,  // LaTeX rendering via KaTeX
     [rehypePrettyCode, {
         keepBackground: true,
@@ -67,7 +67,7 @@ export const rehypePlugins = [
 /**
  * Rehype plugins for client-side rendering (no Shiki caching)
  */
-export const rehypePluginsClient = [
+const rehypePluginsClient = [
     rehypeKatex,
     [rehypePrettyCode, {
         keepBackground: true,

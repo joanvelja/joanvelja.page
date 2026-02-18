@@ -24,31 +24,33 @@ export function LightboxControls({
       </button>
 
       {canGoPrevious && (
-        <div
-          className="lightbox-nav-zone absolute left-0 top-0 bottom-0 w-1/4 z-10
-                     flex items-center justify-start pl-4 cursor-pointer"
+        <button
+          type="button"
+          className="lightbox-focusable lightbox-nav-zone absolute left-0 top-0 bottom-0 w-1/4 z-10
+                     flex items-center justify-start pl-4 cursor-pointer bg-transparent border-0"
           onClick={onPrevious}
           aria-label="Previous photo"
         >
-          <div className="lightbox-nav-arrow p-2 rounded-full bg-black/40
-                          backdrop-blur-sm text-white/90 hover:bg-black/60 transition-colors">
-            <ChevronLeft size={28} />
-          </div>
-        </div>
+          <span className="lightbox-nav-arrow p-2 rounded-full bg-black/40
+                           backdrop-blur-sm text-white/90 hover:bg-black/60 transition-colors">
+            <ChevronLeft size={28} aria-hidden="true" />
+          </span>
+        </button>
       )}
 
       {canGoNext && (
-        <div
-          className="lightbox-nav-zone absolute right-0 top-0 bottom-0 w-1/4 z-10
-                     flex items-center justify-end pr-4 cursor-pointer"
+        <button
+          type="button"
+          className="lightbox-focusable lightbox-nav-zone absolute right-0 top-0 bottom-0 w-1/4 z-10
+                     flex items-center justify-end pr-4 cursor-pointer bg-transparent border-0"
           onClick={onNext}
           aria-label="Next photo"
         >
-          <div className="lightbox-nav-arrow p-2 rounded-full bg-black/40
-                          backdrop-blur-sm text-white/90 hover:bg-black/60 transition-colors">
-            <ChevronRight size={28} />
-          </div>
-        </div>
+          <span className="lightbox-nav-arrow p-2 rounded-full bg-black/40
+                           backdrop-blur-sm text-white/90 hover:bg-black/60 transition-colors">
+            <ChevronRight size={28} aria-hidden="true" />
+          </span>
+        </button>
       )}
 
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20

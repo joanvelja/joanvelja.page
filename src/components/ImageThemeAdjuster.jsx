@@ -1,24 +1,24 @@
 import Image from 'next/image';
+
 import { cn } from '@/lib/utils';
 
-/**
- * A component that adjusts images for dark mode with various strategies.
- * Uses Tailwind dark: classes for theme-aware styling.
- */
+const EMPTY_OBJECT = Object.freeze({});
+
 export function ImageThemeAdjuster({
   src,
   alt,
   width,
   height,
   className,
-  strategy = "subtle",
-  customStyles = {},
+  strategy = 'subtle',
+  customStyles = EMPTY_OBJECT,
   showCaption = false,
-  caption = "",
+  caption = '',
   priority = false,
   aspectRatio,
-  objectFit = "contain",
-  nextProps = {},
+  objectFit = 'contain',
+  sizes = '(min-width: 768px) 800px, 100vw',
+  nextProps = EMPTY_OBJECT,
 }) {
   const imageClasses = cn(
     strategy === 'frame' && 'rounded-lg',
@@ -29,35 +29,34 @@ export function ImageThemeAdjuster({
     strategy === 'counter-invert' && 'invert brightness-[1.02] contrast-[0.98] dark:invert-0'
   );
 
-  const imageStyle = {
-    ...customStyles,
-    objectFit,
-    width: '100%',
-    height: 'auto',
-  };
+  const hasDimensions = typeof width === 'number' && typeof height === 'number';
 
   return (
     <div
-      className={cn("relative", className)}
-      style={aspectRatio ? { aspectRatio } : undefined}
+      className={cn('relative', className)}
+      style={!hasDimensions ? { aspectRatio: aspectRatio ?? '16/9' } : undefined}
     >
-      {width && height ? (
+      {hasDimensions ? (
         <Image
           src={src}
-          alt={alt || "Image"}
+          alt={alt || ''}
           width={width}
           height={height}
           priority={priority}
-          style={imageStyle}
           className={imageClasses}
+          sizes={sizes}
+          style={{ ...customStyles, objectFit, width: '100%', height: 'auto' }}
           {...nextProps}
         />
       ) : (
-        <img
+        <Image
           src={src}
-          alt={alt || "Image"}
-          style={imageStyle}
-          className={cn("w-full", imageClasses)}
+          alt={alt || ''}
+          fill
+          priority={priority}
+          className={imageClasses}
+          sizes={sizes}
+          style={{ ...customStyles, objectFit }}
           {...nextProps}
         />
       )}

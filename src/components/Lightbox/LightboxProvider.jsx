@@ -1,49 +1,80 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import { createContext, useContext, useCallback, useEffect, useRef, useMemo, useReducer } from 'react';
 import { useThumbnailRegistry } from '@/hooks/useThumbnailRegistry';
 
 const ThumbnailRegistryContext = createContext(null);
 const LightboxStateContext = createContext(null);
 
+const initialState = { isOpen: false, currentIndex: null };
+
+function lightboxReducer(state, action) {
+  switch (action.type) {
+    case 'OPEN':
+      return { isOpen: true, currentIndex: action.index };
+    case 'CLOSE':
+      return { isOpen: false, currentIndex: null };
+    case 'SET_INDEX':
+      return { ...state, currentIndex: action.index };
+    default:
+      return state;
+  }
+}
+
 export function LightboxProvider({ children }) {
   const registry = useThumbnailRegistry();
-  const [isOpen, setIsOpen] = useState(false);
-  const isOpenRef = useRef(false);
-  isOpenRef.current = isOpen;
-  const [currentIndex, setCurrentIndex] = useState(null);
-  const currentIndexRef = useRef(currentIndex);
-  currentIndexRef.current = currentIndex;
+  const [{ isOpen, currentIndex }, dispatch] = useReducer(lightboxReducer, initialState);
   const photosRef = useRef([]);
+  const previousFocusRef = useRef(null);
 
   const getPhotos = useCallback(() => photosRef.current, []);
 
-  const openLightbox = useCallback((index, photos) => {
-    if (photos) photosRef.current = photos;
-    setCurrentIndex(index);
-    setIsOpen(true);
-    const photo = photosRef.current[index];
-    if (photo?.id) {
-      window.history.pushState({}, '', `/photos?image=${photo.id}`);
-    }
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('lightbox-open');
+    };
   }, []);
 
-  const closeLightbox = useCallback(() => {
-    setIsOpen(false);
-    setCurrentIndex(null);
-    window.history.pushState({}, '', '/photos');
-  }, []);
+  const openLightbox = useCallback((index, photos, options = {}) => {
+    const { updateUrl = true } = options;
+    if (photos) photosRef.current = photos;
+    if (!isOpen) {
+      previousFocusRef.current = document.activeElement;
+      document.body.classList.add('lightbox-open');
+    }
+
+    dispatch({ type: 'OPEN', index });
+    const photo = photosRef.current[index];
+    if (updateUrl && photo?.id) {
+      window.history.pushState({}, '', `/photos?image=${photo.id}`);
+    }
+  }, [isOpen]);
+
+  const closeLightbox = useCallback((options = {}) => {
+    const { updateUrl = true } = options;
+    if (isOpen) {
+      document.body.classList.remove('lightbox-open');
+      previousFocusRef.current?.focus?.();
+      previousFocusRef.current = null;
+    }
+
+    dispatch({ type: 'CLOSE' });
+    if (updateUrl) {
+      window.history.pushState({}, '', '/photos');
+    }
+  }, [isOpen]);
 
   const navigate = useCallback((direction) => {
     const photos = photosRef.current;
-    const next = currentIndexRef.current + direction;
+    if (currentIndex === null) return;
+    const next = currentIndex + direction;
     if (next < 0 || next >= photos.length) return;
-    setCurrentIndex(next);
+    dispatch({ type: 'SET_INDEX', index: next });
     const photo = photos[next];
     if (photo?.id) {
       window.history.replaceState({}, '', `/photos?image=${photo.id}`);
     }
-  }, []);
+  }, [currentIndex]);
 
   useEffect(() => {
     const handlePopstate = () => {
@@ -52,31 +83,28 @@ export function LightboxProvider({ children }) {
       if (imageId) {
         const index = photosRef.current.findIndex(p => p.id === imageId);
         if (index >= 0) {
-          setCurrentIndex(index);
-          setIsOpen(true);
+          openLightbox(index, undefined, { updateUrl: false });
         }
       } else {
-        setIsOpen(false);
-        setCurrentIndex(null);
+        closeLightbox({ updateUrl: false });
       }
     };
 
     window.addEventListener('popstate', handlePopstate);
     return () => window.removeEventListener('popstate', handlePopstate);
-  }, []);
+  }, [closeLightbox, openLightbox]);
 
   const setPhotos = useCallback((photos) => {
     photosRef.current = photos;
     const params = new URLSearchParams(window.location.search);
     const imageId = params.get('image');
-    if (imageId && !isOpenRef.current) {
+    if (imageId && !isOpen) {
       const index = photos.findIndex(p => p.id === imageId);
       if (index >= 0) {
-        setCurrentIndex(index);
-        setIsOpen(true);
+        openLightbox(index, undefined, { updateUrl: false });
       }
     }
-  }, []);
+  }, [isOpen, openLightbox]);
 
   const stateValue = useMemo(() => ({
     isOpen,

@@ -1,22 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { decryptContent } from '@/lib/encryption';
-import { compileMDX } from 'next-mdx-remote/rsc';
 import { Lock, ShieldCheck } from 'lucide-react';
 
 export function PasswordProtection({ post, onDecrypt }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [decryptedContent, setDecryptedContent] = useState(null);
   const [attempts, setAttempts] = useState(0);
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!password.trim()) {
+    const trimmedPassword = password.trim();
+    if (!trimmedPassword) {
       setError('Please enter a password');
       return;
     }
@@ -25,7 +23,6 @@ export function PasswordProtection({ post, onDecrypt }) {
     setError('');
 
     try {
-      // Call the API to verify the password
       const response = await fetch('/api/verify-password', {
         method: 'POST',
         headers: {
@@ -33,14 +30,13 @@ export function PasswordProtection({ post, onDecrypt }) {
         },
         body: JSON.stringify({
           slug: post.slug,
-          password: password.trim(),
+          password: trimmedPassword,
         }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle different error types
         if (response.status === 429) {
           setError('Too many attempts. Please try again later.');
         } else {
@@ -51,30 +47,20 @@ export function PasswordProtection({ post, onDecrypt }) {
         return;
       }
 
-      // Password is correct, decrypt the content
       try {
         const { decryptionData } = data;
 
-        // Decrypt the content using the provided keys
         const decrypted = decryptContent(
           post.encryptedContent,
-          password.trim(),
+          trimmedPassword,
           decryptionData.salt,
           decryptionData.iv,
           decryptionData.authTag
         );
 
-        // Set the decrypted content
-        setDecryptedContent(decrypted);
+        onDecrypt?.(decrypted);
 
-        // Call the parent component's callback with the decrypted content
-        if (onDecrypt) {
-          onDecrypt(decrypted);
-        }
-
-        // Clear the password field
         setPassword('');
-
       } catch (decryptError) {
         console.error('Decryption error:', decryptError);
         setError('Failed to decrypt content. Please try again.');
@@ -88,7 +74,6 @@ export function PasswordProtection({ post, onDecrypt }) {
     }
   };
 
-  // Determine if we should show a stronger warning based on attempts
   const showStrongWarning = attempts >= 3;
 
   return (

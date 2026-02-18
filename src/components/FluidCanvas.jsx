@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useMemo, forwardRef } from 'react';
+import { useRef, useEffect, useMemo, forwardRef, useCallback } from 'react';
 import { useFluidSimulation } from '@/hooks/useFluidSimulation';
 
 const TILE_COLOR_MAP = {
@@ -21,8 +21,7 @@ const TILE_COLOR_MAP = {
 };
 
 export const FluidCanvas = forwardRef(function FluidCanvas({
-    intensityRef,
-    onUpdateIntensity,
+    updateRef,
     tileColor = 'sky',
     theme = 'light',
     className = ''
@@ -36,28 +35,27 @@ export const FluidCanvas = forwardRef(function FluidCanvas({
         [themeKey, tileColor]
     );
 
-    useEffect(() => {
-        if (ref) {
-            if (typeof ref === 'function') {
-                ref(canvasRef.current);
-            } else {
-                ref.current = canvasRef.current;
-            }
+    const setRef = useCallback((node) => {
+        canvasRef.current = node;
+        if (typeof ref === 'function') {
+            ref(node);
+        } else if (ref) {
+            ref.current = node;
         }
     }, [ref]);
 
-    useEffect(() => {
-        if (onUpdateIntensity) {
-            onUpdateIntensity((value, action) => {
-                updateIntensity(value);
-                if (action === 'enter') {
-                    start(colors, { fresh: true });
-                } else if (value <= 0.01) {
-                    stop();
-                }
-            });
+    const update = useCallback((value, action) => {
+        updateIntensity(value);
+        if (action === 'enter') {
+            start(colors, { fresh: true });
+        } else if (value <= 0.01) {
+            stop();
         }
-    }, [onUpdateIntensity, updateIntensity, start, stop, colors]);
+    }, [updateIntensity, start, stop, colors]);
+
+    if (updateRef) {
+        updateRef.current = update;
+    }
 
     useEffect(() => {
         updateColors(colors);
@@ -71,7 +69,7 @@ export const FluidCanvas = forwardRef(function FluidCanvas({
 
     return (
         <canvas
-            ref={canvasRef}
+            ref={setRef}
             width={64}
             height={64}
             className={`absolute inset-0 w-full h-full pointer-events-none rounded-xl ${className}`}

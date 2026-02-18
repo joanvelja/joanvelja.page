@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useEffect } from 'react';
-import { useMotionValue, useSpring, motion } from 'framer-motion';
+import { LazyMotion, domAnimation, m, useMotionValue, useSpring } from 'framer-motion';
 import { useGesture } from '@use-gesture/react';
 
 const SPRINGS = {
@@ -125,7 +125,6 @@ export function LightboxImage({ photo, onDismiss, onImageError }) {
     if (!el) return;
 
     const handleWheel = (e) => {
-      e.preventDefault();
       const delta = -e.deltaY * 0.01;
       const current = rawScale.get();
       const next = Math.min(Math.max(current + delta, MIN_SCALE), MAX_SCALE);
@@ -133,7 +132,7 @@ export function LightboxImage({ photo, onDismiss, onImageError }) {
       zoomStateRef.current = next > ZOOM_HYSTERESIS ? 'ZOOMED' : 'FIT';
     };
 
-    el.addEventListener('wheel', handleWheel, { passive: false });
+    el.addEventListener('wheel', handleWheel, { passive: true });
     return () => el.removeEventListener('wheel', handleWheel);
   }, [rawScale]);
 
@@ -150,20 +149,22 @@ export function LightboxImage({ photo, onDismiss, onImageError }) {
   }, [handleDoubleTap]);
 
   return (
-    <motion.div
-      ref={containerRef}
-      className="relative w-full h-full flex items-center justify-center overflow-hidden"
-      style={{ touchAction: 'none', opacity }}
-      onClick={handleTap}
-    >
-      <motion.img
-        src={photo.src}
-        alt={photo.alt || photo.title}
-        className="max-w-full max-h-full object-contain select-none"
-        style={{ scale, x, y }}
-        draggable={false}
-        onError={onImageError}
-      />
-    </motion.div>
+    <LazyMotion features={domAnimation}>
+      <m.div
+        ref={containerRef}
+        className="relative w-full h-full flex items-center justify-center overflow-hidden"
+        style={{ touchAction: 'none', opacity }}
+        onClick={handleTap}
+      >
+        <m.img
+          src={photo.src}
+          alt={photo.alt || photo.title}
+          className="max-w-full max-h-full object-contain select-none"
+          style={{ scale, x, y }}
+          draggable={false}
+          onError={onImageError}
+        />
+      </m.div>
+    </LazyMotion>
   );
 }

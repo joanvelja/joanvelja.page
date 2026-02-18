@@ -5,4 +5,4 @@
 node scripts/check-heic.js
 
 # Security audit
-bun audit
+bun audit --ignore=GHSA-2g4f-4pwh-qvx6

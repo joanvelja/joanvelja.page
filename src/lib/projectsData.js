@@ -17,6 +17,21 @@ export const projects = {
             location: 'London, UK',
             period: 'Aug 2025 - Present',
             links: [],
+            relatedWorks: [
+                {
+                    title: 'When Can We Trust an Untrusted Monitor?',
+                    description: 'Untrusted monitoring uses one untrusted model to oversee another, shifting the core challenge from capability gaps to potential collusion. We relax prior assumptions about collusion by developing a taxonomy of collusion strategies and presenting an empirically grounded safety case sketch. We highlight key assumptions and open problems needed for robust pre-deployment evaluations.',
+                    coauthors: 'Nelson Gardner-Challis*, Jonathan Bostock*, Georgiy Kozhevnikov*, Morgan Sinclaire*, Joan Velja, Alessandro Abate, Charlie Griffin',
+                    publication_venue: 'LASR Labs preprint (2025)',
+                    links: [
+                        {
+                            type: 'pdf',
+                            url: 'https://www.lasrlabs.org/s/LASR_2025_UM_Paper.pdf',
+                            text: 'Read the preprint (PDF)'
+                        }
+                    ]
+                }
+            ]
         }
     ],
     past: [
@@ -39,15 +54,39 @@ export const projects = {
             relatedWorks: [
                 {
                     title: 'Dynamic Vocabulary Pruning in Early-Exit LLMs',
-                    description: 'Studied the gains in efficiency from pruning the vocabulary matrix of LLMs under early-exit [(Schuster et al. 2022)](https://arxiv.org/abs/2207.07061) settings.',
+                    description: 'Study of efficiency gains from pruning the output vocabulary in early-exit LLMs, characterizing speed–quality trade-offs across exit layers.',
                     supervisor: 'Metod Jazbec',
                     supervisor_link: 'https://metodj.github.io/',
                     coauthors: 'Jort Vincenti*, Karim Abdel Sadek*, Joan Velja*, Matteo Nulli*, Metod Jazbec',
+                    publication_venue: 'arXiv preprint (2024)',
                     links: [
                         {
                             type: 'arxiv',
                             url: 'https://arxiv.org/abs/2410.18952',
                             text: 'Read on arXiv'
+                        },
+                        {
+                            type: 'github',
+                            url: 'https://github.com/matteonulli/vocabulary_pruning',
+                            text: 'GitHub Codebase'
+                        }
+                    ]
+                },
+                {
+                    title: "'Explaining RL Decisions with Trajectories': A Reproducibility Study",
+                    description: 'We investigate the reproducibility of a trajectory-based method for explaining reinforcement learning decisions. We recover the experimental environments and validate several of the paper’s claims, extending the original analysis with additional quantitative metrics and experiments. We also document where evidence is inconclusive and what remains underspecified.',
+                    coauthors: 'Karim Abdel Sadek, Matteo Nulli, Joan Velja, Jort Vincenti',
+                    publication_venue: 'TMLR (2024)',
+                    links: [
+                        {
+                            type: 'arxiv',
+                            url: 'https://arxiv.org/abs/2411.07200',
+                            text: 'Read on arXiv'
+                        },
+                        {
+                            type: 'github',
+                            url: 'https://github.com/karim-abdel/Explaining-RL-Decisions-with-Trajectories',
+                            text: 'GitHub Codebase'
                         }
                     ]
                 }
@@ -56,17 +95,23 @@ export const projects = {
         {
             name: 'LASR Labs (London Initiative for Safe AI)',
             type: 'Researcher',
-            shortDescription: 'Steganographic collusion research, published at NeurIPS SoLaR 2024',
-            description: 'Wrote a cool paper on steganographic collusion between Language Models!',
+            shortDescription: 'Steganographic collusion research (IJCNLP-AACL 2025 oral; NeurIPS SoLaR 2024)',
+            description: 'Research on steganographic collusion between language models, focusing on emergence mechanisms and mitigation approaches.',
             location: 'London, UK',
+            period: 'Jul 2024 - Oct 2024',
             relatedWorks: [
                 {
                     title: 'Hidden in Plain Text: Emergence & Mitigation of Steganographic Collusion in LLMs',
-                    description: 'Wrote a cool paper on steganographic collusion between Language Models! Cited by Deepmind [(MONA, Farquhar et al. 2025)](https://arxiv.org/abs/2501.13011), and mentioned by Anthropic as a influential safety paper in 2024 ([here](https://x.com/saprmarks/status/1873551162919506068) and [here](https://www.lesswrong.com/posts/nAsMfmxDv6Qp7cfHh/fabien-s-shortform?commentId=gGDAXomb2ihucF4Ls)). Finally, Open Philanthropy is funding further research on the topic, as seen [here](https://arc.net/l/quote/xxtlyguv).',
+                    description: 'We study steganographic collusion: language models coordinating via hidden signals embedded in natural-language outputs. The paper analyzes when this behavior emerges and evaluates mitigation strategies.',
                     coauthors: 'Yohan Mathew*, Ollie Matthews*, Robert McCarthy*, Joan Velja*, Christian Schroeder de Witt, Dylan Cope, Nandi Schoots',
-                    publication_venue: 'NeurIPS - SoLaR Workshop 2024',
+                    publication_venue: 'IJCNLP-AACL 2025 (Oral)',
                     featured: true, // Mark as featured for landing page
                     links: [
+                        {
+                            type: 'website',
+                            url: 'https://aclanthology.org/2025.ijcnlp-long.34/',
+                            text: 'ACL Anthology'
+                        },
                         {
                             type: 'arxiv',
                             url: 'https://arxiv.org/abs/2410.03768',
@@ -99,8 +144,9 @@ export const projects = {
             relatedWorks: [
                 {
                     title: 'An unorthodox shift in the variance-bias tradeoff in Neural Networks',
-                    description: 'I was supervised by Prof. Enrico Maria Malatesta, and our work on Singular Learning Theory culminated into my Thesis, which I defended with distinction.',
+                    description: 'BSc thesis on variance–bias trade-offs in neural networks through the lens of singular learning theory; defended with distinction.',
                     coauthors: 'Joan Velja, Enrico Maria Malatesta',
+                    publication_venue: 'BSc thesis (Bocconi, 2023)',
                     links: [
                         {
                             type: 'pdf',

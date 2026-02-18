@@ -6,7 +6,9 @@ describe('cn utility', () => {
   });
 
   it('handles conditional classes', () => {
-    expect(cn('c1', true && 'c2', false && 'c3')).toBe('c1 c2');
+    const shouldInclude = true;
+    const shouldExclude = false;
+    expect(cn('c1', shouldInclude && 'c2', shouldExclude && 'c3')).toBe('c1 c2');
   });
 
   it('merges tailwind classes', () => {

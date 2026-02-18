@@ -56,12 +56,48 @@ export default [
         localStorage: "readonly",
         atob: "readonly",
         btoa: "readonly",
-        crypto: "readonly",
         TextDecoder: "readonly",
         TextEncoder: "readonly",
         Uint8Array: "readonly",
         URLSearchParams: "readonly",
         HTMLElement: "readonly",
+      },
+    },
+  },
+  {
+    files: ["scripts/**/*.js"],
+    languageOptions: {
+      sourceType: "script",
+      globals: {
+        require: "readonly",
+        module: "readonly",
+        __dirname: "readonly",
+        __filename: "readonly",
+        Buffer: "readonly",
+      },
+    },
+  },
+  {
+    files: ["**/*.test.js", "**/*.spec.js"],
+    languageOptions: {
+      globals: {
+        describe: "readonly",
+        it: "readonly",
+        test: "readonly",
+        expect: "readonly",
+        beforeAll: "readonly",
+        beforeEach: "readonly",
+        afterAll: "readonly",
+        afterEach: "readonly",
+        jest: "readonly",
+      },
+    },
+  },
+  {
+    files: ["src/lib/encryption.js"],
+    languageOptions: {
+      globals: {
+        Buffer: "readonly",
       },
     },
   },

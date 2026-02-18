@@ -19,7 +19,7 @@ function getNodeText(node) {
   return '';
 }
 
-export function slugify(text) {
+function slugify(text) {
   const str = typeof text === 'string' ? text : getNodeText(text);
   return str
     .toLowerCase()
@@ -81,6 +81,7 @@ export const mdxComponents = {
     if (!props.src || props.src === '' || (typeof props.src === 'object' && Object.keys(props.src).length === 0)) {
       return null;
     }
+    const aspectRatio = props.src === '/images/blog/checklist/swiss.png' ? '4/1' : '16/9';
     return (
       <div className="my-4">
         <DarkModeImageWrapper
@@ -88,6 +89,7 @@ export const mdxComponents = {
           alt={props.alt || 'Image'}
           className="w-full"
           rounded="rounded-lg"
+          aspectRatio={aspectRatio}
         />
         {props.alt && props.alt !== 'Image' && (
           <p className="text-xs text-center text-neutral-500 dark:text-neutral-400 mt-1 italic font-serif">

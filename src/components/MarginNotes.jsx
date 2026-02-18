@@ -1,62 +1,76 @@
 'use client';
 
-import { createContext, useState, useEffect, useRef, useCallback } from 'react';
+import { createContext, useEffect, useRef, useCallback, useReducer } from 'react';
 
 export const MarginNotesContext = createContext();
 
+const initialState = { notes: [], visibleNotes: [] };
+
+function reducer(state, action) {
+    switch (action.type) {
+        case 'REGISTER_NOTE': {
+            if (state.notes.some(note => note.id === action.note.id)) return state;
+            return { ...state, notes: [...state.notes, action.note] };
+        }
+        case 'SET_VISIBLE_NOTES': {
+            return { ...state, visibleNotes: action.visibleNotes };
+        }
+        default:
+            return state;
+    }
+}
+
 export function MarginNotesProvider({ children }) {
-    const [notes, setNotes] = useState([]);
-    const [visibleNotes, setVisibleNotes] = useState([]);
+    const [{ notes, visibleNotes }, dispatch] = useReducer(reducer, initialState);
     const notePositions = useRef(new Map());
+    const visibleNotesRef = useRef(new Set());
     const observerRef = useRef(null);
     const contentRef = useRef(null);
     const updateTimeout = useRef(null);
 
-    // Register a new note
     const registerNote = useCallback((note) => {
-        setNotes(prev => {
-            // Check if the note already exists
-            if (prev.some(n => n.id === note.id)) {
-                return prev;
-            }
-            return [...prev, note];
-        });
+        dispatch({ type: 'REGISTER_NOTE', note });
     }, []);
 
     useEffect(() => {
-        // Create an intersection observer to track which notes are visible
         observerRef.current = new IntersectionObserver(
             (entries) => {
+                let changed = false;
+                const nextVisible = visibleNotesRef.current;
+
                 entries.forEach(entry => {
                     const id = entry.target.dataset.marginNoteId;
                     if (!id) return;
 
                     if (entry.isIntersecting) {
-                        setVisibleNotes(prev => {
-                            if (prev.includes(id)) return prev;
-                            return [...prev, id];
-                        });
+                        if (!nextVisible.has(id)) {
+                            nextVisible.add(id);
+                            changed = true;
+                        }
 
                         const position = entry.boundingClientRect.top + window.scrollY;
                         notePositions.current.set(id, position);
                     } else {
-                        setVisibleNotes(prev => prev.filter(noteId => noteId !== id));
+                        if (nextVisible.delete(id)) {
+                            changed = true;
+                        }
                     }
                 });
+
+                if (changed) {
+                    dispatch({ type: 'SET_VISIBLE_NOTES', visibleNotes: Array.from(nextVisible) });
+                }
             },
             { threshold: 0.1 }
         );
 
-        // Add hover effects for margin notes
         const addHoverEffects = () => {
             const noteElements = document.querySelectorAll('[data-margin-note-id]');
             noteElements.forEach(element => {
-                // Add hover class to make notes subtly detectable
                 element.classList.add('hover:bg-blue-50', 'dark:hover:bg-blue-900/10', 'transition-colors', 'cursor-help');
             });
         };
 
-        // Start observing any existing notes
         const updateObservedElements = () => {
             const noteElements = document.querySelectorAll('[data-margin-note-id]');
             noteElements.forEach(element => {
@@ -65,7 +79,6 @@ export function MarginNotesProvider({ children }) {
             addHoverEffects();
         };
 
-        // Initial observation
         updateObservedElements();
 
         const mutationObserver = new MutationObserver(mutations => {
@@ -90,6 +103,7 @@ export function MarginNotesProvider({ children }) {
             observerRef.current?.disconnect();
             mutationObserver?.disconnect();
             clearTimeout(updateTimeout.current);
+            visibleNotesRef.current.clear();
         };
     }, []);
 
