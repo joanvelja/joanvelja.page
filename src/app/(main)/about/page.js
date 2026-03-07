@@ -83,7 +83,7 @@ export default async function AboutPage() {
                         </h1>
                         <div className="prose dark:prose-invert max-w-none">
                             <p className="text-lg leading-relaxed font-serif text-neutral-700 dark:text-neutral-300">
-                                {renderTextWithLinks(`I'm a PhD student at the **University of Oxford**, supervised by [Alessandro Abate](https://www.cs.ox.ac.uk/people/alessandro.abate/). My research focuses on AI alignment and safety—in particular, understanding how we can ensure supervision of increasingly powerful AI systems, in what is called the *scalable* (or amplified) *oversight problem*. I'm particularly interested in the role of priors and generalization in this endeavour. I also co-supervise research on red-teaming untrusted monitoring at **LASR Labs**.`)}
+                                {renderTextWithLinks(`I'm a PhD student at the **University of Oxford**, supervised by [Alessandro Abate](https://www.cs.ox.ac.uk/people/alessandro.abate/). I work on AI alignment — specifically, how to reliably supervise systems smarter than the supervisor. This is the *scalable oversight problem*. I'm funded by the [Alignment Project](https://alignmentproject.aisi.gov.uk/) (UK AISI) to work on adversarial elicitation — building on the [unexploitable search problem](https://www.alignmentforum.org/posts/CuneN5HmLnztsLRzD/unexploitable-search-blocking-malicious-use-of-free-1).`)}
                             </p>
                         </div>
                     </HeroItem>

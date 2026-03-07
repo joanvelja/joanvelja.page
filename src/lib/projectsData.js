@@ -1,10 +1,30 @@
 export const projects = {
     present: [
         {
+            name: 'UK AISI Alignment Project',
+            type: 'Researcher',
+            shortDescription: 'Adversarial elicitation theory',
+            description: 'Funded by the Alignment Project (UK AISI) to work on adversarial elicitation — building on the unexploitable search problem.',
+            location: 'Oxford, UK',
+            period: 'Feb 2026 - Present',
+            links: [
+                {
+                    type: 'website',
+                    url: 'https://alignmentproject.aisi.gov.uk/',
+                    text: 'Alignment Project'
+                },
+                {
+                    type: 'arxiv',
+                    url: 'https://www.alignmentforum.org/posts/CuneN5HmLnztsLRzD/unexploitable-search-blocking-malicious-use-of-free-1',
+                    text: 'Unexploitable Search (Pfau & Irving)'
+                }
+            ],
+        },
+        {
             name: 'University of Oxford',
             type: 'PhD',
             shortDescription: 'AI alignment and elicitation research, supervised by Prof. Alessandro Abate',
-            description: 'D.Phil. student (fancy British for PhD), working on AI Alignment and Elicitation. Supervised by Prof. Alessandro Abate (OxCAV Group).',
+            description: 'D.Phil. student, working on AI alignment and elicitation. Supervised by Prof. Alessandro Abate (OxCAV Group).',
             location: 'Oxford, UK',
             period: 'Sept 2025 - Present',
             links: [],
@@ -22,12 +42,12 @@ export const projects = {
                     title: 'When Can We Trust an Untrusted Monitor?',
                     description: 'Untrusted monitoring uses one untrusted model to oversee another, shifting the core challenge from capability gaps to potential collusion. We relax prior assumptions about collusion by developing a taxonomy of collusion strategies and presenting an empirically grounded safety case sketch. We highlight key assumptions and open problems needed for robust pre-deployment evaluations.',
                     coauthors: 'Nelson Gardner-Challis*, Jonathan Bostock*, Georgiy Kozhevnikov*, Morgan Sinclaire*, Joan Velja, Alessandro Abate, Charlie Griffin',
-                    publication_venue: 'LASR Labs preprint (2025)',
+                    publication_venue: 'Preprint (2025)',
                     links: [
                         {
-                            type: 'pdf',
-                            url: 'https://www.lasrlabs.org/s/LASR_2025_UM_Paper.pdf',
-                            text: 'Read the preprint (PDF)'
+                            type: 'arxiv',
+                            url: 'https://arxiv.org/abs/2602.20628',
+                            text: 'Read on arXiv'
                         }
                     ]
                 }
