@@ -91,7 +91,7 @@ function MarkdownContent({ text, showAnnotations }) {
     for (const { pattern, type } of HIGHLIGHT_PATTERNS) {
       const style = HIGHLIGHT_STYLES[type];
       result = result.replace(
-        new RegExp(pattern.source, pattern.flags),
+        pattern,
         (match) => `<mark class="${style} rounded-sm px-0.5" title="${type}">${match}</mark>`
       );
     }

@@ -112,13 +112,11 @@ export function MarginNotesProvider({ children }) {
             <div ref={contentRef} className="relative max-w-full">
                 {children}
 
-                {/* Margin notes container - positioned outside the content container */}
                 {notes.length > 0 && (
                     <div className="absolute top-0 right-0 w-64 h-full hidden xl:block"
                         style={{ left: 'calc(50% + 400px)', marginLeft: '2rem' }}>
                         <div className="relative w-full h-full">
                             {notes.filter(note => visibleNotes.includes(note.id)).map(note => {
-                                // Calculate position based on the original element's position
                                 const position = notePositions.current.get(note.id) || 0;
                                 const contentTop = contentRef.current?.getBoundingClientRect().top || 0;
                                 const adjustedPosition = position - window.scrollY - contentTop;

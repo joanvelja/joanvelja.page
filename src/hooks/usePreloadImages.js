@@ -6,6 +6,7 @@ export function usePreloadImages(photos, currentIndex, isOpen) {
   const preloadedRef = useRef(new Set());
   const linksRef = useRef([]);
 
+  // Add preload links when index changes
   useEffect(() => {
     if (!isOpen || currentIndex === null) return;
 
@@ -24,15 +25,17 @@ export function usePreloadImages(photos, currentIndex, isOpen) {
       document.head.appendChild(link);
       linksRef.current.push(link);
     });
+  }, [photos, currentIndex, isOpen]);
+
+  // Clean up only when lightbox closes
+  useEffect(() => {
+    if (isOpen) return;
 
     const currentLinks = linksRef.current;
-    const currentPreloaded = preloadedRef.current;
-    return () => {
-      currentLinks.forEach(link => {
-        if (link.parentNode) link.parentNode.removeChild(link);
-      });
-      linksRef.current = [];
-      currentPreloaded.clear();
-    };
-  }, [photos, currentIndex, isOpen]);
+    currentLinks.forEach(link => {
+      if (link.parentNode) link.parentNode.removeChild(link);
+    });
+    linksRef.current = [];
+    preloadedRef.current.clear();
+  }, [isOpen]);
 }

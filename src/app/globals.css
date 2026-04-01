@@ -12,11 +12,6 @@
   --foreground: var(--ink);
 }
 
-/*
- * Theme transitions are now handled via Tailwind's built-in dark: variants.
- * No global * transition - that causes cascade conflicts with component transitions.
- */
-
 body {
   @apply font-sans text-ink bg-paper;
   transition: background-color var(--transition-duration) ease,
@@ -136,7 +131,6 @@ body {
     border-color var(--transition-duration) ease;
 }
 
-/* Optional vignette effect for images - can be applied with a specific class */
 .img-vignette {
   position: relative;
 }

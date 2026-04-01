@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useContext, useRef, useCallback, useMemo } from 'react';
+import { createContext, useState, useContext, useRef, useCallback, useMemo } from 'react';
 import { useHoverTooltip } from '@/hooks/useHoverTooltip';
 
-const CitationContext = React.createContext();
+const CitationContext = createContext();
 
 export function CitationProvider({ children }) {
     const [citations, setCitations] = useState([]);
@@ -165,6 +165,3 @@ export function Bibliography() {
     );
 }
 
-export function Cite({ children, ...props }) {
-    return <Citation {...props}>{children}</Citation>;
-}

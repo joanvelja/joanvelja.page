@@ -3,7 +3,7 @@
 import { useRef, useSyncExternalStore } from 'react';
 import { usePathname } from 'next/navigation';
 import { User, Mail, Briefcase, BookText, Image, Moon, Sun } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { NavTile } from '@/components/NavTile';
@@ -52,6 +52,7 @@ export default function MainLayout({ children }) {
     }
 
     return (
+        <LazyMotion features={domAnimation}>
         <div className="min-h-screen bg-white dark:bg-neutral-900 transition-colors duration-300">
             <header
                 ref={headerRef}
@@ -64,7 +65,7 @@ export default function MainLayout({ children }) {
                         </div>
                         <div className="flex items-center justify-center">
                             <AnimatePresence mode="popLayout">
-                                <motion.h1
+                                <m.h1
                                     key={pathname}
                                     initial={{ opacity: 0, y: 4 }}
                                     animate={{ opacity: 1, y: 0 }}
@@ -73,7 +74,7 @@ export default function MainLayout({ children }) {
                                     className="text-xl font-medium md:block hidden text-neutral-900 dark:text-white font-serif-display"
                                 >
                                     {title}
-                                </motion.h1>
+                                </m.h1>
                             </AnimatePresence>
                         </div>
                         <div className="w-[130px] flex flex-col items-end justify-center">
@@ -84,7 +85,7 @@ export default function MainLayout({ children }) {
                                     className="p-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                                 >
                                     <AnimatePresence mode="wait" initial={false}>
-                                        <motion.div
+                                        <m.div
                                             key={theme}
                                             initial={{ opacity: 0, rotate: -90, scale: 0.8 }}
                                             animate={{ opacity: 1, rotate: 0, scale: 1 }}
@@ -96,7 +97,7 @@ export default function MainLayout({ children }) {
                                             ) : (
                                                 <Sun size={20} className="text-neutral-400" />
                                             )}
-                                        </motion.div>
+                                        </m.div>
                                     </AnimatePresence>
                                 </button>
                             </div>
@@ -115,7 +116,7 @@ export default function MainLayout({ children }) {
                 <div className="w-full flex flex-col items-center pointer-events-none">
                     <div
                         ref={dockRef}
-                        className="fixed bottom-8 pb-[env(safe-area-inset-bottom)] flex flex-col justify-end transition-transform duration-300 translate-y-0 data-[hidden=true]:translate-y-[200%]"
+                        className="fixed bottom-8 pb-[env(safe-area-inset-bottom)] flex flex-col justify-end transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] translate-y-0 opacity-100 data-[hidden=true]:translate-y-[calc(100%+3rem)] data-[hidden=true]:opacity-0"
                     >
                         <div className="z-10 pointer-events-auto">
                             <div className="gap-2 flex flex-row bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md shadow-lg rounded-2xl p-[8px]">
@@ -140,5 +141,6 @@ export default function MainLayout({ children }) {
                 </div>
             </div>
         </div>
+        </LazyMotion>
     );
 }

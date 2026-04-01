@@ -1,4 +1,4 @@
-import { getPostBySlug, getAllPosts } from '@/lib/mdx';
+import { getPostBySlug, getAllPosts, getPostFrontmatter } from '@/lib/mdx';
 import { ShareButton } from '../components/ShareButton';
 import { ReadingProgress } from '../components/ReadingProgress';
 import { SidenotesProvider } from '@/components/Sidenotes';
@@ -12,7 +12,7 @@ import 'katex/dist/katex.min.css';
 
 export async function generateMetadata({ params }) {
     const { slug } = await params;
-    const post = await getPostBySlug(slug);
+    const post = await getPostFrontmatter(slug);
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://joanvelja.page';
     const postUrl = `${baseUrl}/blog/${slug}`;

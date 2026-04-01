@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { MDXRemote } from 'next-mdx-remote';
 import { serialize } from 'next-mdx-remote/serialize';
 import { PasswordProtection } from './PasswordProtection';
@@ -8,6 +8,7 @@ import { Lock } from 'lucide-react';
 
 import { mdxComponents } from '@/lib/mdx-components';
 import { mdxOptionsClient } from '@/lib/mdx-plugins';
+import { estimateReadingTime } from '@/lib/utils';
 
 export function ProtectedContent({ post }) {
   const [isDecrypted, setIsDecrypted] = useState(false);
@@ -19,9 +20,7 @@ export function ProtectedContent({ post }) {
     setIsProcessing(true);
 
     try {
-      const wordsPerMinute = 200;
-      const wordCount = decryptedContent.split(/\s+/g).length;
-      setReadingTime(Math.ceil(wordCount / wordsPerMinute));
+      setReadingTime(estimateReadingTime(decryptedContent));
 
       const source = await serialize(decryptedContent, {
         mdxOptions: mdxOptionsClient,
@@ -38,20 +37,6 @@ export function ProtectedContent({ post }) {
       setIsProcessing(false);
     }
   };
-
-  useEffect(() => {
-    const wasDecrypted = sessionStorage.getItem(`decrypted-${post.slug}`);
-    if (wasDecrypted === 'true') {
-      setIsDecrypted(false);
-    }
-  }, [post.slug]);
-
-  useEffect(() => {
-    return () => {
-      setMdxSource(null);
-      setIsDecrypted(false);
-    };
-  }, []);
 
   if (isProcessing) {
     return (

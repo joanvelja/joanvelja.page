@@ -1,16 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'lucide-react';
 
 export function CopyLinkButton({ id }) {
     const [showCopied, setShowCopied] = useState(false);
+    const timeoutRef = useRef(null);
+
+    useEffect(() => {
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+    }, []);
 
     const handleCopy = () => {
         const url = `${window.location.origin}${window.location.pathname}#${id}`;
         navigator.clipboard.writeText(url);
         setShowCopied(true);
-        setTimeout(() => setShowCopied(false), 2000);
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        timeoutRef.current = setTimeout(() => setShowCopied(false), 2000);
     };
 
     return (

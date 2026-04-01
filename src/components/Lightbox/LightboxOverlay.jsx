@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, Component } from 'react';
-import { AnimatePresence, LazyMotion, domAnimation, m } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { useLightbox, useThumbnailRegistryContext } from './LightboxProvider';
 import { LightboxImage } from './LightboxImage';
 import { LightboxControls } from './LightboxControls';
@@ -42,19 +42,17 @@ export function LightboxOverlay() {
   usePreloadImages(photos, currentIndex, isOpen);
 
   return (
-    <LazyMotion features={domAnimation}>
-      <AnimatePresence mode="wait">
-        {isOpen && photo && (
-          <LightboxOverlayBody
-            photo={photo}
-            photos={photos}
-            currentIndex={currentIndex}
-            closeLightbox={closeLightbox}
-            navigate={navigate}
-          />
-        )}
-      </AnimatePresence>
-    </LazyMotion>
+    <AnimatePresence mode="wait">
+      {isOpen && photo && (
+        <LightboxOverlayBody
+          photo={photo}
+          photos={photos}
+          currentIndex={currentIndex}
+          closeLightbox={closeLightbox}
+          navigate={navigate}
+        />
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -75,10 +73,6 @@ function LightboxOverlayBody({ photo, photos, currentIndex, closeLightbox, navig
 
     closeLightbox();
   }, [photo.id, closeLightbox, getElement]);
-
-  const handleDismiss = useCallback(() => {
-    handleClose();
-  }, [handleClose]);
 
   const handleErrorBoundary = useCallback(() => {
     closeLightbox();
@@ -141,7 +135,7 @@ function LightboxOverlayBody({ photo, photos, currentIndex, closeLightbox, navig
           style={{ borderRadius: 16 }}
           transition={{ layout: SPRING_MORPH }}
         >
-          <LightboxImageSlot key={photo.id} photo={photo} onDismiss={handleDismiss} />
+          <LightboxImageSlot key={photo.id} photo={photo} onDismiss={handleClose} />
         </m.div>
 
         <LightboxControls

@@ -12,9 +12,11 @@ export function MetricsSummary({ metrics, iterations, labels, currentIter }) {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
       {METRIC_DEFS.map(({ key, label, fmt, color }) => {
         const values = iterations.map(it => metrics[it][key]);
-        const first = values[0];
-        const last = values[values.length - 1];
         const current = metrics[currentIter][key];
+
+        const max = Math.max(...values);
+        const min = Math.min(...values);
+        const range = max - min || 1;
 
         return (
           <div key={key} className="p-3 rounded-lg bg-white/5 border border-white/10">
@@ -25,9 +27,6 @@ export function MetricsSummary({ metrics, iterations, labels, currentIter }) {
             {/* Sparkline */}
             <div className="flex items-end gap-[3px] h-5 mt-2">
               {values.map((v, i) => {
-                const max = Math.max(...values);
-                const min = Math.min(...values);
-                const range = max - min || 1;
                 const height = ((v - min) / range) * 100;
                 const isActive = iterations[i] === currentIter;
                 return (

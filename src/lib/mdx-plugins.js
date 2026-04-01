@@ -1,8 +1,3 @@
-/**
- * Shared MDX plugin configuration for blog rendering
- * Used by both server-side (mdx.js) and client-side (ProtectedContent) rendering
- */
-
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import remarkToc from 'remark-toc';
@@ -11,10 +6,6 @@ import rehypePrettyCode from 'rehype-pretty-code';
 import rehypeSlug from 'rehype-slug';
 import rehypePunctilio from 'punctilio/rehype';
 
-/**
- * Singleton Shiki highlighter for code syntax highlighting
- * Prevents re-initialization on every request
- */
 let shikiHighlighterPromise = null;
 
 async function getShikiHighlighter(highlighterOpts) {
@@ -32,41 +23,29 @@ async function getShikiHighlighter(highlighterOpts) {
     return shikiHighlighterPromise;
 }
 
-/**
- * Remark plugins for markdown processing
- */
 const remarkPlugins = [
-    remarkGfm,    // GitHub Flavored Markdown (tables, strikethrough, etc.)
-    remarkMath,   // Math equations ($$...$$ and $...$)
-    remarkToc,    // Table of contents generation
+    remarkGfm,
+    remarkMath,
+    remarkToc,
 ];
 
-/**
- * Remark plugins without TOC (for protected content client-side rendering)
- */
 const remarkPluginsNoToc = [
     remarkGfm,
     remarkMath,
 ];
 
-/**
- * Rehype plugins for HTML transformation (server-side with Shiki caching)
- */
 const rehypePlugins = [
-    rehypeKatex,  // LaTeX rendering via KaTeX
+    rehypeKatex,
     [rehypePrettyCode, {
         keepBackground: true,
         theme: 'one-dark-pro',
         defaultLang: 'plaintext',
         getHighlighter: getShikiHighlighter,
     }],
-    rehypeSlug,   // Add IDs to headings
+    rehypeSlug,
     rehypePunctilio,
 ];
 
-/**
- * Rehype plugins for client-side rendering (no Shiki caching)
- */
 const rehypePluginsClient = [
     rehypeKatex,
     [rehypePrettyCode, {
@@ -78,18 +57,12 @@ const rehypePluginsClient = [
     rehypePunctilio,
 ];
 
-/**
- * Full MDX options for server-side compilation
- */
 export const mdxOptions = {
     remarkPlugins,
     rehypePlugins,
     format: 'mdx',
 };
 
-/**
- * MDX options for client-side protected content
- */
 export const mdxOptionsClient = {
     remarkPlugins: remarkPluginsNoToc,
     rehypePlugins: rehypePluginsClient,

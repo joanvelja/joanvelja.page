@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { X, ExternalLink, ChevronRight } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { projects } from '@/lib/projectsData';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { renderTextWithLinks } from '@/lib/utils';
 
 const Tag = ({ type }) => {
     const colors = {
@@ -54,23 +55,6 @@ const WorkListItem = ({ name, type, location, period, shortDescription, isSelect
         </div>
     </div>
 );
-
-const renderTextWithLinks = (text) => {
-    if (!text) return null;
-    const parts = text.split(/(\[[^\]]+\]\([^)]+\))/g);
-    return parts.map((part, index) => {
-        const match = part.match(/\[([^\]]+)\]\(([^)]+)\)/);
-        if (match) {
-            const [_, text, url] = match;
-            return (
-                <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="text-oxford-700 hover:text-oxford-800 dark:text-oxford-300 dark:hover:text-oxford-200 hover:underline">
-                    {text}
-                </a>
-            );
-        }
-        return part;
-    });
-};
 
 const LINK_ICONS = { arxiv: '\uD83D\uDCDC', github: '\uD83D\uDD17', website: '\uD83C\uDF10', pdf: '\uD83D\uDCC4' };
 
@@ -144,7 +128,7 @@ const WorkDetailPanel = ({ project, onClose }) => {
     };
 
     return (
-        <motion.div
+        <m.div
             role="dialog"
             aria-modal="true"
             onKeyDown={handleKeyDown}
@@ -194,7 +178,7 @@ const WorkDetailPanel = ({ project, onClose }) => {
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </m.div>
     );
 };
 
@@ -249,7 +233,7 @@ export default function ProjectsPage() {
             <AnimatePresence>
                 {selectedProject && (
                     <>
-                        <motion.div
+                        <m.div
                             key="backdrop"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}

@@ -1,31 +1,11 @@
-/**
- * Shared MDX component definitions for blog rendering
- * Used by both server-side (mdx.js) and client-side (ProtectedContent) rendering
- */
-
 import { Sidenote } from '@/components/Sidenote';
 import { HeadingWithAnchor } from '@/components/HeadingWithAnchor';
 import { MarginNote } from '@/components/MarginNote';
-import { Citation, Cite, Bibliography } from '@/components/Citation';
+import { Citation, Bibliography } from '@/components/Citation';
 import { DarkModeImageWrapper } from '@/components/DarkModeImageWrapper';
 import { ImageThemeAdjuster } from '@/components/ImageThemeAdjuster';
 import { InteractiveEmbed } from '@/components/InteractiveEmbed';
-import { cn } from '@/lib/utils';
-
-function getNodeText(node) {
-  if (['string', 'number'].includes(typeof node)) return node;
-  if (node instanceof Array) return node.map(getNodeText).join('');
-  if (typeof node === 'object' && node) return getNodeText(node.props?.children);
-  return '';
-}
-
-function slugify(text) {
-  const str = typeof text === 'string' ? text : getNodeText(text);
-  return str
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
+import { cn, slugify } from '@/lib/utils';
 
 function createHeadingComponent(level, className) {
   const Component = ({ children, ...props }) => {
@@ -81,7 +61,7 @@ export const mdxComponents = {
     if (!props.src || props.src === '' || (typeof props.src === 'object' && Object.keys(props.src).length === 0)) {
       return null;
     }
-    const aspectRatio = props.src === '/images/blog/checklist/swiss.png' ? '4/1' : '16/9';
+    const aspectRatio = '16/9';
     return (
       <div className="my-4">
         <DarkModeImageWrapper
@@ -106,6 +86,6 @@ export const mdxComponents = {
   ImageThemeAdjuster,
   InteractiveEmbed,
   Citation,
-  Cite,
+  Cite: Citation,
   Bibliography,
 };

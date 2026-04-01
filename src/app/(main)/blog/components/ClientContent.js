@@ -1,20 +1,10 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import { ArticleCard } from './ArticleCard';
 import { TagPill } from './TagPill';
-
-function useDebouncedValue(value, delay = 300) {
-    const [debouncedValue, setDebouncedValue] = useState(value);
-
-    useEffect(() => {
-        const timer = setTimeout(() => setDebouncedValue(value), delay);
-        return () => clearTimeout(timer);
-    }, [value, delay]);
-
-    return debouncedValue;
-}
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 
 export function ClientContent({ initialPosts, allTags }) {
     const [selectedTag, setSelectedTag] = useState(null);
@@ -36,9 +26,7 @@ export function ClientContent({ initialPosts, allTags }) {
 
     return (
         <>
-            {/* Search and Tags Section */}
             <div className="space-y-6 mb-8">
-                {/* Search Bar */}
                 <div className="relative group">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 transition-colors group-hover:text-neutral-500 dark:group-hover:text-neutral-300" />
                     <input
@@ -58,7 +46,6 @@ export function ClientContent({ initialPosts, allTags }) {
                     />
                 </div>
 
-                {/* Tags filter */}
                 <div className="flex flex-wrap gap-2">
                     <TagPill
                         tag="All"
@@ -76,14 +63,12 @@ export function ClientContent({ initialPosts, allTags }) {
                 </div>
             </div>
 
-            {/* Posts grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {filteredPosts.map(post => (
                     <ArticleCard key={post.slug} post={post} />
                 ))}
             </div>
 
-            {/* Empty state */}
             {filteredPosts.length === 0 && (
                 <div className="text-center py-16 px-4">
                     <div className="inline-block h-[1px] w-12 bg-neutral-300 dark:bg-neutral-700 mb-6"></div>

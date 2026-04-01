@@ -7,11 +7,11 @@ import { unstable_cache } from 'next/cache';
 
 import { mdxComponents } from './mdx-components';
 import { mdxOptions } from './mdx-plugins';
+import { estimateReadingTime as _estimateReadingTime } from './utils';
 
-function estimateReadingTime(content, isProtected, estimatedReadingTime) {
-    if (isProtected) return estimatedReadingTime || 5;
-    const wordCount = content.split(/\s+/).length;
-    return Math.ceil(wordCount / 200);
+function estimateReadingTime(content, isProtected, estimatedReadingTimeOverride) {
+    if (isProtected) return estimatedReadingTimeOverride || 5;
+    return _estimateReadingTime(content);
 }
 
 export async function getAllPosts() {
@@ -88,6 +88,12 @@ const getPostRawData = cache(async (slug) => {
         { tags: [`post-${slug}`], revalidate: 3600 }
     )();
 });
+
+export async function getPostFrontmatter(slug) {
+    const postData = await getPostRawData(slug);
+    const { rawContent: _rawContent, ...frontmatter } = postData;
+    return frontmatter;
+}
 
 export async function getPostBySlug(slug) {
     const postData = await getPostRawData(slug);

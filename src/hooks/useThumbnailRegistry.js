@@ -13,14 +13,9 @@ export function useThumbnailRegistry() {
     }
   }, []);
 
-  const getRect = useCallback((id) => {
-    const el = elementsRef.current.get(id);
-    return el ? el.getBoundingClientRect() : null;
-  }, []);
-
   const getElement = useCallback((id) => {
     return elementsRef.current.get(id) || null;
   }, []);
 
-  return { register, getRect, getElement };
+  return { register, getElement };
 }

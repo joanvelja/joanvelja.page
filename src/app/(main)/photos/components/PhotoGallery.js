@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useCallback, useRef, useState, useMemo } from 'react';
+import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { LightboxProvider, useLightbox, useThumbnailRegistryContext } from '@/components/Lightbox/LightboxProvider';
 import { LightboxOverlay } from '@/components/Lightbox/LightboxOverlay';
 import { useImageLazyLoad } from '@/hooks/useImageLazyLoad';
@@ -52,7 +52,7 @@ function PhotoGridItem({ photo, index, isFullSpan, isCentered, openLightbox }) {
   }, [index, openLightbox]);
 
   return (
-    <motion.div
+    <m.div
       ref={setRef}
       layoutId={`photo-${photo.id}`}
       onClick={handleClick}
@@ -100,7 +100,7 @@ function PhotoGridItem({ photo, index, isFullSpan, isCentered, openLightbox }) {
           {formatDate(photo.date)}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

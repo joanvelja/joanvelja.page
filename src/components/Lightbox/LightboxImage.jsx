@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useCallback, useEffect } from 'react';
-import { LazyMotion, domAnimation, m, useMotionValue, useSpring } from 'framer-motion';
+import { m, useMotionValue, useSpring } from 'framer-motion';
 import { useGesture } from '@use-gesture/react';
 
 const SPRINGS = {
@@ -149,22 +149,20 @@ export function LightboxImage({ photo, onDismiss, onImageError }) {
   }, [handleDoubleTap]);
 
   return (
-    <LazyMotion features={domAnimation}>
-      <m.div
-        ref={containerRef}
-        className="relative w-full h-full flex items-center justify-center overflow-hidden"
-        style={{ touchAction: 'none', opacity }}
-        onClick={handleTap}
-      >
-        <m.img
-          src={photo.src}
-          alt={photo.alt || photo.title}
-          className="max-w-full max-h-full object-contain select-none"
-          style={{ scale, x, y }}
-          draggable={false}
-          onError={onImageError}
-        />
-      </m.div>
-    </LazyMotion>
+    <m.div
+      ref={containerRef}
+      className="relative w-full h-full flex items-center justify-center overflow-hidden"
+      style={{ touchAction: 'none', opacity }}
+      onClick={handleTap}
+    >
+      <m.img
+        src={photo.src}
+        alt={photo.alt || photo.title}
+        className="max-w-full max-h-full object-contain select-none"
+        style={{ scale, x, y }}
+        draggable={false}
+        onError={onImageError}
+      />
+    </m.div>
   );
 }

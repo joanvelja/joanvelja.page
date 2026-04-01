@@ -5,49 +5,11 @@ import { ExternalLink, ArrowRight } from 'lucide-react';
 import { getAllPosts } from '@/lib/mdx';
 import { HeroReveal, HeroItem } from '@/components/HeroReveal';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { renderTextWithLinks } from '@/lib/utils';
 
 export const metadata = {
     title: 'About | Joan Velja',
     description: 'Learn more about Joan Velja and his work.'
-};
-
-const renderTextWithLinks = (text) => {
-    if (!text) return null;
-
-    const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-
-    return parts.map((part, index) => {
-        const boldMatch = part.match(/^\*\*([^*]+)\*\*$/);
-        if (boldMatch) {
-            return <strong key={index} className="font-semibold text-neutral-900 dark:text-white">{boldMatch[1]}</strong>;
-        }
-
-        const italicMatch = part.match(/^\*([^*]+)\*$/);
-        if (italicMatch) {
-            return <em key={index} className="italic">{italicMatch[1]}</em>;
-        }
-
-        const linkParts = part.split(/(\[[^\]]+\]\([^)]+\))/g);
-
-        return linkParts.map((subPart, subIndex) => {
-            const linkMatch = subPart.match(/\[([^\]]+)\]\(([^)]+)\)/);
-            if (linkMatch) {
-                const [_, linkText, linkUrl] = linkMatch;
-                return (
-                    <a
-                        key={`${index}-${subIndex}`}
-                        href={linkUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-oxford-700 hover:text-oxford-800 dark:text-oxford-300 dark:hover:text-oxford-200 underline decoration-oxford-200 dark:decoration-oxford-800 underline-offset-2 transition-colors"
-                    >
-                        {linkText}
-                    </a>
-                );
-            }
-            return subPart;
-        });
-    });
 };
 
 
@@ -62,8 +24,8 @@ export default async function AboutPage() {
     return (
         <main className="flex flex-col items-center justify-start w-full max-w-2xl mx-auto">
             <section className="w-full px-4 py-12">
-                <HeroReveal className="flex flex-col md:flex-row md:items-start gap-8 md:gap-10">
-                    <HeroItem className="flex-shrink-0">
+                <HeroReveal className="flex flex-row items-start gap-6 md:gap-10">
+                    <HeroItem className="w-[40%] flex-shrink-0">
                         <div className="rounded-2xl overflow-hidden">
                             <Image
                                 alt="Joan Velja"
@@ -71,7 +33,7 @@ export default async function AboutPage() {
                                 width={302}
                                 height={403}
                                 priority
-                                className="shadow-md object-cover"
+                                className="shadow-md object-cover w-full h-auto"
                                 style={{ aspectRatio: '4/5' }}
                             />
                         </div>

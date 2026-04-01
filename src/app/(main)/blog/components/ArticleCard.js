@@ -1,7 +1,5 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArticlePreview } from './ArticlePreview';
-import { format } from 'date-fns';
 
 export function ArticleCard({ post }) {
     return (
@@ -52,7 +50,7 @@ export function ArticleCard({ post }) {
 
                 <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-500 font-serif tracking-wide border-t border-neutral-100 dark:border-neutral-800 pt-3 mt-3">
                     <span className="uppercase">
-                        {format(new Date(post.date), 'MMM d, yyyy')}
+                        {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
                     <span>
                         {post.readingTime} min read
@@ -60,9 +58,6 @@ export function ArticleCard({ post }) {
                 </div>
                 
             </div>
-
-            {/* Preview on hover */}
-            <ArticlePreview post={post} />
         </Link>
     );
 } 

@@ -1,6 +1,6 @@
 'use client';
 
-import { LazyMotion, domAnimation, m, useReducedMotion } from 'framer-motion';
+import { m, useReducedMotion } from 'framer-motion';
 
 const container = { hidden: {}, visible: { transition: { staggerChildren: 0.1 } } };
 const item = {
@@ -12,11 +12,9 @@ export function HeroReveal({ children, className }) {
     const shouldReduceMotion = useReducedMotion();
     if (shouldReduceMotion) return <div className={className}>{children}</div>;
     return (
-        <LazyMotion features={domAnimation}>
-            <m.div variants={container} initial="hidden" animate="visible" className={className}>
-                {children}
-            </m.div>
-        </LazyMotion>
+        <m.div variants={container} initial="hidden" animate="visible" className={className}>
+            {children}
+        </m.div>
     );
 }
 
@@ -24,10 +22,8 @@ export function HeroItem({ children, className }) {
     const shouldReduceMotion = useReducedMotion();
     if (shouldReduceMotion) return <div className={className}>{children}</div>;
     return (
-        <LazyMotion features={domAnimation}>
-            <m.div variants={item} className={className}>
-                {children}
-            </m.div>
-        </LazyMotion>
+        <m.div variants={item} className={className}>
+            {children}
+        </m.div>
     );
 }

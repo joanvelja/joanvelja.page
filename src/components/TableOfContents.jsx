@@ -14,6 +14,13 @@ export function TableOfContents() {
     const headingPositionsRef = useRef([]);
     const activeIdRef = useRef('');
 
+    const updateHeadingPositions = useCallback(() => {
+        headingPositionsRef.current = headingElementsRef.current.map(heading => ({
+            id: heading.id,
+            offsetTop: heading.offsetTop,
+        }));
+    }, []);
+
     // Extract headings from the document
     useEffect(() => {
         const extractHeadings = () => {
@@ -28,15 +35,7 @@ export function TableOfContents() {
             }));
             setHeadings(headingData);
 
-            // Also update cached positions
             updateHeadingPositions();
-        };
-
-        const updateHeadingPositions = () => {
-            headingPositionsRef.current = headingElementsRef.current.map(heading => ({
-                id: heading.id,
-                offsetTop: heading.offsetTop,
-            }));
         };
 
         extractHeadings();
@@ -48,36 +47,40 @@ export function TableOfContents() {
             observer.observe(articleContainer, { childList: true, subtree: true });
             return () => observer.disconnect();
         }
-    }, []);
+    }, [updateHeadingPositions]);
 
     // Recalculate heading positions on resize
     useEffect(() => {
-        const updateHeadingPositions = () => {
-            headingPositionsRef.current = headingElementsRef.current.map(heading => ({
-                id: heading.id,
-                offsetTop: heading.offsetTop,
-            }));
-        };
-
         const throttledResize = throttle(updateHeadingPositions, 100);
         window.addEventListener('resize', throttledResize);
 
         return () => window.removeEventListener('resize', throttledResize);
-    }, []);
+    }, [updateHeadingPositions]);
+
+    // Debounced history.replaceState — only fires after activeId is stable for 300ms
+    const replaceStateTimerRef = useRef(null);
+    useEffect(() => {
+        if (replaceStateTimerRef.current) clearTimeout(replaceStateTimerRef.current);
+        if (activeId) {
+            replaceStateTimerRef.current = setTimeout(() => {
+                window.history.replaceState(null, null, `#${activeId}`);
+            }, 300);
+        }
+        return () => {
+            if (replaceStateTimerRef.current) clearTimeout(replaceStateTimerRef.current);
+        };
+    }, [activeId]);
 
     // Track active heading based on scroll position
     useEffect(() => {
         const handleScroll = () => {
-            const scrollY = window.scrollY;
             const viewportOffset = 150;
 
-            // Use cached heading elements and get their current positions
             const headingPositions = headingElementsRef.current.map(heading => {
                 const rect = heading.getBoundingClientRect();
                 return { id: heading.id, top: rect.top };
             });
 
-            // Bias towards headings near the top, but not too far above
             const activeHeading = headingPositions.reduce((closest, current) => {
                 if (current.top <= viewportOffset && current.top > closest.top) {
                     return current;
@@ -88,7 +91,6 @@ export function TableOfContents() {
             if (activeHeading.id && activeHeading.id !== activeIdRef.current) {
                 activeIdRef.current = activeHeading.id;
                 setActiveId(activeHeading.id);
-                window.history.replaceState(null, null, `#${activeHeading.id}`);
             } else if (!activeHeading.id && activeIdRef.current) {
                 activeIdRef.current = '';
                 setActiveId('');
@@ -98,7 +100,7 @@ export function TableOfContents() {
         const throttledHandleScroll = throttle(handleScroll, 100);
 
         window.addEventListener('scroll', throttledHandleScroll, { passive: true });
-        handleScroll(); // Call on initial render
+        handleScroll();
 
         return () => window.removeEventListener('scroll', throttledHandleScroll);
     }, []);
