@@ -88,8 +88,15 @@ async function processImage(file, sharp, exifr) {
     const dimensions = await probe(fs.createReadStream(filePath));
 
     const exifData = await exifr.parse(filePath, {
-        pick: ['Make', 'Model', 'LensModel', 'ISO', 'FNumber', 'ExposureTime']
+        pick: ['Orientation', 'Make', 'Model', 'LensModel', 'ISO', 'FNumber', 'ExposureTime']
     }).catch(() => null);
+
+    // EXIF orientation: values 5-8 indicate 90°/270° rotation → swap width/height
+    const orient = exifData?.Orientation;
+    const needsSwap = typeof orient === 'number' ? orient >= 5 && orient <= 8
+        : typeof orient === 'string' && (orient.includes('90') || orient.includes('270'));
+    const width = needsSwap ? dimensions.height : dimensions.width;
+    const height = needsSwap ? dimensions.width : dimensions.height;
 
     let thumbhash = null;
     let blurDataURL = null;
@@ -123,9 +130,9 @@ async function processImage(file, sharp, exifr) {
         blurDataURL,
         title,
         date: date ? date.toISOString() : null,
-        width: dimensions.width,
-        height: dimensions.height,
-        aspectRatio: `${dimensions.width}/${dimensions.height}`,
+        width,
+        height,
+        aspectRatio: `${width}/${height}`,
         exif
     };
 }

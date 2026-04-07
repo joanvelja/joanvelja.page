@@ -48,15 +48,15 @@ export default function ContactPage() {
                 </HeroReveal>
 
                 <ScrollReveal>
-                    <div className="flex items-start justify-center gap-8">
+                    <div className="flex items-start justify-center gap-10">
                         <a
                             href="https://x.com/joanvelja"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group flex flex-col items-center gap-1.5"
                         >
-                            <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-sky-500"><path d="M23.953 4.57a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 2.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 0 0-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 0 1-2.228-.616v.06a4.923 4.923 0 0 0 3.946 4.827 4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417 9.867 9.867 0 0 1-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0 0 24 4.59z" /></svg>
-                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">X</span>
+                            <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-9 h-9 text-neutral-700 dark:text-neutral-200 transition-colors duration-200 group-hover:text-sky-500"><path d="M23.953 4.57a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 2.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 0 0-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 0 1-2.228-.616v.06a4.923 4.923 0 0 0 3.946 4.827 4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417 9.867 9.867 0 0 1-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0 0 24 4.59z" /></svg>
+                            <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">X</span>
                         </a>
 
                         <a
@@ -65,16 +65,16 @@ export default function ContactPage() {
                             rel="noopener noreferrer"
                             className="group flex flex-col items-center gap-1.5"
                         >
-                            <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-violet-500"><path d={GITHUB_ICON_PATH} /></svg>
-                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">GitHub</span>
+                            <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-9 h-9 text-neutral-700 dark:text-neutral-200 transition-colors duration-200 group-hover:text-violet-500"><path d={GITHUB_ICON_PATH} /></svg>
+                            <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">GitHub</span>
                         </a>
 
                         <a
                             href="mailto:joan.velja22@gmail.com"
                             className="group flex flex-col items-center gap-1.5"
                         >
-                            <Mail className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-emerald-500" />
-                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">Email</span>
+                            <Mail className="w-9 h-9 text-neutral-700 dark:text-neutral-200 transition-colors duration-200 group-hover:text-emerald-500" />
+                            <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">Email</span>
                         </a>
 
                         <a
@@ -83,8 +83,8 @@ export default function ContactPage() {
                             rel="noopener noreferrer"
                             className="group flex flex-col items-center gap-1.5"
                         >
-                            <GraduationCap className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-oxford-500" />
-                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">Scholar</span>
+                            <GraduationCap className="w-9 h-9 text-neutral-700 dark:text-neutral-200 transition-colors duration-200 group-hover:text-oxford-500" />
+                            <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">Scholar</span>
                         </a>
 
                         <a
@@ -93,8 +93,8 @@ export default function ContactPage() {
                             rel="noopener noreferrer"
                             className="group flex flex-col items-center gap-1.5"
                         >
-                            <LessWrongIcon className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-orange-500" size={28} />
-                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">LessWrong</span>
+                            <LessWrongIcon className="w-9 h-9 text-neutral-700 dark:text-neutral-200 transition-colors duration-200 group-hover:text-orange-500" size={36} />
+                            <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">LessWrong</span>
                         </a>
 
                         <Link
@@ -102,8 +102,8 @@ export default function ContactPage() {
                             target="_blank"
                             className="group flex flex-col items-center gap-1.5"
                         >
-                            <FileText className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-red-500" />
-                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">CV</span>
+                            <FileText className="w-9 h-9 text-neutral-700 dark:text-neutral-200 transition-colors duration-200 group-hover:text-red-500" />
+                            <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">CV</span>
                         </Link>
                     </div>
                 </ScrollReveal>

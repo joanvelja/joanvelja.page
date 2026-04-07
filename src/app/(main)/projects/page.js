@@ -32,18 +32,18 @@ const Tag = ({ type }) => {
 const WorkListItem = ({ name, type, location, period, shortDescription, isSelected, onClick }) => (
     <div
         onClick={onClick}
-        className={`group flex items-center justify-between p-6 cursor-pointer transition-all duration-300
-            border-l-2 rounded-xl mb-3
+        className={`group flex items-center justify-between py-4 px-2 cursor-pointer transition-colors duration-200
+            border-l-2
             ${isSelected
-                ? 'bg-white dark:bg-neutral-800 shadow-md border-l-oxford-700 dark:border-l-oxford-300 border border-neutral-200 dark:border-neutral-700'
-                : 'border-l-transparent border border-transparent hover:bg-white dark:hover:bg-neutral-800 hover:shadow-sm hover:border-neutral-200 dark:hover:border-neutral-700 hover:border-l-oxford-700 dark:hover:border-l-oxford-300'}`}
+                ? 'border-l-oxford-700 dark:border-l-oxford-300'
+                : 'border-l-transparent hover:border-l-oxford-400 dark:hover:border-l-oxford-600'}`}
     >
-        <div className="flex flex-col gap-1">
-            <span className={`font-serif text-lg font-medium transition-colors ${isSelected ? 'text-oxford-700 dark:text-oxford-300' : 'text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300'}`}>
+        <div className="flex flex-col gap-0.5">
+            <span className={`font-serif-display text-lg font-medium transition-colors ${isSelected ? 'text-oxford-700 dark:text-oxford-300' : 'text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300'}`}>
                 {name}
             </span>
             {shortDescription && (
-                <span className="text-sm text-neutral-500 line-clamp-1 mt-1 font-serif">
+                <span className="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-1 font-serif">
                     {shortDescription}
                 </span>
             )}
@@ -51,7 +51,7 @@ const WorkListItem = ({ name, type, location, period, shortDescription, isSelect
         </div>
         <div className="flex flex-col items-end gap-2">
             <Tag type={type} />
-            <ChevronRight size={18} className={`text-neutral-400 transition-transform duration-300 ${isSelected ? 'rotate-90 text-oxford-500' : ''}`} />
+            <ChevronRight size={16} className={`text-neutral-400 transition-transform duration-200 ${isSelected ? 'rotate-90 text-oxford-500' : ''}`} />
         </div>
     </div>
 );
@@ -202,8 +202,9 @@ export default function ProjectsPage() {
         <main className="flex flex-col items-center justify-start w-full">
             <section className="w-full max-w-2xl px-4 md:px-0 py-8 space-y-10">
                 <ScrollReveal>
-                    <h3 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 mb-4 px-2 font-serif-display">Current</h3>
-                    <div className="space-y-2">
+                    <h3 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 mb-2 px-2 font-serif-display">Current</h3>
+                    <hr className="border-oxford-200 dark:border-oxford-800/60 mb-2" />
+                    <div className="divide-y divide-neutral-200/60 dark:divide-neutral-800/60">
                         {projects.present.map((project) => (
                             <WorkListItem
                                 key={project.name}
@@ -216,8 +217,9 @@ export default function ProjectsPage() {
                 </ScrollReveal>
 
                 <ScrollReveal delay={0.1}>
-                    <h3 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 mb-4 px-2 font-serif-display">Previous</h3>
-                    <div className="space-y-2">
+                    <h3 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 mb-2 px-2 font-serif-display">Previous</h3>
+                    <hr className="border-oxford-200 dark:border-oxford-800/60 mb-2" />
+                    <div className="divide-y divide-neutral-200/60 dark:divide-neutral-800/60">
                         {projects.past.map((project) => (
                             <WorkListItem
                                 key={project.name}
