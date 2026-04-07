@@ -96,7 +96,7 @@ const renderRelatedWork = (work) => (
         )}
 
         {work.publication_venue && (
-            <div className="mt-3 inline-block px-2 py-1 bg-white dark:bg-neutral-900 rounded border border-neutral-200 dark:border-neutral-700 text-xs font-medium text-neutral-600 dark:text-neutral-400 font-sans">
+            <div className="mt-3 inline-block px-2 py-1 bg-oxford-50 dark:bg-oxford-900/30 rounded border border-oxford-200 dark:border-oxford-800 text-xs font-medium text-oxford-700 dark:text-oxford-300 font-sans">
                 {work.publication_venue}
             </div>
         )}
@@ -161,7 +161,7 @@ const WorkDetailPanel = ({ project, onClose }) => {
 
                     <div className="space-y-6">
                         <div>
-                            <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-3 font-sans">Overview</h3>
+                            <h3 className="text-base font-medium italic text-oxford-700 dark:text-oxford-300 mb-3 font-serif-display">Overview</h3>
                             <p className="text-neutral-800 dark:text-neutral-200 leading-relaxed font-serif text-lg">
                                 {project.description}
                             </p>
@@ -169,7 +169,7 @@ const WorkDetailPanel = ({ project, onClose }) => {
 
                         {project.relatedWorks?.length > 0 && (
                             <div>
-                                <h3 className="text-sm font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-4 font-sans">Key Research & Projects</h3>
+                                <h3 className="text-base font-medium italic text-oxford-700 dark:text-oxford-300 mb-4 font-serif-display">Key Research & Projects</h3>
                                 <div className="space-y-4">
                                     {project.relatedWorks.map(renderRelatedWork)}
                                 </div>
@@ -202,7 +202,7 @@ export default function ProjectsPage() {
         <main className="flex flex-col items-center justify-start w-full">
             <section className="w-full max-w-2xl px-4 md:px-0 py-8 space-y-10">
                 <ScrollReveal>
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-4 px-2 font-sans">Current</h3>
+                    <h3 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 mb-4 px-2 font-serif-display">Current</h3>
                     <div className="space-y-2">
                         {projects.present.map((project) => (
                             <WorkListItem
@@ -216,7 +216,7 @@ export default function ProjectsPage() {
                 </ScrollReveal>
 
                 <ScrollReveal delay={0.1}>
-                    <h3 className="text-sm font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 mb-4 px-2 font-sans">Previous</h3>
+                    <h3 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 mb-4 px-2 font-serif-display">Previous</h3>
                     <div className="space-y-2">
                         {projects.past.map((project) => (
                             <WorkListItem

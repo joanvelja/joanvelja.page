@@ -2,36 +2,48 @@
 
 import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import { m } from 'framer-motion';
 import { LightboxProvider, useLightbox, useThumbnailRegistryContext } from '@/components/Lightbox/LightboxProvider';
-import { LightboxOverlay } from '@/components/Lightbox/LightboxOverlay';
 import { useImageLazyLoad } from '@/hooks/useImageLazyLoad';
-import { formatDate } from '@/lib/utils';
-import { thumbHashToDataURL } from 'thumbhash';
 
-function decodeThumbhash(base64) {
-  if (!base64) return null;
-  try {
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-      bytes[i] = binary.charCodeAt(i);
-    }
-    return thumbHashToDataURL(bytes);
-  } catch {
-    return null;
-  }
+const LightboxOverlay = dynamic(
+  () => import('@/components/Lightbox/LightboxOverlay').then(m => m.LightboxOverlay),
+  { ssr: false }
+);
+
+function distributeToColumns(photos, numCols) {
+  const columns = Array.from({ length: numCols }, () => ({ items: [], height: 0 }));
+  photos.forEach((photo, index) => {
+    const [w, h] = (photo.aspectRatio || '1/1').split('/').map(Number);
+    const shortest = columns.reduce((min, col, i) =>
+      col.height < columns[min].height ? i : min, 0);
+    columns[shortest].items.push({ photo, index });
+    columns[shortest].height += h / w;
+  });
+  return columns.map(col => col.items);
 }
 
-function PhotoGridItem({ photo, index, isFullSpan, isCentered, openLightbox }) {
+function useColumnCount() {
+  const [cols, setCols] = useState(3);
+  useEffect(() => {
+    const update = () => setCols(window.innerWidth >= 768 ? 3 : 2);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+  return cols;
+}
+
+const ABOVE_FOLD_COUNT = 6;
+
+function PhotoGridItem({ photo, index, openLightbox }) {
   const { register } = useThumbnailRegistryContext();
+  const isAboveFold = index < ABOVE_FOLD_COUNT;
   const { ref: lazyRef, isVisible, hasLoaded, onLoad } = useImageLazyLoad();
   const elementRef = useRef(null);
-  const [overlayVisible, setOverlayVisible] = useState(true);
 
   const [width, height] = (photo.aspectRatio || '1/1').split('/').map(Number);
-  const paddingTop = `${(height / width) * 100}%`;
-  const blurDataURL = useMemo(() => decodeThumbhash(photo.thumbhash), [photo.thumbhash]);
 
   const setRef = useCallback((el) => {
     elementRef.current = el;
@@ -44,86 +56,58 @@ function PhotoGridItem({ photo, index, isFullSpan, isCentered, openLightbox }) {
   }, [photo.id, register]);
 
   const handleClick = useCallback(() => {
-    setOverlayVisible(false);
-    requestAnimationFrame(() => {
-      openLightbox(index, undefined);
-      setTimeout(() => setOverlayVisible(true), 400);
-    });
+    openLightbox(index, undefined);
   }, [index, openLightbox]);
+
+  const shouldRender = isAboveFold || isVisible;
 
   return (
     <m.div
       ref={setRef}
       layoutId={`photo-${photo.id}`}
       onClick={handleClick}
-      className={`photo-grid-item relative cursor-pointer group ${
-        isFullSpan ? 'col-span-2 md:col-span-3' : ''
-      } ${
-        isCentered ? 'md:col-start-2' : ''
-      }`}
-      style={{ paddingTop, borderRadius: 16 }}
+      className="photo-grid-item relative cursor-pointer group"
+      style={{ aspectRatio: `${width}/${height}`, borderRadius: 16 }}
     >
-      {blurDataURL && !hasLoaded && (
+      {photo.blurDataURL && !hasLoaded && (
         <img
-          src={blurDataURL}
+          src={photo.blurDataURL}
           alt=""
           className="absolute inset-0 w-full h-full object-cover rounded-2xl"
           aria-hidden="true"
         />
       )}
 
-      {isVisible && (
+      {shouldRender && (
         <Image
           src={photo.src}
           alt={photo.alt}
           fill
+          priority={isAboveFold}
           className={`absolute inset-0 object-cover rounded-2xl transition-opacity duration-500 ${
             hasLoaded ? 'opacity-100' : 'opacity-0'
           }`}
-          sizes={isFullSpan
-            ? '(max-width: 768px) 100vw, 1200px'
-            : '(max-width: 768px) 50vw, 33vw'
-          }
+          sizes="(max-width: 768px) 50vw, min(400px, 33vw)"
           onLoad={onLoad}
         />
       )}
 
-      <div
-        className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100
-                    transition-opacity duration-300 rounded-2xl flex flex-col
-                    justify-end p-4 ${!overlayVisible ? '!opacity-0' : ''}`}
-      >
-        <p className="text-white font-medium text-sm font-serif">
-          {photo.title}
-        </p>
-        <p className="text-white/80 text-xs font-sans">
-          {formatDate(photo.date)}
-        </p>
-      </div>
     </m.div>
   );
 }
 
 function PhotoGrid({ photos }) {
   const { setPhotos, openLightbox } = useLightbox();
+  const numCols = useColumnCount();
 
   useEffect(() => {
     setPhotos(photos);
   }, [photos, setPhotos]);
 
-  const shouldSpanFull = (photo) => {
-    const [width, height] = (photo.aspectRatio || '1/1').split('/').map(Number);
-    return width > height;
-  };
-
-  const shouldCenter = (photo, index) => {
-    if (shouldSpanFull(photo)) return false;
-    const prevPhoto = photos[index - 1];
-    const nextPhoto = photos[index + 1];
-    const prevSpans = prevPhoto && shouldSpanFull(prevPhoto);
-    const nextSpans = nextPhoto && shouldSpanFull(nextPhoto);
-    return (prevSpans && (!nextPhoto || nextSpans)) || (!prevPhoto && nextSpans);
-  };
+  const columns = useMemo(
+    () => distributeToColumns(photos, numCols),
+    [photos, numCols]
+  );
 
   if (photos.length === 0) {
     return (
@@ -134,16 +118,18 @@ function PhotoGrid({ photos }) {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 auto-rows-[1fr]">
-      {photos.map((photo, index) => (
-        <PhotoGridItem
-          key={photo.id}
-          photo={photo}
-          index={index}
-          isFullSpan={shouldSpanFull(photo)}
-          isCentered={shouldCenter(photo, index)}
-          openLightbox={openLightbox}
-        />
+    <div className="flex gap-4">
+      {columns.map((colItems, colIndex) => (
+        <div key={colIndex} className="flex-1 flex flex-col gap-4">
+          {colItems.map(({ photo, index }) => (
+            <PhotoGridItem
+              key={photo.id}
+              photo={photo}
+              index={index}
+              openLightbox={openLightbox}
+            />
+          ))}
+        </div>
       ))}
     </div>
   );

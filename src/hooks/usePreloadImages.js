@@ -1,16 +1,16 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
+import { getOptimizedSrc } from '@/lib/utils';
 
 export function usePreloadImages(photos, currentIndex, isOpen) {
   const preloadedRef = useRef(new Set());
   const linksRef = useRef([]);
 
-  // Add preload links when index changes
   useEffect(() => {
     if (!isOpen || currentIndex === null) return;
 
-    const indices = [currentIndex - 2, currentIndex - 1, currentIndex + 1, currentIndex + 2]
+    const indices = [currentIndex - 1, currentIndex + 1]
       .filter(i => i >= 0 && i < photos.length);
 
     indices.forEach(i => {
@@ -21,13 +21,12 @@ export function usePreloadImages(photos, currentIndex, isOpen) {
       const link = document.createElement('link');
       link.rel = 'preload';
       link.as = 'image';
-      link.href = src;
+      link.href = getOptimizedSrc(src);
       document.head.appendChild(link);
       linksRef.current.push(link);
     });
   }, [photos, currentIndex, isOpen]);
 
-  // Clean up only when lightbox closes
   useEffect(() => {
     if (isOpen) return;
 

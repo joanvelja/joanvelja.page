@@ -35,6 +35,8 @@ export function LightboxProvider({ children }) {
     };
   }, []);
 
+  const didPushRef = useRef(false);
+
   const openLightbox = useCallback((index, photos, options = {}) => {
     const { updateUrl = true } = options;
     if (photos) photosRef.current = photos;
@@ -47,6 +49,7 @@ export function LightboxProvider({ children }) {
     const photo = photosRef.current[index];
     if (updateUrl && photo?.id) {
       window.history.pushState({}, '', `/photos?image=${photo.id}`);
+      didPushRef.current = true;
     }
   }, [isOpen]);
 
@@ -60,7 +63,12 @@ export function LightboxProvider({ children }) {
 
     dispatch({ type: 'CLOSE' });
     if (updateUrl) {
-      window.history.pushState({}, '', '/photos');
+      if (didPushRef.current) {
+        window.history.back();
+      } else {
+        window.history.replaceState({}, '', '/photos');
+      }
+      didPushRef.current = false;
     }
   }, [isOpen]);
 
@@ -86,6 +94,7 @@ export function LightboxProvider({ children }) {
           openLightbox(index, undefined, { updateUrl: false });
         }
       } else {
+        didPushRef.current = false;
         closeLightbox({ updateUrl: false });
       }
     };

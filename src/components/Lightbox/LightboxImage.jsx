@@ -3,6 +3,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { m, useMotionValue, useSpring } from 'framer-motion';
 import { useGesture } from '@use-gesture/react';
+import { getOptimizedSrc } from '@/lib/utils';
 
 const SPRINGS = {
   morph: { stiffness: 130, damping: 19, mass: 1 },
@@ -18,7 +19,7 @@ const ZOOM_HYSTERESIS = 1.1;
 
 export function LightboxImage({ photo, onDismiss, onImageError }) {
   const containerRef = useRef(null);
-  const zoomStateRef = useRef('FIT'); // FIT | ZOOMING | ZOOMED | RESETTING
+  const zoomStateRef = useRef('FIT');
   const lastTapRef = useRef(0);
 
   const rawScale = useMotionValue(1);
@@ -73,7 +74,7 @@ export function LightboxImage({ photo, onDismiss, onImageError }) {
         rawY.set(oy);
         return memo;
       },
-      onDragEnd: ({ offset: [, oy], velocity: [, vy] }) => {
+      onDragEnd: ({ offset: [ox, oy], velocity: [, vy] }) => {
         const currentScale = rawScale.get();
 
         if (currentScale <= ZOOM_HYSTERESIS) {
@@ -87,6 +88,14 @@ export function LightboxImage({ photo, onDismiss, onImageError }) {
           return;
         }
 
+        const el = containerRef.current;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          const maxX = (rect.width * (currentScale - 1)) / 2;
+          const maxY = (rect.height * (currentScale - 1)) / 2;
+          rawX.set(Math.max(-maxX, Math.min(maxX, ox)));
+          rawY.set(Math.max(-maxY, Math.min(maxY, oy)));
+        }
       },
       onPinch: ({ offset: [s], memo }) => {
         const clamped = Math.min(Math.max(s, MIN_SCALE), MAX_SCALE);
@@ -156,7 +165,7 @@ export function LightboxImage({ photo, onDismiss, onImageError }) {
       onClick={handleTap}
     >
       <m.img
-        src={photo.src}
+        src={getOptimizedSrc(photo.src)}
         alt={photo.alt || photo.title}
         className="max-w-full max-h-full object-contain select-none"
         style={{ scale, x, y }}

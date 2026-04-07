@@ -27,7 +27,7 @@ const NAV_ITEMS = [
 
 export default function MainLayout({ children }) {
     const pathname = usePathname();
-    const { theme, setTheme } = useTheme();
+    const { resolvedTheme, setTheme } = useTheme();
     const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
     const dockRef = useRef(null);
     const headerRef = useRef(null);
@@ -37,7 +37,7 @@ export default function MainLayout({ children }) {
     useScrollDirection(dockRef, headerRef);
 
     const toggleTheme = () => {
-        setTheme(theme === 'dark' ? 'light' : 'dark');
+        setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
     };
 
     if (!mounted) {
@@ -61,7 +61,7 @@ export default function MainLayout({ children }) {
                 <div className="max-w-[1200px] mx-auto px-5 md:px-8">
                     <div className="flex flex-row justify-between w-full md:p-3 p-1">
                         <div className="w-[130px] flex flex-col justify-center">
-                            <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">Joan's Website</p>
+                            <p className="font-light text-neutral-600 dark:text-neutral-400 text-sm md:text-base font-sans">Joan Velja</p>
                         </div>
                         <div className="flex items-center justify-center">
                             <AnimatePresence mode="popLayout">
@@ -86,13 +86,13 @@ export default function MainLayout({ children }) {
                                 >
                                     <AnimatePresence mode="wait" initial={false}>
                                         <m.div
-                                            key={theme}
+                                            key={resolvedTheme}
                                             initial={{ opacity: 0, rotate: -90, scale: 0.8 }}
                                             animate={{ opacity: 1, rotate: 0, scale: 1 }}
                                             exit={{ opacity: 0, rotate: 90, scale: 0.8 }}
                                             transition={{ duration: 0.15 }}
                                         >
-                                            {theme === 'light' ? (
+                                            {resolvedTheme === 'light' ? (
                                                 <Moon size={20} className="text-neutral-600" />
                                             ) : (
                                                 <Sun size={20} className="text-neutral-400" />
@@ -119,7 +119,7 @@ export default function MainLayout({ children }) {
                         className="fixed bottom-8 pb-[env(safe-area-inset-bottom)] flex flex-col justify-end transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] translate-y-0 opacity-100 data-[hidden=true]:translate-y-[calc(100%+3rem)] data-[hidden=true]:opacity-0"
                     >
                         <div className="z-10 pointer-events-auto">
-                            <div className="gap-2 flex flex-row bg-white/80 dark:bg-neutral-800/80 backdrop-blur-md shadow-lg rounded-2xl p-[8px]">
+                            <div className="gap-1 flex flex-row bg-white/70 dark:bg-neutral-800/70 backdrop-blur-md shadow-sm border border-neutral-200/40 dark:border-neutral-700/40 rounded-xl p-[6px]">
                                 {NAV_ITEMS.map((item) => {
                                     const isActive = pathname === item.path || (item.path !== '/about' && pathname.startsWith(item.path));
 
@@ -131,7 +131,6 @@ export default function MainLayout({ children }) {
                                             name={item.name}
                                             colorClass={item.color}
                                             isActive={isActive}
-                                            theme={theme}
                                         />
                                     );
                                 })}

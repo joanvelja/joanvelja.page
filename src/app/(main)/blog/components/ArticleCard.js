@@ -40,7 +40,7 @@ export function ArticleCard({ post }) {
                     ))}
                 </div>
                 
-                <h2 className="text-xl font-medium text-neutral-900 dark:text-white mb-2 line-clamp-2 font-serif tracking-tight leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <h2 className="text-xl font-medium text-neutral-900 dark:text-white mb-2 line-clamp-2 font-serif tracking-tight leading-snug group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
                     {post.title}
                 </h2>
 

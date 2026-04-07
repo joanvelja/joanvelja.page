@@ -30,8 +30,8 @@ export default function ContactPage() {
             <section className="w-full max-w-[540px] space-y-12 px-4 py-16">
                 <HeroReveal className="space-y-6">
                     <HeroItem>
-                        <h1 className="text-2xl md:text-display font-serif-display font-medium text-neutral-900 dark:text-white">
-                            Say hello
+                        <h1 className="text-3xl md:text-display font-serif-display font-medium text-neutral-900 dark:text-white">
+                            Contact
                         </h1>
                     </HeroItem>
                     <HeroItem>
@@ -39,7 +39,7 @@ export default function ContactPage() {
                             href="https://calendar.app.google/4SE9NkamgzSWytEXA"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-full font-sans font-medium hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                            className="group inline-flex items-center gap-2 px-6 py-3 bg-oxford-800 text-white dark:bg-oxford-100 dark:text-oxford-900 rounded-full font-sans font-medium hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-200"
                         >
                             Schedule a call
                             <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />

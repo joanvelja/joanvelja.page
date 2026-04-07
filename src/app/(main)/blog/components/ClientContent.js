@@ -42,7 +42,7 @@ export function ClientContent({ initialPosts, allTags }) {
                                  placeholder-neutral-400 dark:placeholder-neutral-500
                                  font-serif tracking-wide text-[0.95rem]
                                  transition-all duration-300
-                                 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-500 focus:bg-white/90 dark:focus:bg-neutral-800/90"
+                                 focus:outline-none focus:border-oxford-300 dark:focus:border-oxford-700 focus:bg-white/90 dark:focus:bg-neutral-800/90"
                     />
                 </div>
 

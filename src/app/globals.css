@@ -92,9 +92,14 @@ body {
 
 /* Distill-style link underlines */
 .blog-content a {
+  color: #334e68;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
+}
+
+.dark .blog-content a {
+  color: #9fb3c8;
 }
 
 .blog-content a:hover {

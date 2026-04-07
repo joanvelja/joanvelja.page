@@ -40,7 +40,7 @@ export default async function AboutPage() {
                     </HeroItem>
 
                     <HeroItem className="space-y-4">
-                        <h1 className="text-3xl md:text-display font-serif-display font-medium text-neutral-900 dark:text-neutral-100 tracking-tight">
+                        <h1 className="text-4xl md:text-display-large font-serif-display font-medium text-neutral-900 dark:text-neutral-100 tracking-tight">
                             Hi, I'm Joan.
                         </h1>
                         <div className="prose dark:prose-invert max-w-none">
@@ -51,33 +51,32 @@ export default async function AboutPage() {
                     </HeroItem>
                 </HeroReveal>
 
-                <hr className="border-neutral-200/50 dark:border-neutral-800/50 w-1/3 mx-auto my-12" />
+                <hr className="border-oxford-200 dark:border-oxford-800/60 w-16 mx-auto my-14" />
 
                 <div className="text-neutral-900 dark:text-neutral-200 w-full">
                     {featuredWorks.length > 0 && (
                         <ScrollReveal className="mt-12">
-                            <h2 className="text-sm font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-sans mb-4">Selected Research</h2>
-                            <div className="grid gap-4">
+                            <h2 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 font-serif-display mb-2">Selected Research</h2>
+                            <hr className="border-oxford-200 dark:border-oxford-800/60 mb-6" />
+                            <div className="divide-y divide-oxford-100 dark:divide-oxford-900/40">
                                 {featuredWorks.map((work) => (
-                                    <div key={work.title} className="group bg-white dark:bg-neutral-800/50 rounded-xl p-5 border border-neutral-200 dark:border-neutral-800 hover:border-oxford-200 dark:hover:border-oxford-900/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
+                                    <div key={work.title} className="group py-5 first:pt-0">
                                         <div className="flex justify-between items-start gap-4">
-                                            <h3 className="text-lg font-medium font-serif-display text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
+                                            <h3 className="text-xl font-medium font-serif-display text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
                                                 {work.title}
                                             </h3>
                                             {work.links && work.links[0] && (
-                                                <a href={work.links[0].url} target="_blank" rel="noopener noreferrer" className="text-neutral-400 hover:text-oxford-700 transition-all group-hover:rotate-[-3deg]">
-                                                    <ExternalLink size={18} />
+                                                <a href={work.links[0].url} target="_blank" rel="noopener noreferrer" className="text-oxford-400 dark:text-oxford-500 hover:text-oxford-700 dark:hover:text-oxford-300 transition-colors mt-1">
+                                                    <ExternalLink size={16} />
                                                 </a>
                                             )}
                                         </div>
                                         <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 font-serif leading-relaxed line-clamp-3">
                                             {renderTextWithLinks(work.description)}
                                         </p>
-                                        <div className="mt-3 flex items-center gap-2">
-                                            <span className="text-xs font-medium px-2 py-1 bg-neutral-100 dark:bg-neutral-800 rounded text-neutral-600 dark:text-neutral-400 font-sans">
-                                                {work.publication_venue}
-                                            </span>
-                                        </div>
+                                        <span className="inline-block mt-3 text-xs font-medium px-2 py-0.5 bg-oxford-50 dark:bg-oxford-900/30 rounded border border-oxford-200 dark:border-oxford-800 text-oxford-700 dark:text-oxford-300 font-sans">
+                                            {work.publication_venue}
+                                        </span>
                                     </div>
                                 ))}
                             </div>
@@ -91,14 +90,12 @@ export default async function AboutPage() {
 
                     {featuredPost && (
                         <ScrollReveal className="mt-12">
-                            <h2 className="text-sm font-bold uppercase tracking-widest text-neutral-400 dark:text-neutral-500 font-sans mb-4">Latest Writing</h2>
-                            <Link href={`/blog/${featuredPost.slug}`} className="block group bg-white dark:bg-neutral-800/50 rounded-xl p-5 border border-neutral-200 dark:border-neutral-800 hover:border-oxford-200 dark:hover:border-oxford-900/50 hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
-                                <div className="flex justify-between items-start gap-4">
-                                    <h3 className="text-lg font-medium font-serif-display text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
-                                        {featuredPost.title}
-                                    </h3>
-                                    <ArrowRight size={18} className="text-neutral-400 group-hover:text-oxford-700 transition-all group-hover:translate-x-1" />
-                                </div>
+                            <h2 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 font-serif-display mb-2">Latest Writing</h2>
+                            <hr className="border-oxford-200 dark:border-oxford-800/60 mb-6" />
+                            <Link href={`/blog/${featuredPost.slug}`} className="block group border-l-2 border-l-oxford-600 dark:border-l-oxford-400 pl-5 py-1 hover:border-l-oxford-800 dark:hover:border-l-oxford-200 transition-colors">
+                                <h3 className="text-xl font-medium font-serif-display text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
+                                    {featuredPost.title}
+                                </h3>
                                 <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 font-serif leading-relaxed line-clamp-2">
                                     {featuredPost.excerpt}
                                 </p>
@@ -118,12 +115,12 @@ export default async function AboutPage() {
 
                     <ScrollReveal className="mt-16">
                         <div className="flex flex-col items-center">
-                            <p className="text-base font-serif text-neutral-500 dark:text-neutral-400 mb-4">Want to collaborate?</p>
+                            <p className="text-base font-serif text-neutral-500 dark:text-neutral-400 mb-4">I like talking to people working on alignment, RL, forecasting, or anything I'd find on my own reading list.</p>
                             <a
                                 href="https://calendar.app.google/4SE9NkamgzSWytEXA"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group inline-flex items-center gap-2 px-6 py-3 bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 rounded-full font-sans font-medium hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                                className="group inline-flex items-center gap-2 px-6 py-3 bg-oxford-800 text-white dark:bg-oxford-100 dark:text-oxford-900 rounded-full font-sans font-medium hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-200"
                             >
                                 Schedule a call
                                 <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />

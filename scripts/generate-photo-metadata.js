@@ -6,6 +6,8 @@ const probe = require('probe-image-size');
 const PHOTOS_DIR = path.join(process.cwd(), 'public', 'images', 'photos');
 const OUTPUT_PATH = path.join(process.cwd(), 'src', 'data', 'photo-manifest.json');
 const IMAGE_PATTERN = /\.(jpg|jpeg|png|webp)$/i;
+const HEIC_PATTERN = /\.heic$/i;
+const MONTHS = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
 
 function parsePhotoInfo(filename) {
     const nameWithoutExt = path.basename(filename, path.extname(filename));
@@ -22,12 +24,22 @@ function parsePhotoInfo(filename) {
         }
     }
 
+    let parsedDate = null;
+    if (date) {
+        const m = date.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{4})\b/);
+        if (m) {
+            parsedDate = new Date(Date.UTC(parseInt(m[2]), MONTHS[m[1]], 1, 12, 0, 0));
+        } else {
+            parsedDate = new Date(date);
+        }
+    }
+
     return {
         title: title
             .split(/[-_\s]/)
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' '),
-        date: date ? new Date(date) : null
+        date: parsedDate
     };
 }
 
@@ -57,7 +69,7 @@ async function loadSharp() {
 async function generateThumbhash(filePath, sharp) {
     if (!sharp) return null;
 
-    const { rgbaToThumbHash } = await import('thumbhash');
+    const { rgbaToThumbHash, thumbHashToDataURL } = await import('thumbhash');
     const { data, info } = await sharp(filePath)
         .resize(100, 100, { fit: 'inside' })
         .ensureAlpha()
@@ -65,7 +77,9 @@ async function generateThumbhash(filePath, sharp) {
         .toBuffer({ resolveWithObject: true });
 
     const hash = rgbaToThumbHash(info.width, info.height, data);
-    return Buffer.from(hash).toString('base64');
+    const base64 = Buffer.from(hash).toString('base64');
+    const dataURL = thumbHashToDataURL(hash);
+    return { base64, dataURL };
 }
 
 async function processImage(file, sharp, exifr) {
@@ -78,8 +92,13 @@ async function processImage(file, sharp, exifr) {
     }).catch(() => null);
 
     let thumbhash = null;
+    let blurDataURL = null;
     try {
-        thumbhash = await generateThumbhash(filePath, sharp);
+        const result = await generateThumbhash(filePath, sharp);
+        if (result) {
+            thumbhash = result.base64;
+            blurDataURL = result.dataURL;
+        }
     } catch (err) {
         console.warn(`  Warning: thumbhash generation failed for ${file}: ${err.message}`);
     }
@@ -101,6 +120,7 @@ async function processImage(file, sharp, exifr) {
         id,
         src: publicPath,
         thumbhash,
+        blurDataURL,
         title,
         date: date ? date.toISOString() : null,
         width: dimensions.width,
@@ -110,12 +130,40 @@ async function processImage(file, sharp, exifr) {
     };
 }
 
+async function convertHeicFiles() {
+    const { execFileSync } = require('child_process');
+
+    const files = await fsp.readdir(PHOTOS_DIR);
+    const heicFiles = files.filter(file => HEIC_PATTERN.test(file));
+
+    if (heicFiles.length === 0) return;
+
+    console.log(`Converting ${heicFiles.length} HEIC files via sips...`);
+
+    for (const heicFile of heicFiles) {
+        const baseName = path.basename(heicFile, path.extname(heicFile));
+        const heicPath = path.join(PHOTOS_DIR, heicFile);
+        const jpgPath = path.join(PHOTOS_DIR, `${baseName}.jpg`);
+
+        try {
+            execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '92', heicPath, '--out', jpgPath]);
+            console.log(`  ${heicFile} → ${baseName}.jpg`);
+        } catch (err) {
+            console.error(`  Error converting ${heicFile}: ${err.message}`);
+        }
+    }
+
+    console.log('');
+}
+
 async function main() {
     const sharp = await loadSharp();
     if (!sharp) {
         console.warn('Warning: sharp not available. Thumbhash generation will be skipped.');
         console.warn('Install sharp as a devDependency for blur placeholders: bun add -d sharp');
     }
+
+    await convertHeicFiles();
 
     const exifrModule = await import('exifr');
     const exifr = exifrModule.default || exifrModule;

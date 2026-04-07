@@ -43,6 +43,10 @@ export function slugify(text) {
         .replace(/(^-|-$)/g, '');
 }
 
+export function getOptimizedSrc(src) {
+  return `/_next/image?url=${encodeURIComponent(src)}&w=1920&q=75`;
+}
+
 export function renderTextWithLinks(text) {
     if (!text) return null;
 
