@@ -74,19 +74,15 @@ export function TableOfContents() {
     // Track active heading based on scroll position
     useEffect(() => {
         const handleScroll = () => {
-            const viewportOffset = 150;
+            const scrollTop = window.scrollY;
+            const threshold = scrollTop + 150;
 
-            const headingPositions = headingElementsRef.current.map(heading => {
-                const rect = heading.getBoundingClientRect();
-                return { id: heading.id, top: rect.top };
-            });
-
-            const activeHeading = headingPositions.reduce((closest, current) => {
-                if (current.top <= viewportOffset && current.top > closest.top) {
+            const activeHeading = headingPositionsRef.current.reduce((closest, current) => {
+                if (current.offsetTop <= threshold && current.offsetTop > closest.offsetTop) {
                     return current;
                 }
                 return closest;
-            }, { id: '', top: -Infinity });
+            }, { id: '', offsetTop: -Infinity });
 
             if (activeHeading.id && activeHeading.id !== activeIdRef.current) {
                 activeIdRef.current = activeHeading.id;

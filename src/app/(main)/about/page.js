@@ -5,7 +5,7 @@ import { ExternalLink, ArrowRight } from 'lucide-react';
 import { getAllPosts } from '@/lib/mdx';
 import { HeroReveal, HeroItem } from '@/components/HeroReveal';
 import { ScrollReveal } from '@/components/ScrollReveal';
-import { renderTextWithLinks } from '@/lib/utils';
+import { renderTextWithLinks, formatDate } from '@/lib/utils';
 
 export const metadata = {
     title: 'About | Joan Velja',
@@ -100,7 +100,7 @@ export default async function AboutPage() {
                                     {featuredPost.excerpt}
                                 </p>
                                 <div className="mt-3 flex items-center gap-3 text-xs text-neutral-500 dark:text-neutral-400 font-sans">
-                                    <span>{new Date(featuredPost.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                                    <span>{formatDate(featuredPost.date, 'long')}</span>
                                     <span>&middot;</span>
                                     <span>{featuredPost.readingTime} min read</span>
                                 </div>

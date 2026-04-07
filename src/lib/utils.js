@@ -16,11 +16,14 @@ export function throttle(fn, ms) {
     };
 }
 
-export function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
+const DATE_FORMATS = {
+  'month-year': { month: 'long', year: 'numeric' },
+  long: { month: 'long', day: 'numeric', year: 'numeric' },
+  short: { month: 'short', day: 'numeric', year: 'numeric' },
+};
+
+export function formatDate(date, style = 'month-year') {
+  return new Date(date).toLocaleDateString('en-US', DATE_FORMATS[style]);
 }
 
 export function estimateReadingTime(text) {

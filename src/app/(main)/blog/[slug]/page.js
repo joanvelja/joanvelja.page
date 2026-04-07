@@ -1,4 +1,5 @@
 import { getPostBySlug, getAllPosts, getPostFrontmatter } from '@/lib/mdx';
+import { formatDate } from '@/lib/utils';
 import { ShareButton } from '../components/ShareButton';
 import { ReadingProgress } from '../components/ReadingProgress';
 import { SidenotesProvider } from '@/components/Sidenotes';
@@ -78,11 +79,7 @@ export default async function BlogPost({ params }) {
                             </h1>
                             <div className="flex items-center justify-between text-neutral-600 dark:text-neutral-400 font-sans">
                                 <time dateTime={post.date}>
-                                    {new Date(post.date).toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                    })}
+                                    {formatDate(post.date, 'long')}
                                 </time>
                                 <div className="flex items-center gap-4">
                                     {!post.isProtected && <span>{post.readingTime} min read</span>}

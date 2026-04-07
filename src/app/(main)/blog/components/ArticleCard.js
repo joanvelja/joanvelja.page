@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatDate } from '@/lib/utils';
 
 export function ArticleCard({ post }) {
     return (
@@ -49,7 +50,7 @@ export function ArticleCard({ post }) {
 
                 <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 font-sans tracking-wide border-t border-neutral-100 dark:border-neutral-800 pt-3 mt-3">
                     <span className="uppercase">
-                        {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {formatDate(post.date, 'short')}
                     </span>
                     <span>
                         {post.readingTime} min read

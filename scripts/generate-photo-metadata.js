@@ -85,11 +85,12 @@ async function generateThumbhash(filePath, sharp) {
 async function processImage(file, sharp, exifr) {
     const filePath = path.join(PHOTOS_DIR, file);
 
-    const dimensions = await probe(fs.createReadStream(filePath));
-
-    const exifData = await exifr.parse(filePath, {
-        pick: ['Orientation', 'Make', 'Model', 'LensModel', 'ISO', 'FNumber', 'ExposureTime']
-    }).catch(() => null);
+    const [dimensions, exifData] = await Promise.all([
+        probe(fs.createReadStream(filePath)),
+        exifr.parse(filePath, {
+            pick: ['Orientation', 'Make', 'Model', 'LensModel', 'ISO', 'FNumber', 'ExposureTime']
+        }).catch(() => null),
+    ]);
 
     // EXIF orientation: values 5-8 indicate 90°/270° rotation → swap width/height
     const orient = exifData?.Orientation;
@@ -138,7 +139,9 @@ async function processImage(file, sharp, exifr) {
 }
 
 async function convertHeicFiles() {
-    const { execFileSync } = require('child_process');
+    const { execFile } = require('child_process');
+    const { promisify } = require('util');
+    const execFileAsync = promisify(execFile);
 
     const files = await fsp.readdir(PHOTOS_DIR);
     const heicFiles = files.filter(file => HEIC_PATTERN.test(file));
@@ -147,18 +150,18 @@ async function convertHeicFiles() {
 
     console.log(`Converting ${heicFiles.length} HEIC files via sips...`);
 
-    for (const heicFile of heicFiles) {
+    await Promise.all(heicFiles.map(async (heicFile) => {
         const baseName = path.basename(heicFile, path.extname(heicFile));
         const heicPath = path.join(PHOTOS_DIR, heicFile);
         const jpgPath = path.join(PHOTOS_DIR, `${baseName}.jpg`);
 
         try {
-            execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '92', heicPath, '--out', jpgPath]);
+            await execFileAsync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '92', heicPath, '--out', jpgPath]);
             console.log(`  ${heicFile} → ${baseName}.jpg`);
         } catch (err) {
             console.error(`  Error converting ${heicFile}: ${err.message}`);
         }
-    }
+    }));
 
     console.log('');
 }

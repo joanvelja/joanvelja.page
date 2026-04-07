@@ -8,7 +8,7 @@ import { LightboxProvider, useLightbox, useThumbnailRegistryContext } from '@/co
 import { useImageLazyLoad } from '@/hooks/useImageLazyLoad';
 
 const LightboxOverlay = dynamic(
-  () => import('@/components/Lightbox/LightboxOverlay').then(m => m.LightboxOverlay),
+  () => import('@/components/Lightbox/LightboxOverlay').then(mod => mod.LightboxOverlay),
   { ssr: false }
 );
 
@@ -27,10 +27,11 @@ function distributeToColumns(photos, numCols) {
 function useColumnCount() {
   const [cols, setCols] = useState(3);
   useEffect(() => {
-    const update = () => setCols(window.innerWidth >= 768 ? 3 : 2);
-    update();
-    window.addEventListener('resize', update);
-    return () => window.removeEventListener('resize', update);
+    const mql = window.matchMedia('(min-width: 768px)');
+    const update = (e) => setCols(e.matches ? 3 : 2);
+    setCols(mql.matches ? 3 : 2);
+    mql.addEventListener('change', update);
+    return () => mql.removeEventListener('change', update);
   }, []);
   return cols;
 }
