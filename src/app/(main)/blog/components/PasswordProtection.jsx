@@ -114,7 +114,7 @@ export function PasswordProtection({ post, onDecrypt }) {
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-neutral-900 dark:text-white"
+            className="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-oxford-500 dark:bg-neutral-900 dark:text-white"
             placeholder="Enter password"
             autoComplete="off"
             disabled={isLoading}
@@ -130,7 +130,7 @@ export function PasswordProtection({ post, onDecrypt }) {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-oxford-600 hover:bg-oxford-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-oxford-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Verifying...' : 'Unlock Content'}
         </button>

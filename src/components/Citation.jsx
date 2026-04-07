@@ -98,7 +98,7 @@ export function Citation({
                             href={url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-2 block text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                            className="mt-2 block text-xs text-oxford-700 dark:text-oxford-300 hover:underline truncate"
                         >
                             {url}
                         </a>
@@ -144,7 +144,7 @@ export function Bibliography() {
                                         href={url}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                                        className="text-oxford-700 dark:text-oxford-300 hover:underline break-all"
                                     >
                                         [link]
                                     </a>
@@ -152,7 +152,7 @@ export function Bibliography() {
                             )}
                             <a
                                 href={`#ref-${number}`}
-                                className="ml-2 text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 text-xs"
+                                className="ml-2 text-neutral-400 hover:text-oxford-700 dark:hover:text-oxford-300 text-xs"
                                 title="Back to citation"
                             >
                                 ↩

@@ -39,79 +39,71 @@ export default function ContactPage() {
                             href="https://calendar.app.google/4SE9NkamgzSWytEXA"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group inline-flex items-center gap-2 px-6 py-3 bg-oxford-800 text-white dark:bg-oxford-100 dark:text-oxford-900 rounded-full font-sans font-medium hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                            className="group inline-flex items-center gap-2 px-6 py-3 bg-oxford-800 text-white dark:bg-oxford-100 dark:text-oxford-900 rounded-full font-sans font-medium hover:bg-oxford-700 dark:hover:bg-oxford-200 transition-colors duration-200"
                         >
                             Schedule a call
-                            <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
+                            <ArrowRight size={16} />
                         </a>
                     </HeroItem>
                 </HeroReveal>
 
                 <ScrollReveal>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+                    <div className="flex items-start justify-center gap-8">
                         <a
                             href="https://x.com/joanvelja"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center p-4 rounded-xl bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700
-                            transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-600
-                            group"
+                            className="group flex flex-col items-center gap-1.5"
                         >
                             <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-sky-500"><path d="M23.953 4.57a10 10 0 0 1-2.825.775 4.958 4.958 0 0 0 2.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 0 0-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 0 0-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 0 1-2.228-.616v.06a4.923 4.923 0 0 0 3.946 4.827 4.996 4.996 0 0 1-2.212.085 4.936 4.936 0 0 0 4.604 3.417 9.867 9.867 0 0 1-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 0 0 7.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0 0 24 4.59z" /></svg>
+                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">X</span>
                         </a>
 
                         <a
                             href="#"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center p-4 rounded-xl bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700
-                            transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-600
-                            group"
+                            className="group flex flex-col items-center gap-1.5"
                         >
                             <svg role="img" viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-violet-500"><path d={GITHUB_ICON_PATH} /></svg>
+                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">GitHub</span>
                         </a>
 
                         <a
                             href="mailto:joan.velja22@gmail.com"
-                            className="flex items-center justify-center p-4 rounded-xl bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700
-                            transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-600
-                            group"
+                            className="group flex flex-col items-center gap-1.5"
                         >
                             <Mail className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-emerald-500" />
+                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">Email</span>
                         </a>
 
                         <a
                             href="https://scholar.google.com/citations?user=9WJ1rYkAAAAJ&hl=en"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center p-4 rounded-xl bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700
-                            transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-600
-                            group"
+                            className="group flex flex-col items-center gap-1.5"
                         >
-                            <GraduationCap className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-blue-500" />
+                            <GraduationCap className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-oxford-500" />
+                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">Scholar</span>
                         </a>
 
                         <a
                             href="https://www.lesswrong.com/users/joanv"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex flex-col items-center justify-center gap-1.5 p-4 rounded-xl bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700
-                            transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-600
-                            group"
+                            className="group flex flex-col items-center gap-1.5"
                         >
                             <LessWrongIcon className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-orange-500" size={28} />
-                            <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">LessWrong</span>
+                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">LessWrong</span>
                         </a>
 
                         <Link
                             href="/pdf/CV_extended_Velja.pdf"
                             target="_blank"
-                            className="flex flex-col items-center justify-center gap-1.5 p-4 rounded-xl bg-white dark:bg-neutral-800 shadow-sm border border-neutral-200 dark:border-neutral-700
-                            transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-600
-                            group"
+                            className="group flex flex-col items-center gap-1.5"
                         >
                             <FileText className="w-7 h-7 text-neutral-700 dark:text-neutral-200 transition-colors duration-300 group-hover:text-red-500" />
-                            <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">CV</span>
+                            <span className="text-[10px] font-sans text-neutral-400 dark:text-neutral-500">CV</span>
                         </Link>
                     </div>
                 </ScrollReveal>

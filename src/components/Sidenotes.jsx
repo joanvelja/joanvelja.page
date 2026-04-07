@@ -52,7 +52,7 @@ export function SidenotesProvider({ children }) {
                                     {content}
                                     <a
                                         href={`#sidenote-ref-${number}`}
-                                        className="ml-2 text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 text-xs"
+                                        className="ml-2 text-neutral-400 hover:text-oxford-700 dark:hover:text-oxford-300 text-xs"
                                         title="Back to text"
                                     >
                                         ↩

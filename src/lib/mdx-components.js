@@ -44,7 +44,7 @@ export const mdxComponents = {
     <blockquote {...props} className="border-l-4 border-neutral-300 dark:border-neutral-700 pl-4 my-6 italic text-neutral-600 dark:text-neutral-400 leading-[1.8] text-[1.05rem] font-serif" />
   ),
   a: (props) => (
-    <a {...props} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer" />
+    <a {...props} className="text-oxford-600 hover:underline" target="_blank" rel="noopener noreferrer" />
   ),
 
   code: (props) => {

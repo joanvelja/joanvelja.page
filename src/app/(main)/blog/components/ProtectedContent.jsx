@@ -42,7 +42,7 @@ export function ProtectedContent({ post }) {
     return (
       <div className="w-full flex justify-center items-center py-12">
         <div className="animate-pulse text-center">
-          <div className="mx-auto w-12 h-12 border-4 border-neutral-300 border-t-blue-500 rounded-full animate-spin mb-4" />
+          <div className="mx-auto w-12 h-12 border-4 border-neutral-300 border-t-oxford-600 rounded-full animate-spin mb-4" />
           <p className="text-neutral-600 dark:text-neutral-400">Decrypting content...</p>
         </div>
       </div>
@@ -55,16 +55,16 @@ export function ProtectedContent({ post }) {
 
   return (
     <div className="protected-content">
-      <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-md">
+      <div className="mb-4 p-3 bg-oxford-50 dark:bg-oxford-900/30 border border-oxford-200 dark:border-oxford-800 rounded-md">
         <div className="flex items-start justify-between">
           <div className="flex items-start">
-            <Lock className="w-5 h-5 text-blue-600 dark:text-blue-500 mt-0.5 mr-2" />
-            <p className="text-sm text-blue-700 dark:text-blue-400">
+            <Lock className="w-5 h-5 text-oxford-700 dark:text-oxford-400 mt-0.5 mr-2" />
+            <p className="text-sm text-oxford-800 dark:text-oxford-300">
               You are viewing protected content. This content will remain accessible during your current session.
             </p>
           </div>
           {readingTime && (
-            <span className="text-sm text-blue-700 dark:text-blue-400 whitespace-nowrap ml-2">
+            <span className="text-sm text-oxford-800 dark:text-oxford-300 whitespace-nowrap ml-2">
               {readingTime} min read
             </span>
           )}

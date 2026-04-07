@@ -120,10 +120,10 @@ export default async function AboutPage() {
                                 href="https://calendar.app.google/4SE9NkamgzSWytEXA"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="group inline-flex items-center gap-2 px-6 py-3 bg-oxford-800 text-white dark:bg-oxford-100 dark:text-oxford-900 rounded-full font-sans font-medium hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] transition-all duration-200"
+                                className="group inline-flex items-center gap-2 px-6 py-3 bg-oxford-800 text-white dark:bg-oxford-100 dark:text-oxford-900 rounded-full font-sans font-medium hover:bg-oxford-700 dark:hover:bg-oxford-200 transition-colors duration-200"
                             >
                                 Schedule a call
-                                <ArrowRight size={16} className="transition-transform duration-200 group-hover:translate-x-1" />
+                                <ArrowRight size={16} />
                             </a>
                         </div>
                     </ScrollReveal>

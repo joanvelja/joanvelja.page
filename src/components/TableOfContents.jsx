@@ -158,7 +158,7 @@ export function TableOfContents() {
                                         block py-1.5 px-2 rounded transition-colors
                                         hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50
                                         ${activeId === heading.id ?
-                                            'text-blue-600/90 dark:text-blue-400/90 font-medium' :
+                                            'text-oxford-700/90 dark:text-oxford-300/90 font-medium' :
                                             'text-neutral-700/90 dark:text-neutral-300/90'}
                                         leading-snug tracking-[0.01em]
                                     `}
@@ -214,7 +214,7 @@ export function TableOfContents() {
                                             block py-1.5 px-1 rounded transition-colors
                                             hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50
                                             ${activeId === heading.id ?
-                                                'text-blue-600/90 dark:text-blue-400/90 font-medium' :
+                                                'text-oxford-700/90 dark:text-oxford-300/90 font-medium' :
                                                 'text-neutral-700/90 dark:text-neutral-300/90'}
                                             leading-snug tracking-[0.01em]
                                         `}

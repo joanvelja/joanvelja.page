@@ -35,7 +35,7 @@ export function ClientContent({ initialPosts, allTags }) {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="w-full pl-10 pr-4 py-3 
-                                 bg-white/80 dark:bg-neutral-800/80 backdrop-blur-sm
+                                 bg-white/80 dark:bg-neutral-800/80
                                  border-b border-neutral-200 dark:border-neutral-700
                                  rounded-md
                                  text-neutral-800 dark:text-neutral-200 

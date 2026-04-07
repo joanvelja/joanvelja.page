@@ -35,8 +35,8 @@ const WorkListItem = ({ name, type, location, period, shortDescription, isSelect
         className={`group flex items-center justify-between p-6 cursor-pointer transition-all duration-300
             border-l-2 rounded-xl mb-3
             ${isSelected
-                ? 'bg-white dark:bg-neutral-800 shadow-md border-l-oxford-700 dark:border-l-oxford-300 border border-neutral-200 dark:border-neutral-700 scale-[1.02]'
-                : 'border-l-transparent border border-transparent hover:bg-white dark:hover:bg-neutral-800 hover:shadow-sm hover:border-neutral-200 dark:hover:border-neutral-700 hover:border-l-oxford-700 dark:hover:border-l-oxford-300 hover:scale-[1.01]'}`}
+                ? 'bg-white dark:bg-neutral-800 shadow-md border-l-oxford-700 dark:border-l-oxford-300 border border-neutral-200 dark:border-neutral-700'
+                : 'border-l-transparent border border-transparent hover:bg-white dark:hover:bg-neutral-800 hover:shadow-sm hover:border-neutral-200 dark:hover:border-neutral-700 hover:border-l-oxford-700 dark:hover:border-l-oxford-300'}`}
     >
         <div className="flex flex-col gap-1">
             <span className={`font-serif text-lg font-medium transition-colors ${isSelected ? 'text-oxford-700 dark:text-oxford-300' : 'text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300'}`}>
@@ -51,7 +51,7 @@ const WorkListItem = ({ name, type, location, period, shortDescription, isSelect
         </div>
         <div className="flex flex-col items-end gap-2">
             <Tag type={type} />
-            <ChevronRight size={18} className={`text-neutral-400 transition-transform duration-300 ${isSelected ? 'rotate-90 text-oxford-500' : 'group-hover:translate-x-1'}`} />
+            <ChevronRight size={18} className={`text-neutral-400 transition-transform duration-300 ${isSelected ? 'rotate-90 text-oxford-500' : ''}`} />
         </div>
     </div>
 );
@@ -68,7 +68,7 @@ const renderRelatedLink = (link) => (
 );
 
 const renderRelatedWork = (work) => (
-    <div key={work.title} className="group bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-5 border border-neutral-100 dark:border-neutral-800 hover:border-oxford-100 dark:hover:border-oxford-900/30 hover:-translate-y-0.5 transition-all duration-300">
+    <div key={work.title} className="group bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-5 border border-neutral-100 dark:border-neutral-800 hover:border-oxford-100 dark:hover:border-oxford-900/30 transition-all duration-300">
         <h4 className="text-neutral-900 dark:text-white font-medium font-serif-display text-lg leading-tight group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
             {work.title}
         </h4>

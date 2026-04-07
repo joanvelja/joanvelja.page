@@ -6,9 +6,8 @@ export function ArticleCard({ post }) {
         <Link
             href={`/blog/${post.slug}`}
             className="group relative overflow-hidden rounded-xl border border-neutral-200/80 dark:border-neutral-800/80
-                      bg-white/90 dark:bg-neutral-900/90 backdrop-blur-sm
-                      transform transition-all duration-300 
-                      hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:hover:shadow-[0_8px_20px_rgba(0,0,0,0.1)]"
+                      bg-white/90 dark:bg-neutral-900/90
+                      transition-colors duration-300"
         >
             <div className="relative aspect-[1.85/1] w-full overflow-hidden">
                 {post.image ? (
@@ -16,7 +15,7 @@ export function ArticleCard({ post }) {
                         src={post.image}
                         alt={post.title}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="object-cover"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                         priority={false}
                     />
@@ -40,7 +39,7 @@ export function ArticleCard({ post }) {
                     ))}
                 </div>
                 
-                <h2 className="text-xl font-medium text-neutral-900 dark:text-white mb-2 line-clamp-2 font-serif tracking-tight leading-snug group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
+                <h2 className="text-xl font-medium text-neutral-900 dark:text-white mb-2 line-clamp-2 font-serif-display tracking-tight leading-snug group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
                     {post.title}
                 </h2>
 
@@ -48,7 +47,7 @@ export function ArticleCard({ post }) {
                     {post.description}
                 </p>
 
-                <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-500 font-serif tracking-wide border-t border-neutral-100 dark:border-neutral-800 pt-3 mt-3">
+                <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400 font-sans tracking-wide border-t border-neutral-100 dark:border-neutral-800 pt-3 mt-3">
                     <span className="uppercase">
                         {new Date(post.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </span>
