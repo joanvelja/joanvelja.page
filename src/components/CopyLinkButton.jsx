@@ -33,7 +33,7 @@ export function CopyLinkButton({ id }) {
             <Link size={14} strokeWidth={2.5} />
             {showCopied && (
                 <span className="absolute left-full ml-2 px-2 py-1 text-xs text-white
-                               bg-neutral-800 dark:bg-neutral-700 rounded shadow-lg whitespace-nowrap">
+                               bg-neutral-800 dark:bg-neutral-700 border border-neutral-700 dark:border-neutral-600 rounded-sm whitespace-nowrap">
                     Copied to clipboard!
                 </span>
             )}

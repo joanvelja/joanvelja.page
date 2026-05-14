@@ -26,14 +26,14 @@ export default async function AboutPage() {
             <section className="w-full px-4 py-12">
                 <HeroReveal className="flex flex-row items-start gap-6 md:gap-10">
                     <HeroItem className="w-[40%] flex-shrink-0">
-                        <div className="rounded-2xl overflow-hidden">
+                        <div className="overflow-hidden border border-neutral-300/70 dark:border-neutral-700/60">
                             <Image
                                 alt="Joan Velja"
                                 src="/pfp/joan.png"
                                 width={302}
                                 height={403}
                                 priority
-                                className="shadow-md object-cover w-full h-auto"
+                                className="object-cover w-full h-auto"
                                 style={{ aspectRatio: '4/5' }}
                             />
                         </div>
@@ -74,7 +74,7 @@ export default async function AboutPage() {
                                         <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 font-serif leading-relaxed line-clamp-3">
                                             {renderTextWithLinks(work.description)}
                                         </p>
-                                        <span className="inline-block mt-3 text-xs font-medium px-2 py-0.5 bg-oxford-50 dark:bg-oxford-900/30 rounded border border-oxford-200 dark:border-oxford-800 text-oxford-700 dark:text-oxford-300 font-sans">
+                                        <span className="inline-block mt-3 text-xs italic text-oxford-700 dark:text-oxford-300 font-serif-display">
                                             {work.publication_venue}
                                         </span>
                                     </div>
@@ -92,7 +92,7 @@ export default async function AboutPage() {
                         <ScrollReveal className="mt-12">
                             <h2 className="text-lg font-medium italic text-oxford-700 dark:text-oxford-300 font-serif-display mb-2">Latest Writing</h2>
                             <hr className="border-oxford-200 dark:border-oxford-800/60 mb-6" />
-                            <Link href={`/blog/${featuredPost.slug}`} className="block group border-l-2 border-l-oxford-600 dark:border-l-oxford-400 pl-5 py-1 hover:border-l-oxford-800 dark:hover:border-l-oxford-200 transition-colors">
+                            <Link href={`/blog/${featuredPost.slug}`} className="block group py-1">
                                 <h3 className="text-xl font-medium font-serif-display text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300 transition-colors">
                                     {featuredPost.title}
                                 </h3>

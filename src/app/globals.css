@@ -357,14 +357,6 @@ body.lightbox-open {
   overflow: hidden;
 }
 
-.photo-grid-item {
-  transition: transform 0.2s ease-out;
-}
-
-.photo-grid-item:hover {
-  transform: scale(1.02);
-}
-
 @media (hover: hover) and (pointer: fine) {
   .lightbox-nav-arrow { opacity: 0; transition: opacity 0.2s; }
   .lightbox-nav-zone:hover .lightbox-nav-arrow { opacity: 1; }

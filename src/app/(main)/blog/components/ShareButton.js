@@ -48,7 +48,7 @@ export function ShareButton({ post }) {
             {showTooltip && (
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1
                               bg-neutral-900 dark:bg-white text-white dark:text-neutral-900
-                              text-sm rounded shadow-lg whitespace-nowrap">
+                              border border-neutral-700 dark:border-neutral-300 text-sm rounded-sm whitespace-nowrap">
                     Link copied!
                 </div>
             )}

@@ -56,7 +56,7 @@ export default function MainLayout({ children }) {
         <div className="min-h-screen bg-white dark:bg-neutral-900 transition-colors duration-300">
             <header
                 ref={headerRef}
-                className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-neutral-900/80 border-b border-neutral-200/50 dark:border-neutral-800/50 transition-[backdrop-filter] duration-200 backdrop-blur-[0px] data-[scrolled=true]:backdrop-blur-[12px]"
+                className="fixed top-0 left-0 right-0 z-50 bg-paper/95 dark:bg-neutral-900/95 border-b border-transparent data-[scrolled=true]:border-neutral-200/60 dark:data-[scrolled=true]:border-neutral-800/60 transition-colors duration-200"
             >
                 <div className="max-w-[1200px] mx-auto px-5 md:px-8">
                     <div className="flex flex-row justify-between w-full md:p-3 p-1">

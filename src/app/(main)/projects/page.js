@@ -32,24 +32,28 @@ const Tag = ({ type }) => {
 const WorkListItem = ({ name, type, location, period, shortDescription, isSelected, onClick }) => (
     <div
         onClick={onClick}
-        className={`group flex items-center justify-between py-4 px-2 cursor-pointer transition-colors duration-200
-            border-l-2
-            ${isSelected
-                ? 'border-l-oxford-700 dark:border-l-oxford-300'
-                : 'border-l-transparent hover:border-l-oxford-400 dark:hover:border-l-oxford-600'}`}
+        className="group flex items-center justify-between py-4 px-2 cursor-pointer transition-colors duration-200"
     >
-        <div className="flex flex-col gap-0.5">
-            <span className={`font-serif-display text-lg font-medium transition-colors ${isSelected ? 'text-oxford-700 dark:text-oxford-300' : 'text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300'}`}>
-                {name}
+        <div className="flex items-baseline gap-3 min-w-0">
+            <span
+                aria-hidden
+                className={`font-serif-display text-base leading-none select-none transition-opacity duration-200 ${isSelected ? 'opacity-100 text-oxford-700 dark:text-oxford-300' : 'opacity-0 group-hover:opacity-50 text-oxford-500 dark:text-oxford-400'}`}
+            >
+                ›
             </span>
-            {shortDescription && (
-                <span className="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-1 font-serif">
-                    {shortDescription}
+            <div className="flex flex-col gap-0.5 min-w-0">
+                <span className={`font-serif-display text-lg font-medium transition-colors ${isSelected ? 'text-oxford-700 dark:text-oxford-300' : 'text-neutral-900 dark:text-white group-hover:text-oxford-700 dark:group-hover:text-oxford-300'}`}>
+                    {name}
                 </span>
-            )}
-            <span className="text-neutral-500 dark:text-neutral-400 text-sm font-sans">{location} &middot; {period}</span>
+                {shortDescription && (
+                    <span className="text-sm text-neutral-500 dark:text-neutral-400 line-clamp-1 font-serif">
+                        {shortDescription}
+                    </span>
+                )}
+                <span className="text-neutral-500 dark:text-neutral-400 text-sm font-sans">{location} &middot; {period}</span>
+            </div>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-end gap-2 flex-shrink-0 ml-3">
             <Tag type={type} />
             <ChevronRight size={16} className={`text-neutral-400 transition-transform duration-200 ${isSelected ? 'rotate-90 text-oxford-500' : ''}`} />
         </div>
