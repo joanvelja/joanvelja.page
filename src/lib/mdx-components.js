@@ -28,8 +28,8 @@ export const mdxComponents = {
   h3: createHeadingComponent('h3', 'text-xl font-bold mt-6 mb-3 text-neutral-900 dark:text-white font-serif'),
   h4: createHeadingComponent('h4', 'text-lg font-bold mt-6 mb-3 text-neutral-900 dark:text-white font-serif'),
 
-  p: (props) => (
-    <p {...props} className={cn(PROSE_BASE, 'mb-6 tracking-[0.01em]')} />
+  p: ({ className, ...props }) => (
+    <p {...props} className={cn(PROSE_BASE, 'mb-6 tracking-[0.01em]', className)} />
   ),
   ul: (props) => (
     <ul {...props} className={cn(PROSE_BASE, 'mb-6 list-disc ml-4 space-y-2')} />

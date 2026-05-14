@@ -267,6 +267,12 @@ pre>code>[data-line][data-highlighted] {
   display: inline;
 }
 
+/* remark-math parses single-line $$x$$ as inline math; rehypeCenterMathParagraphs
+   tags the wrapping <p> so display-style equations sit centered. */
+.math-display-wrap {
+  text-align: center;
+}
+
 /* Display math - centered with scrollable container */
 .math-display,
 .katex-display {
