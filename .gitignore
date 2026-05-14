@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# photo originals (HEIC source files; only optimized JPGs are served)
+*.HEIC
+*.heic
+
+# local scratch
+/tmp/
+/effect/
