@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useState, useContext, useRef, useCallback, useMemo } from 'react';
+import { createContext, useState, useContext, useRef, useCallback, useMemo, useEffect } from 'react';
 import { useHoverTooltip } from '@/hooks/useHoverTooltip';
 
 const CitationContext = createContext();
@@ -9,27 +9,26 @@ export function CitationProvider({ children }) {
     const [citations, setCitations] = useState([]);
     const citationMap = useRef(new Map());
 
-    const addCitation = useCallback((citation) => {
+    const getCitationNumber = useCallback((citation) => {
         const key = citation.key || `${citation.author}-${citation.year}`;
-
         if (citationMap.current.has(key)) {
             return citationMap.current.get(key);
         }
-
         const number = citationMap.current.size + 1;
         citationMap.current.set(key, number);
-
-        setCitations(prev => {
-            if (prev.some(cite => cite.number === number)) {
-                return prev;
-            }
-            return [...prev, { number, ...citation }];
-        });
-
         return number;
     }, []);
 
-    const value = useMemo(() => ({ citations, addCitation }), [citations, addCitation]);
+    const registerCitation = useCallback((entry) => {
+        setCitations(prev =>
+            prev.some(cite => cite.number === entry.number) ? prev : [...prev, entry]
+        );
+    }, []);
+
+    const value = useMemo(
+        () => ({ citations, getCitationNumber, registerCitation }),
+        [citations, getCitationNumber, registerCitation],
+    );
 
     return (
         <CitationContext.Provider value={value}>
@@ -46,14 +45,18 @@ export function Citation({
     venue,
     key,
 }) {
-    const { addCitation } = useContext(CitationContext);
+    const { getCitationNumber, registerCitation } = useContext(CitationContext);
     const { show: showTooltip, handlers } = useHoverTooltip();
     const citationRef = useRef(null);
 
     if (citationRef.current === null) {
-        citationRef.current = addCitation({ author, year, title, url, venue, key });
+        citationRef.current = getCitationNumber({ author, year, title, url, venue, key });
     }
     const citationNumber = citationRef.current;
+
+    useEffect(() => {
+        registerCitation({ number: citationNumber, author, year, title, url, venue, key });
+    }, [registerCitation, citationNumber, author, year, title, url, venue, key]);
 
     return (
         <span
