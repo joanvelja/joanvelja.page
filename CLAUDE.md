@@ -73,6 +73,7 @@ Only take an action after all the above reasoning is completed. Once you've take
 ## Tooling & Workflow
 
 - Use **bun** for everything.
+- **Pinned to Bun 1.3.14** (`.bun-version`) — the last Zig release before the 1.3.15 Rust rewrite. Do **not** run `bun upgrade` or `bun upgrade --stable`; both pull the Rust line. Reinstall with `curl -fsSL https://bun.sh/install | bash -s "bun-v1.3.14"`. Vercel is pinned via `bunx bun@1.3.14` in `vercel.json`.
 - Env & deps:
   - Add deps: `bun add <pkg>` (save to `dependencies`) or `bun add -d <pkg>` (for `devDependencies`).
   - Run: `bun run <script>` (e.g., `bun dev`, `bun test`).
