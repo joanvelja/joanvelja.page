@@ -59,6 +59,13 @@ export function LightboxOverlay() {
 function LightboxOverlayBody({ photo, photos, currentIndex, closeLightbox, navigate }) {
   const { getElement } = useThumbnailRegistryContext();
   const [settled, setSettled] = useState(false);
+  const metadataItems = [
+    formatDate(photo.date),
+    photo.width && photo.height ? `${photo.width} x ${photo.height}` : null,
+    photo.exif?.camera,
+    photo.exif?.aperture,
+    photo.exif?.iso ? `ISO ${photo.exif.iso}` : null,
+  ].filter(Boolean);
 
   const handleClose = useCallback(async () => {
     const el = getElement(`photo-${photo.id}`);
@@ -165,36 +172,15 @@ function LightboxOverlayBody({ photo, photos, currentIndex, closeLightbox, navig
             {photo.title}
           </h2>
           <div
-            className="hidden items-center justify-center gap-2 text-xs text-white/60 font-sans md:flex"
+            className="mx-auto flex max-w-[min(92vw,42rem)] flex-wrap items-center justify-center
+                       gap-x-2 gap-y-1 text-[11px] text-white/65 font-sans md:text-xs"
             style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.5)' }}
           >
-            <span>{formatDate(photo.date)}</span>
-            {photo.width && photo.height && (
-              <>
-                <span>·</span>
-                <span>
-                  {photo.width} × {photo.height}
-                </span>
-              </>
-            )}
-            {photo.exif?.camera && (
-              <>
-                <span>·</span>
-                <span>{photo.exif.camera}</span>
-              </>
-            )}
-            {photo.exif?.aperture && (
-              <>
-                <span>·</span>
-                <span>{photo.exif.aperture}</span>
-              </>
-            )}
-            {photo.exif?.iso && (
-              <>
-                <span>·</span>
-                <span>ISO {photo.exif.iso}</span>
-              </>
-            )}
+            {metadataItems.map((item) => (
+              <span key={item} className="whitespace-nowrap rounded-full bg-black/25 px-2 py-0.5 backdrop-blur-sm">
+                {item}
+              </span>
+            ))}
           </div>
         </m.div>
       </m.div>
