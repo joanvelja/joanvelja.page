@@ -4,10 +4,16 @@ const path = require('path');
 const probe = require('probe-image-size');
 
 const PHOTOS_DIR = path.join(process.cwd(), 'public', 'images', 'photos');
+const GENERATED_DIR = path.join(PHOTOS_DIR, 'generated');
+const PUBLIC_GENERATED_DIR = '/images/photos/generated';
 const OUTPUT_PATH = path.join(process.cwd(), 'src', 'data', 'photo-manifest.json');
 const IMAGE_PATTERN = /\.(jpg|jpeg|png|webp)$/i;
 const HEIC_PATTERN = /\.heic$/i;
 const MONTHS = { Jan:0, Feb:1, Mar:2, Apr:3, May:4, Jun:5, Jul:6, Aug:7, Sep:8, Oct:9, Nov:10, Dec:11 };
+const VARIANTS = {
+    grid: { width: 900, quality: 78 },
+    full: { width: 1920, quality: 82 },
+};
 
 function parsePhotoInfo(filename) {
     const nameWithoutExt = path.basename(filename, path.extname(filename));
@@ -66,20 +72,50 @@ async function loadSharp() {
     }
 }
 
-async function generateThumbhash(filePath, sharp) {
+async function generateBlurDataURL(filePath, sharp) {
     if (!sharp) return null;
 
-    const { rgbaToThumbHash, thumbHashToDataURL } = await import('thumbhash');
-    const { data, info } = await sharp(filePath)
-        .resize(100, 100, { fit: 'inside' })
-        .ensureAlpha()
-        .raw()
-        .toBuffer({ resolveWithObject: true });
+    const buffer = await sharp(filePath)
+        .rotate()
+        .resize({ width: 12, withoutEnlargement: true })
+        .jpeg({ quality: 35, mozjpeg: true })
+        .toBuffer();
 
-    const hash = rgbaToThumbHash(info.width, info.height, data);
-    const base64 = Buffer.from(hash).toString('base64');
-    const dataURL = thumbHashToDataURL(hash);
-    return { base64, dataURL };
+    return `data:image/jpeg;base64,${buffer.toString('base64')}`;
+}
+
+async function ensureVariant(filePath, id, variant, options, sharp) {
+    if (!sharp) return null;
+
+    await fsp.mkdir(GENERATED_DIR, { recursive: true });
+
+    const filename = `${id}-${variant}.webp`;
+    const outputPath = path.join(GENERATED_DIR, filename);
+    const sourceStat = await fsp.stat(filePath);
+    const outputStat = await fsp.stat(outputPath).catch(() => null);
+
+    if (!outputStat || outputStat.mtimeMs < sourceStat.mtimeMs) {
+        await sharp(filePath)
+            .rotate()
+            .resize({ width: options.width, withoutEnlargement: true })
+            .webp({ quality: options.quality })
+            .toFile(outputPath);
+    }
+
+    return `${PUBLIC_GENERATED_DIR}/${filename}`;
+}
+
+async function generateVariants(filePath, id, sharp) {
+    if (!sharp) return null;
+
+    const entries = await Promise.all(
+        Object.entries(VARIANTS).map(async ([variant, options]) => [
+            `${variant}Src`,
+            await ensureVariant(filePath, id, variant, options, sharp),
+        ])
+    );
+
+    return Object.fromEntries(entries);
 }
 
 async function processImage(file, sharp, exifr) {
@@ -99,20 +135,17 @@ async function processImage(file, sharp, exifr) {
     const width = needsSwap ? dimensions.height : dimensions.width;
     const height = needsSwap ? dimensions.width : dimensions.height;
 
-    let thumbhash = null;
     let blurDataURL = null;
-    try {
-        const result = await generateThumbhash(filePath, sharp);
-        if (result) {
-            thumbhash = result.base64;
-            blurDataURL = result.dataURL;
-        }
-    } catch (err) {
-        console.warn(`  Warning: thumbhash generation failed for ${file}: ${err.message}`);
-    }
-
+    let variants = null;
     const { title, date } = parsePhotoInfo(file);
     const id = slugify(file);
+
+    try {
+        blurDataURL = await generateBlurDataURL(filePath, sharp);
+        variants = await generateVariants(filePath, id, sharp);
+    } catch (err) {
+        console.warn(`  Warning: derivative generation failed for ${file}: ${err.message}`);
+    }
 
     const publicPath = `/images/photos/${file}`;
 
@@ -127,7 +160,8 @@ async function processImage(file, sharp, exifr) {
     return {
         id,
         src: publicPath,
-        thumbhash,
+        gridSrc: variants?.gridSrc || publicPath,
+        fullSrc: variants?.fullSrc || publicPath,
         blurDataURL,
         title,
         date: date ? date.toISOString() : null,
@@ -156,6 +190,14 @@ async function convertHeicFiles() {
         const jpgPath = path.join(PHOTOS_DIR, `${baseName}.jpg`);
 
         try {
+            const [heicStat, jpgStat] = await Promise.all([
+                fsp.stat(heicPath),
+                fsp.stat(jpgPath).catch(() => null),
+            ]);
+            if (jpgStat && jpgStat.mtimeMs >= heicStat.mtimeMs) {
+                return;
+            }
+
             await execFileAsync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '92', heicPath, '--out', jpgPath]);
             console.log(`  ${heicFile} → ${baseName}.jpg`);
         } catch (err) {

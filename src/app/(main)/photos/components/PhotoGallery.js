@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useCallback, useRef, useState, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
-import { m } from 'framer-motion';
 import { LightboxProvider, useLightbox, useThumbnailRegistryContext } from '@/components/Lightbox/LightboxProvider';
 import { useImageLazyLoad } from '@/hooks/useImageLazyLoad';
 
@@ -25,26 +24,37 @@ function distributeToColumns(photos, numCols) {
 }
 
 function useColumnCount() {
-  const [cols, setCols] = useState(3);
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const mql = window.matchMedia('(min-width: 768px)');
+      mql.addEventListener('change', onStoreChange);
+      return () => mql.removeEventListener('change', onStoreChange);
+    },
+    () => window.matchMedia('(min-width: 768px)').matches ? 3 : 2,
+    () => 3
+  );
+}
+
+function useImageReadyFallback(isAboveFold, onLoad) {
   useEffect(() => {
-    const mql = window.matchMedia('(min-width: 768px)');
-    const update = (e) => setCols(e.matches ? 3 : 2);
-    setCols(mql.matches ? 3 : 2);
-    mql.addEventListener('change', update);
-    return () => mql.removeEventListener('change', update);
-  }, []);
-  return cols;
+    if (!isAboveFold) return;
+    const timeout = window.setTimeout(onLoad, 1800);
+    return () => window.clearTimeout(timeout);
+  }, [isAboveFold, onLoad]);
 }
 
 const ABOVE_FOLD_COUNT = 6;
 
-function PhotoGridItem({ photo, index, openLightbox }) {
+const PhotoGridItem = memo(function PhotoGridItem({ photo, index, openLightbox }) {
   const { register } = useThumbnailRegistryContext();
   const isAboveFold = index < ABOVE_FOLD_COUNT;
-  const { ref: lazyRef, isVisible, hasLoaded, onLoad } = useImageLazyLoad();
+  const { ref: lazyRef, isVisible, hasLoaded, onLoad } = useImageLazyLoad({
+    rootMargin: '500px 0px',
+  });
   const elementRef = useRef(null);
 
   const [width, height] = (photo.aspectRatio || '1/1').split('/').map(Number);
+  const imageSrc = photo.gridSrc || photo.src;
 
   const setRef = useCallback((el) => {
     elementRef.current = el;
@@ -61,41 +71,36 @@ function PhotoGridItem({ photo, index, openLightbox }) {
   }, [index, openLightbox]);
 
   const shouldRender = isAboveFold || isVisible;
+  useImageReadyFallback(isAboveFold, onLoad);
 
   return (
-    <m.div
+    <button
       ref={setRef}
-      layoutId={`photo-${photo.id}`}
+      type="button"
       onClick={handleClick}
-      className="photo-grid-item relative cursor-pointer group"
-      style={{ aspectRatio: `${width}/${height}`, borderRadius: 16 }}
+      className="photo-grid-item group relative block w-full cursor-pointer overflow-hidden rounded-2xl bg-neutral-100 text-left shadow-sm transition-transform duration-300 ease-out hover:scale-[1.01] focus:outline-none focus-visible:ring-2 focus-visible:ring-oxford-500 dark:bg-neutral-800"
+      style={{ aspectRatio: `${width}/${height}` }}
     >
-      {photo.blurDataURL && !hasLoaded && (
-        <img
-          src={photo.blurDataURL}
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover rounded-2xl"
-          aria-hidden="true"
-        />
-      )}
-
       {shouldRender && (
         <Image
-          src={photo.src}
+          src={imageSrc}
           alt={photo.alt}
           fill
-          priority={isAboveFold}
-          className={`absolute inset-0 object-cover rounded-2xl transition-opacity duration-500 ${
-            hasLoaded ? 'opacity-100' : 'opacity-0'
+          unoptimized
+          loading={index === 0 ? 'eager' : 'lazy'}
+          fetchPriority={index === 0 ? 'high' : 'auto'}
+          placeholder={photo.blurDataURL ? 'blur' : 'empty'}
+          blurDataURL={photo.blurDataURL || undefined}
+          className={`absolute inset-0 object-cover transition duration-500 ease-out group-hover:scale-[1.02] ${
+            hasLoaded ? 'opacity-100 blur-0' : 'opacity-0 blur-sm'
           }`}
-          sizes="(max-width: 768px) 50vw, min(400px, 33vw)"
+          sizes="(max-width: 767px) calc((100vw - 56px) / 2), (max-width: 1279px) calc((100vw - 112px) / 3), 368px"
           onLoad={onLoad}
         />
       )}
-
-    </m.div>
+    </button>
   );
-}
+});
 
 function PhotoGrid({ photos }) {
   const { setPhotos, openLightbox } = useLightbox();

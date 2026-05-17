@@ -52,6 +52,6 @@ export function decryptContent(encryptedContent, password, salt, iv, authTag) {
     decrypted += decipher.final('utf8');
     return decrypted;
   } catch (error) {
-    throw new Error('Decryption failed: Invalid password or corrupted data');
+    throw new Error('Decryption failed: Invalid password or corrupted data', { cause: error });
   }
 } 

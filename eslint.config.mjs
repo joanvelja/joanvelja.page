@@ -67,7 +67,7 @@ export default [
   {
     files: ["scripts/**/*.js"],
     languageOptions: {
-      sourceType: "script",
+      sourceType: "module",
       globals: {
         require: "readonly",
         module: "readonly",

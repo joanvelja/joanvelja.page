@@ -130,10 +130,12 @@ function LightboxOverlayBody({ photo, photos, currentIndex, closeLightbox, navig
         </div>
 
         <m.div
-          layoutId={`photo-${photo.id}`}
           className="relative z-10 w-[90vw] h-[85vh] md:w-[85vw] md:h-[85vh] max-w-6xl"
           style={{ borderRadius: 16 }}
-          transition={{ layout: SPRING_MORPH }}
+          initial={{ opacity: 0, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.985 }}
+          transition={SPRING_MORPH}
         >
           <LightboxImageSlot key={photo.id} photo={photo} onDismiss={handleClose} />
         </m.div>
@@ -163,7 +165,7 @@ function LightboxOverlayBody({ photo, photos, currentIndex, closeLightbox, navig
             {photo.title}
           </h2>
           <div
-            className="flex items-center justify-center gap-2 text-xs text-white/60 font-sans"
+            className="hidden items-center justify-center gap-2 text-xs text-white/60 font-sans md:flex"
             style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.5)' }}
           >
             <span>{formatDate(photo.date)}</span>

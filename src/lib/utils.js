@@ -46,8 +46,12 @@ export function slugify(text) {
         .replace(/(^-|-$)/g, '');
 }
 
-export function getOptimizedSrc(src) {
-  return `/_next/image?url=${encodeURIComponent(src)}&w=1920&q=75`;
+export function getDisplaySrc(photoOrSrc) {
+  if (typeof photoOrSrc === 'object' && photoOrSrc) {
+    return photoOrSrc.fullSrc || photoOrSrc.src;
+  }
+
+  return `/_next/image?url=${encodeURIComponent(photoOrSrc)}&w=1920&q=75`;
 }
 
 export function renderTextWithLinks(text) {

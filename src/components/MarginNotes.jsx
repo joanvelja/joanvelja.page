@@ -99,11 +99,13 @@ export function MarginNotesProvider({ children }) {
             mutationObserver.observe(contentRef.current, { childList: true, subtree: true });
         }
 
+        const visibleNotes = visibleNotesRef.current;
+
         return () => {
             observerRef.current?.disconnect();
             mutationObserver?.disconnect();
             clearTimeout(updateTimeout.current);
-            visibleNotesRef.current.clear();
+            visibleNotes.clear();
         };
     }, []);
 

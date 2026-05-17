@@ -205,7 +205,7 @@ function TurnBlock({ turn, showAnnotations, isCriticT5, defaultOpen, annotation 
 
 export function TranscriptCard({
   transcript, judgeDecision, judgeResponse, correct, reward,
-  iteration, iterLabel, showAnnotations, annotations,
+  iteration: _iteration, iterLabel, showAnnotations, annotations,
 }) {
   const [showJudge, setShowJudge] = useState(false);
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useEffect } from 'react';
-import { getOptimizedSrc } from '@/lib/utils';
+import { getDisplaySrc } from '@/lib/utils';
 
 export function usePreloadImages(photos, currentIndex, isOpen) {
   const preloadedRef = useRef(new Set());
@@ -14,14 +14,14 @@ export function usePreloadImages(photos, currentIndex, isOpen) {
       .filter(i => i >= 0 && i < photos.length);
 
     indices.forEach(i => {
-      const src = photos[i].src;
+      const src = getDisplaySrc(photos[i]);
       if (preloadedRef.current.has(src)) return;
       preloadedRef.current.add(src);
 
       const link = document.createElement('link');
       link.rel = 'preload';
       link.as = 'image';
-      link.href = getOptimizedSrc(src);
+      link.href = src;
       document.head.appendChild(link);
       linksRef.current.push(link);
     });

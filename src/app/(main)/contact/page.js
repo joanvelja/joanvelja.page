@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, GraduationCap, FileText, ArrowRight } from 'lucide-react';
 import { HeroReveal, HeroItem } from '@/components/HeroReveal';
 import { ScrollReveal } from '@/components/ScrollReveal';
@@ -23,7 +24,7 @@ const GitHubIcon = (props) => (
 );
 
 const LessWrongIcon = ({ className = "", size = 24 }) => (
-    <img
+    <Image
       src="/png/Lesswrong.png"
       alt="LessWrong"
       width={size}
@@ -68,16 +69,16 @@ export default function ContactPage() {
                 </HeroReveal>
 
                 <ScrollReveal>
-                    <div className="flex items-start justify-center gap-10">
+                    <div className="grid w-full grid-cols-3 justify-items-center gap-x-4 gap-y-8 sm:flex sm:items-start sm:justify-center sm:gap-10">
                         {SOCIAL_LINKS.map(({ label, href, icon: Icon, hoverColor, iconProps, internal }) => {
                             const Wrapper = internal ? Link : 'a';
                             const linkProps = internal
                                 ? { href }
                                 : { href, target: '_blank', rel: 'noopener noreferrer' };
                             return (
-                                <Wrapper key={label} {...linkProps} className="group flex flex-col items-center gap-1.5">
+                                <Wrapper key={label} {...linkProps} className="group flex w-20 flex-col items-center gap-1.5 sm:w-auto">
                                     <Icon className={`${ICON_CLASS} ${hoverColor}`} {...iconProps} />
-                                    <span className="text-xs font-sans text-neutral-400 dark:text-neutral-500">{label}</span>
+                                    <span className="text-center text-xs font-sans text-neutral-400 dark:text-neutral-500">{label}</span>
                                 </Wrapper>
                             );
                         })}

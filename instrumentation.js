@@ -1,7 +1,7 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs' && process.env.NODE_ENV === 'production') {
-    const { getHighlighter } = await import('shiki');
-    await getHighlighter({
+    const { createHighlighter } = await import('shiki');
+    await createHighlighter({
       themes: ['one-dark-pro'],
       langs: [
         'javascript',

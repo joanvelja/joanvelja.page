@@ -12,7 +12,7 @@ const DECISION_RING = {
   draw: 'ring-neutral-500/50',
 };
 
-export function IterationSlider({ iterations, labels, currentIdx, onChange, timeline }) {
+export function IterationSlider({ iterations: _iterations, labels: _labels, currentIdx, onChange, timeline }) {
   return (
     <div className="my-6">
       <div className="relative px-4">

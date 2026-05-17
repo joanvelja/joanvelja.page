@@ -3,7 +3,7 @@
 import { useRef, useCallback, useEffect } from 'react';
 import { m, useMotionValue, useSpring } from 'framer-motion';
 import { useGesture } from '@use-gesture/react';
-import { getOptimizedSrc } from '@/lib/utils';
+import { getDisplaySrc } from '@/lib/utils';
 
 const SPRINGS = {
   morph: { stiffness: 130, damping: 19, mass: 1 },
@@ -165,7 +165,7 @@ export function LightboxImage({ photo, onDismiss, onImageError }) {
       onClick={handleTap}
     >
       <m.img
-        src={getOptimizedSrc(photo.src)}
+        src={getDisplaySrc(photo)}
         alt={photo.alt || photo.title}
         className="max-w-full max-h-full object-contain select-none"
         style={{ scale, x, y }}
